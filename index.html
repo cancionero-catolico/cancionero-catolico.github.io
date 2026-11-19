@@ -1,0 +1,1904 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1e4a36">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Cancionero">
+<meta name="description" content="Cancionero Católico: cantos para misas y retiros, con cambio de tono y acordes.">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
+</head><body>
+<title>Cancionero Católico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,500;0,700;0,800;1,500&family=Alegreya+Sans:wght@400;500;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Cancionero Católico 3.0
+   One idea carries the identity: the app wears the color of the liturgical time (verde, morado, blanco y oro, rojo).
+   Everything else stays quiet: neutral paper, book typography (Alegreya), red chords like a printed songbook. */
+:root{
+  --bg:#f4f4f1; --surface:#ffffff; --sunk:#ecece8; --ink:#1d1f24; --muted:#5f636c; --line:#dfe0dc;
+  --chord:#c8102e; --chord-text:#c8102e; --hit:#ffe7a3; --gold:#b48a2c; --danger:#b42318; --paper:#ffffff;
+  --lit:#2e6b4e; --lit-deep:#1e4a36; --lit-soft:#e1ede5; --lit-on:#ffffff; --soft-ink:var(--lit-deep); --hero:var(--lit);
+  --f-display:"Alegreya",Georgia,"Times New Roman",serif;
+  --f-body:"Alegreya Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --navh:64px;
+}
+:root[data-lit="morado"]{--lit:#5e3f8f;--lit-deep:#3f2963;--lit-soft:#ebe4f4}
+:root[data-lit="blanco"]{--lit:#94701d;--lit-deep:#6b5012;--lit-soft:#f4ecd8}
+:root[data-lit="rojo"]{--lit:#a12b2b;--lit-deep:#731c1c;--lit-soft:#f6e1df}
+:root[data-lit="rosa"]{--lit:#b0507a;--lit-deep:#7f3355;--lit-soft:#f8e3ec}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#131417; --surface:#1c1d21; --sunk:#25272c; --ink:#eceef1; --muted:#a3a7af; --line:#2e3036;
+  --chord-text:#ff8d9b; --hit:#6b5512; --gold:#e1bb63; --danger:#ff8a80; --paper:#f6f6f2; color-scheme:dark;
+  --lit:#7fbf9d; --lit-deep:#2b5a43; --lit-soft:#1d2c25; --lit-on:#0f1a14; --soft-ink:var(--lit); --hero:var(--lit-deep);}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"])[data-lit="morado"]{--lit:#b59ae0;--lit-deep:#4a3474;--lit-soft:#262033;--lit-on:#170f24}
+  :root:not([data-theme="light"])[data-lit="blanco"]{--lit:#e1bb63;--lit-deep:#6b5012;--lit-soft:#2b2618;--lit-on:#1c1606}
+  :root:not([data-theme="light"])[data-lit="rojo"]{--lit:#f08a84;--lit-deep:#7a2222;--lit-soft:#311d1c;--lit-on:#250b0b}
+  :root:not([data-theme="light"])[data-lit="rosa"]{--lit:#f0a2c4;--lit-deep:#7f3355;--lit-soft:#33202a;--lit-on:#2a0c19}}
+:root[data-theme="dark"]{
+  --bg:#131417; --surface:#1c1d21; --sunk:#25272c; --ink:#eceef1; --muted:#a3a7af; --line:#2e3036;
+  --chord-text:#ff8d9b; --hit:#6b5512; --gold:#e1bb63; --danger:#ff8a80; --paper:#f6f6f2; color-scheme:dark;
+  --lit:#7fbf9d; --lit-deep:#2b5a43; --lit-soft:#1d2c25; --lit-on:#0f1a14; --soft-ink:var(--lit); --hero:var(--lit-deep);}
+:root[data-theme="dark"][data-lit="morado"]{--lit:#b59ae0;--lit-deep:#4a3474;--lit-soft:#262033;--lit-on:#170f24}
+:root[data-theme="dark"][data-lit="blanco"]{--lit:#e1bb63;--lit-deep:#6b5012;--lit-soft:#2b2618;--lit-on:#1c1606}
+:root[data-theme="dark"][data-lit="rojo"]{--lit:#f08a84;--lit-deep:#7a2222;--lit-soft:#311d1c;--lit-on:#250b0b}
+:root[data-theme="dark"][data-lit="rosa"]{--lit:#f0a2c4;--lit-deep:#7f3355;--lit-soft:#33202a;--lit-on:#2a0c19}
+
+*{box-sizing:border-box}
+html,body{overflow-x:hidden}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.45;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:inherit}
+button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--lit);outline-offset:2px}
+[hidden]{display:none!important}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3,h4{font-family:var(--f-display);font-weight:800;letter-spacing:-.005em;margin:0;line-height:1.1;text-wrap:balance}
+.note{font-size:15px;color:var(--muted);margin:0}
+.note a{color:var(--lit);font-weight:700}
+
+/* ---------- top bar of the main screens ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:10px;min-height:56px}
+.top h1{font-size:23px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.round{flex:none;width:40px;height:40px;border-radius:50%;border:0;background:var(--sunk);display:grid;place-items:center}
+.round.lit{background:var(--lit);color:var(--lit-on)}
+.searchbar{padding-block:0 10px}
+.search{display:flex;align-items:center;gap:8px;background:var(--sunk);border:1.5px solid transparent;border-radius:14px;padding:0 12px;flex:1;min-width:0}
+.search:focus-within{border-color:var(--lit);background:var(--surface)}
+.search svg{flex:none;opacity:.6}
+.search input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:17.5px;color:var(--ink);padding:11px 0;outline:none}
+.srow{display:flex;gap:8px;align-items:stretch}
+.fbtn{flex:none;display:flex;align-items:center;gap:6px;border:0;background:var(--sunk);border-radius:14px;padding:0 13px;font-weight:700;font-size:15.5px}
+.fbtn[aria-pressed="true"]{background:var(--lit);color:var(--lit-on)}
+.seg-ctl{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:10px}
+.seg-ctl::-webkit-scrollbar{display:none}
+.seg-ctl button{flex:none;border:0;background:none;border-radius:999px;padding:6px 13px;font-size:15.5px;font-weight:700;color:var(--muted)}
+.seg-ctl button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+
+/* ---------- bottom navigation ---------- */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav .wrap{display:grid;grid-template-columns:repeat(5,1fr);height:var(--navh);padding-inline:4px}
+.nav button{border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12.5px;font-weight:700;color:var(--muted);position:relative}
+.nav button svg{width:24px;height:24px}
+.nav button[aria-current="page"]{color:var(--lit)}
+.nav button[aria-current="page"]::before{content:"";position:absolute;top:0;left:28%;right:28%;height:3px;border-radius:0 0 3px 3px;background:var(--lit)}
+.nav .badge{position:absolute;top:7px;left:calc(50% + 6px);min-width:18px;height:18px;border-radius:9px;background:var(--lit);color:var(--lit-on);font-size:11.5px;line-height:18px;padding:0 5px}
+main{padding-bottom:calc(var(--navh) + 28px + env(safe-area-inset-bottom,0px))}
+
+/* ---------- HOY ---------- */
+.hero{background:var(--hero);color:#fff;position:relative;overflow:hidden}
+.hero .wrap{padding-block:20px 22px;position:relative;padding-right:66px}
+.hero .stole{position:absolute;top:0;bottom:0;right:max(18px,calc(50% - 338px));width:28px;border-left:3px solid var(--gold);border-right:3px solid var(--gold);opacity:.55}
+.hero .stole::after{content:"";position:absolute;left:50%;top:26px;width:16px;height:16px;transform:translateX(-50%);
+  background:linear-gradient(var(--gold),var(--gold)) center/3px 100% no-repeat,linear-gradient(var(--gold),var(--gold)) center/100% 3px no-repeat}
+.hero .when{font-size:16px;margin:0 0 6px;opacity:.9}
+.hero h2{font-size:34px;line-height:1.02;margin-right:0}
+.hero .cy{margin:8px 0 0;font-size:16px;opacity:.9}
+.hero .also{margin:12px 0 0;font-size:15px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.14)}
+.hero .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.pill{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:10px 16px;font-weight:800;font-size:16px;text-decoration:none}
+.pill.on-lit{background:#fff;color:var(--lit-deep)}
+.pill.ghost{background:transparent;color:inherit;box-shadow:inset 0 0 0 2px currentColor}
+.sec{margin-top:26px}
+.sec>h3{font-size:22px;display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.sec>h3 a,.sec>h3 button{font-family:var(--f-body);font-size:15px;font-weight:700;color:var(--lit);text-decoration:none;border:0;background:none;padding:0}
+.sec>.note{margin-top:4px}
+/* order of the mass: a real sequence, drawn as a path */
+.ordo{list-style:none;margin:12px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.ordo a{display:flex;align-items:baseline;justify-content:space-between;gap:8px;text-decoration:none;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 12px;font-weight:700}
+.ordo a small{font-weight:500;color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
+.ordo a:active{background:var(--lit-soft)}
+.ordo .part{grid-column:1/-1;font-family:var(--f-display);font-style:italic;font-weight:500;color:var(--muted);font-size:16px;margin:8px 0 0}
+.ordo .part:first-child{margin-top:0}
+.occ{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.occ a{text-decoration:none;border-radius:999px;padding:7px 14px;background:var(--surface);border:1px solid var(--line);font-size:15.5px;font-weight:600}
+.shelf{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;margin:12px -16px 0;padding:0 16px 4px}
+.shelf::-webkit-scrollbar{display:none}
+.shelf a{flex:none;width:160px;text-decoration:none;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:4px;align-content:start}
+.shelf a b{font-weight:800;font-size:16px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.shelf a span{font-size:14px;color:var(--muted)}
+.shelf a.k b{font-family:var(--f-display)}
+
+.news{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--gold);border-radius:12px;padding:16px}
+.news ul{margin:10px 0 12px;padding-left:20px;display:grid;gap:6px;font-size:16px}
+/* ---------- song lists ---------- */
+.group-h{font-family:var(--f-display);font-weight:800;font-size:21px;margin:22px 0 4px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.group-h small{font-family:var(--f-body);font-weight:500;font-size:14.5px;color:var(--muted)}
+ul.res{list-style:none;margin:0;padding:0}
+ul.res li{border-bottom:1px solid var(--line)}
+.r{display:grid;grid-template-columns:1fr auto;gap:1px 12px;width:100%;text-align:left;background:none;border:0;padding:12px 2px;color:inherit;text-decoration:none}
+.r .t{font-weight:700;font-size:17px;min-width:0;line-height:1.25}
+.r .k{grid-row:1/3;grid-column:2;align-self:center;font-family:var(--f-display);font-weight:800;color:var(--lit);font-size:18px;min-width:28px;text-align:right}
+.r .sn{grid-column:1;color:var(--muted);font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.r mark{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px}
+.src{display:inline-block;font-size:12.5px;font-weight:700;color:var(--muted);background:var(--sunk);border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:2px;white-space:nowrap}
+.src.gpd{background:var(--lit-soft);color:var(--soft-ink)}
+.src.ev{background:#f3ead9;color:#7a5418}
+.evbox{margin:0 0 12px;padding:12px 14px;border-radius:12px;background:#f8f1e4;color:#4a3a1e;border-left:4px solid #c9963f}
+.evbox b{display:block;margin-bottom:4px}
+.evbox p{margin:0;font-size:15px;line-height:1.45}
+.evbox .evo{margin-top:6px;font-size:13.5px;opacity:.85}
+.evbox .evo b{display:inline;margin:0}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .evbox{background:#33291a;color:#efe2c8} :root:not([data-theme=light]) .src.ev{background:#3a2e1c;color:#e6c88f}}
+:root[data-theme=dark] .evbox{background:#33291a;color:#efe2c8}
+:root[data-theme=dark] .src.ev{background:#3a2e1c;color:#e6c88f}
+.r .k.ico{font-family:var(--f-body);font-size:13px;color:var(--muted)}
+.empty{color:var(--muted);padding:26px 0;font-size:16.5px}
+.more{margin:12px 0 0;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 16px;font-size:15.5px;font-weight:700}
+.actf{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:14px 0 0}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 13px;font-size:15px}
+.chip[aria-pressed="true"]{background:var(--lit);color:var(--lit-on);border-color:var(--lit)}
+.actf .chip{display:flex;align-items:center;gap:6px;font-weight:700}
+.clearf{border:0;background:none;color:var(--lit);font-weight:800;font-size:15px;padding:5px 4px;flex:none}
+footer.foot{color:var(--muted);font-size:14.5px;padding-block:24px 10px}
+
+/* ---------- sheets (full-screen views) ---------- */
+.sheet{position:fixed;inset:0;z-index:40;background:var(--bg);display:flex;flex-direction:column}
+.vbar{background:var(--surface);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+.vbar .wrap{display:flex;align-items:center;gap:4px;padding-block:6px}
+.iconbtn{border:0;background:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;flex:none}
+.iconbtn:active{background:var(--sunk)}
+.iconbtn[aria-pressed="true"]{color:var(--lit)}
+.vtitle{flex:1;min-width:0}
+.vtitle h2{font-size:21px;line-height:1.1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.scroller{flex:1;overflow:auto;-webkit-overflow-scrolling:touch}
+/* song toolbar at the bottom, within thumb reach */
+.dock{background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.dock .wrap{display:flex;align-items:center;justify-content:space-between;gap:6px;padding-block:7px}
+.dgrp{display:flex;align-items:center;gap:2px;background:var(--sunk);border-radius:14px;padding:3px}
+.dgrp button{border:0;background:none;width:40px;height:40px;border-radius:11px;font-weight:800;font-size:20px;display:grid;place-items:center}
+.dgrp button:active{background:var(--surface)}
+.dgrp button:disabled{opacity:.35}
+.keysel{min-width:58px;text-align:center;line-height:1}
+.keysel b{font-family:var(--f-display);font-size:22px;font-weight:800}
+.keysel small{display:block;font-size:11.5px;color:var(--muted);margin-top:1px;white-space:nowrap}
+.keysel.changed b{color:var(--chord-text)}
+#zout{font-size:14px;font-family:var(--f-display)}#zin{font-size:22px;font-family:var(--f-display)}
+.play[aria-pressed="true"]{background:var(--lit)!important;color:var(--lit-on)}
+.speed{display:flex;align-items:center;gap:10px;padding:0 0 8px}
+.speed input{flex:1;accent-color:var(--lit)}
+.speed span{font-size:14px;color:var(--muted);min-width:76px}
+.infoline{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;padding-block:12px 0}
+.infoline .capo{font-size:14.5px;color:var(--muted);margin:0}
+.toolbtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 13px;font-size:15px;font-weight:700}
+.segs{padding-block:12px 16px;display:grid;gap:0;min-width:100%}
+.segwrap{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
+#scroller{touch-action:pan-x pan-y}
+.seg{position:relative;overflow:hidden;background:var(--paper);max-width:100%}
+.seg:first-child{border-radius:10px 10px 0 0}.seg:last-child{border-radius:0 0 10px 10px}
+.seg:only-child{border-radius:10px}
+.seg+.seg{border-top:1px dashed #ccd}
+.seg img{display:block;max-width:none}
+.seg .load{position:absolute;inset:0;display:grid;place-items:center;color:#777;font-size:14px}
+.cb{position:absolute;background:#fff;box-shadow:1.5px 0 0 #fff,-1.5px 0 0 #fff}
+.cc{position:absolute;display:flex;align-items:flex-end;font-family:Arial,Helvetica,sans-serif;font-weight:700;line-height:1;white-space:nowrap;color:var(--chord);background:#fff;padding:0 1px;box-shadow:0 0 0 1.5px #fff}
+.txtsong{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 14px 18px;margin-block:12px 16px;overflow-x:auto}
+.txtsong pre{margin:0;font-family:var(--f-mono);font-size:14.5px;line-height:1.5;white-space:pre;color:var(--ink)}
+.txtsong .ch{color:var(--chord-text);font-weight:700}
+.txtsong .tt{font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:20px;line-height:1.25;letter-spacing:.01em;margin:2px 0 6px;color:var(--ink)}
+.txtsong .meta{font-size:14px;color:var(--muted);margin:0 0 10px;font-family:var(--f-body)}
+.block{margin-block:14px;padding-top:14px;border-top:1px solid var(--line)}
+.block>h3{font-size:20px;margin:0 0 10px}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:10px}
+.dg{text-align:center}.dg svg{width:100%;max-width:88px;height:auto}.dg b{display:block;font-size:17px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.tags a{font-size:14.5px;font-weight:700;text-decoration:none;border-radius:999px;padding:4px 11px;background:var(--lit-soft);color:var(--soft-ink)}
+.rowbtns{display:flex;flex-wrap:wrap;gap:8px;padding-bottom:30px}
+.dangerbtn{color:var(--danger)}
+body.stage .vbar,body.stage .dock{display:none}
+.stagehint{position:fixed;right:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:45;border:0;border-radius:999px;padding:10px 14px;background:var(--ink);color:var(--surface);font-weight:800;font-size:14.5px;opacity:.88}
+
+/* ---------- internet song ---------- */
+.wbody{padding-block:18px 40px;display:grid;gap:16px}
+.wbody .who{font-size:15.5px;color:var(--lit);font-weight:800;margin:0}
+.wbody h3{font-size:30px;line-height:1.05}
+dl.meta{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font-size:16px}
+dl.meta dt{color:var(--muted)}
+dl.meta dd{margin:0;min-width:0}
+.golink{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--lit);color:var(--lit-on);text-decoration:none;font-weight:800;font-size:17px;border-radius:14px;padding:14px 16px;border:0}
+.golink.second{background:var(--surface);color:var(--ink);border:1.5px solid var(--line);font-size:16px;padding:12px 16px}
+.player{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:8px}
+.player audio{width:100%}
+.player p{margin:0;font-size:15px;font-weight:700}
+.usos{background:var(--lit-soft);border-radius:14px;padding:14px 16px}
+.usos h4{font-size:18px;margin:0 0 4px}
+.usos p{margin:0;font-size:16px}
+
+/* ---------- misa ---------- */
+.misa-h{padding-block:18px 4px}
+.misa-h h2{font-size:28px}
+.misa-h p{margin:4px 0 0}
+.mbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.ord{list-style:none;margin:16px 0 0;padding:0;position:relative}
+.ord::before{content:"";position:absolute;left:11px;top:14px;bottom:14px;width:2px;background:var(--line)}
+.ord>li{position:relative;padding:0 0 14px 34px}
+.ord>li::before{content:"";position:absolute;left:5px;top:6px;width:14px;height:14px;border-radius:50%;background:var(--bg);border:2px solid var(--line)}
+.ord>li.has::before{background:var(--lit);border-color:var(--lit)}
+.ord .mh{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.ord .mh b{font-family:var(--f-display);font-size:18.5px;font-weight:800}
+.ord .addm{border:0;background:none;color:var(--lit);font-weight:800;font-size:15px;padding:2px 0}
+.ord .song{display:flex;align-items:center;gap:6px;margin-top:6px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:2px 4px 2px 12px}
+.ord .song a{flex:1;min-width:0;text-decoration:none;padding:9px 0}
+.ord .song a b{display:block;font-weight:700;font-size:16.5px;line-height:1.2}
+.ord .song a span{display:block;font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ord .part{padding-left:34px;font-family:var(--f-display);font-style:italic;color:var(--muted);font-size:16px;padding-bottom:8px}
+.ord .part::before{display:none}
+.mini{border:0;background:none;border-radius:8px;width:36px;height:36px;display:grid;place-items:center;font-size:17px;flex:none;color:var(--muted)}
+.mini:active{background:var(--sunk)}
+.pick{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.35);display:flex;align-items:flex-end}
+.pick .panel{background:var(--bg);width:100%;max-height:86vh;border-radius:18px 18px 0 0;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px)}
+.pick .ph{padding:14px 16px 8px;display:grid;gap:10px}
+.pick .ph .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pick .ph h3{font-size:22px}
+.pick .list{overflow:auto;padding:0 16px 20px}
+.pick .r{grid-template-columns:1fr auto}
+.pick .r .k{font-size:15px}
+
+/* ---------- más ---------- */
+.menu{list-style:none;margin:14px 0 0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.menu li+li{border-top:1px solid var(--line)}
+.menu a,.menu button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;background:none;padding:14px 16px;text-decoration:none;font-size:17px;font-weight:700}
+.menu small{display:block;font-weight:500;color:var(--muted);font-size:14.5px}
+.menu svg{flex:none;color:var(--lit)}
+.opt{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.about{display:grid;gap:18px;padding-block:22px 40px}
+.about .head{display:flex;gap:16px;align-items:center}
+.about .head img{width:84px;height:84px;border-radius:20px}
+.about h3{font-size:28px}
+.about h4{font-size:19px;margin:6px 0 0}
+.about p,.about li{margin:0;font-size:16px;line-height:1.5}
+.about ul{margin:0;padding-left:20px;display:grid;gap:4px}
+.mail{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.mail code{font-family:var(--f-body);font-size:17px;font-weight:700;user-select:all;-webkit-user-select:all}
+
+/* ---------- filters ---------- */
+.fgroups{display:grid;gap:20px;padding-block:14px 110px}
+.fgroups h3{font-size:19px;margin:0 0 4px}
+.fgroups .help{font-size:14.5px;color:var(--muted);margin:0 0 8px}
+.fgroups .chips{display:flex;flex-wrap:wrap;gap:6px}
+.fdock{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.fdock .wrap{display:flex;gap:10px;align-items:center;padding-block:10px}
+.fdock .primary{flex:1}
+
+/* ---------- form ---------- */
+.form{display:grid;gap:14px;padding-block:16px 40px}
+.field{display:grid;gap:5px}
+.field label{font-weight:800;font-size:15.5px}
+.field .help{font-size:14px;color:var(--muted);margin:0}
+.field input,.field textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;width:100%}
+.field textarea{font-family:var(--f-mono);font-size:14px;line-height:1.5;min-height:260px;resize:vertical;white-space:pre;overflow-x:auto}
+.field input:focus,.field textarea:focus{border-color:var(--lit);outline:none}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:420px){.two{grid-template-columns:1fr}}
+.primary{border:0;background:var(--lit);color:var(--lit-on);border-radius:14px;padding:13px 18px;font-weight:800;font-size:16.5px}
+.primary:disabled{opacity:.5}
+.err{color:var(--danger);font-size:15px;margin:0}
+.prevh{font-size:19px;margin:6px 0 0}
+
+/* ---------- splash, toast ---------- */
+.splash{position:fixed;inset:0;z-index:90;background:var(--hero);color:#fff;display:grid;place-items:center;padding:24px;text-align:center;transition:opacity .4s ease}
+.splash.out{opacity:0;pointer-events:none}
+.splash img{width:104px;height:104px;border-radius:26px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.splash h1{font-size:34px;margin:18px 0 4px}
+.splash p{margin:0;font-size:17px;opacity:.9}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--navh) + 18px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:15px;z-index:70;max-width:min(90vw,420px);text-align:center}
+@media (prefers-reduced-motion:reduce){.splash{transition:none}}
+@media (max-width:370px){.hero h2{font-size:29px}.top h1{font-size:21px}.nav button{font-size:11.5px}.dgrp button{width:36px}.keysel{min-width:50px}}
+
+.magic{margin:14px 0 6px;padding:16px;border-radius:16px;background:var(--lit-soft);border:1px solid var(--line)}
+.magic .primary{width:100%;font-size:18px;padding:14px}
+.magic .note{margin:10px 0 0}
+.mbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ord .song .mini{flex:none}
+.saved .savedrow{display:flex;align-items:center;gap:6px}
+.saved .savedrow .r{flex:1;min-width:0}
+.runbar{display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--lit);color:var(--lit-on);flex:none}
+.runbar button{flex:none;width:48px;height:44px;border:0;border-radius:12px;background:rgba(255,255,255,.18);color:inherit;font-size:28px;font-weight:700;line-height:1;cursor:pointer}
+.runbar button:disabled{opacity:.35}
+.runbar .rb-mid{flex:1;min-width:0;display:flex;flex-direction:column;text-align:center}
+.runbar .rb-mid small{font-size:12px;opacity:.85}
+.runbar .rb-mid b{font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.stage .runbar{display:none}
+.proj{position:fixed;inset:0;z-index:200;background:#0d0d0d;color:#fff;display:flex;flex-direction:column;user-select:none;-webkit-user-select:none}
+.proj .pj-top{display:flex;align-items:center;gap:12px;padding:10px 14px;color:#9a9a9a;font-size:14px}
+.proj .pj-top span:first-child{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.proj .pj-x{background:transparent;border:0;color:#bbb;font-size:22px;width:44px;height:44px;cursor:pointer}
+.proj .pj-txt{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:2vh 5vw 6vh;line-height:1.22;font-weight:700;font-family:inherit}
+.proj .pj-txt p{margin:.12em 0;max-width:100%}
+.proj .pj-hint{position:absolute;bottom:14px;left:0;right:0;text-align:center;color:#888;font-size:14px;transition:opacity .6s;opacity:0}
+.tin{font:inherit;font-size:16px;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;width:100%;margin-top:4px}
+.tin:focus{border-color:var(--lit);outline:none}
+.sendbox{width:100%}.sendbox #sbform{margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.recbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}.recdot{width:12px;height:12px;border-radius:50%;background:#d33;animation:rp 1s infinite}@keyframes rp{50%{opacity:.25}}
+.slv{position:fixed;inset:0;z-index:80;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:40px}
+.slv .sl-body{padding-top:8px}.sl-prev{background:var(--bg);border-radius:14px;aspect-ratio:16/9;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:16px;margin:12px 0;border-bottom:6px solid var(--ac);color:#fff}
+.sl-prev b{font-family:Arial,Helvetica,sans-serif;font-size:22px;line-height:1.2}.sl-prev small{color:var(--ac);font-weight:700;margin-top:8px;filter:brightness(1.4)}
+.slv .field{display:block;margin:8px 0}.slv .field span{display:block;font-size:13px;color:var(--muted);margin-bottom:3px}.slv .field input{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit}
+.sl-song textarea{width:100%;box-sizing:border-box;margin-top:8px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:15px/1.45 var(--f-body);resize:vertical}
+.sl-h{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.sl-h label{display:flex;gap:10px;align-items:flex-start}.sl-h label span{display:flex;flex-direction:column}.sl-h small{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em}.sl-h b{font-size:16px}
+.sl-st{font-size:12px;font-weight:700;white-space:nowrap;padding:3px 8px;border-radius:99px}.sl-st.ok{background:var(--sunk);color:var(--lit)}.sl-st.no{background:#fde8e6;color:#a12b2b}
+.sl-go{position:sticky;bottom:0;background:var(--bg);padding:12px 0;margin-top:8px}
+.shm{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;padding:16px}.shm-card{width:100%;max-width:520px;background:var(--surface);color:var(--ink);border-radius:18px;padding:18px 18px 16px;box-shadow:0 10px 40px rgba(0,0,0,.3)}.shm-card small{color:var(--lit);font-weight:600;text-transform:uppercase;letter-spacing:.04em;font-size:.75rem}.shm-card h3{margin:4px 0 6px;font-size:1.25rem}
+.guide{display:grid;gap:10px;padding-block:18px 48px}
+.gd{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.gd summary{cursor:pointer;list-style:none;padding:14px 44px 14px 16px;font-weight:800;font-size:17px;position:relative}
+.gd summary::-webkit-details-marker{display:none}
+.gd summary::after{content:'+';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:22px;color:var(--lit)}
+.gd[open] summary::after{content:'–'}
+.gd > div{padding:0 16px 14px;line-height:1.5}
+.gd ul{margin:6px 0;padding-left:20px}.gd li{margin:5px 0}.gd p{margin:6px 0}
+</style>
+
+<div id="screen"></div>
+<main id="main"><p class="empty wrap">Cargando el cancionero…</p></main>
+
+<nav class="nav" aria-label="Secciones">
+  <div class="wrap">
+    <button data-tab="hoy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v18M7 8h10"/><path d="M5 21h14"/></svg>Hoy</button>
+    <button data-tab="cantos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>Cantos</button>
+    <button data-tab="misa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1.2" fill="currentColor"/><circle cx="4" cy="12" r="1.2" fill="currentColor"/><circle cx="4" cy="18" r="1.2" fill="currentColor"/></svg>Misa<span class="badge" id="lcount" hidden></span></button>
+    <button data-tab="fav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z"/></svg>Favoritas</button>
+    <button data-tab="mas"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>Más</button>
+  </div>
+</nav>
+
+<section id="view" class="sheet" hidden aria-label="Canción">
+  <div class="vbar"><div class="wrap">
+    <button class="iconbtn back" aria-label="Volver"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="vtitle"><h2 id="vt"></h2></div>
+    <button class="iconbtn addlist" aria-label="Agregar a la misa" aria-pressed="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 6h11M4 12h11M4 18h7"/><path d="M18 14v8M14 18h8"/></svg></button>
+    <button class="iconbtn fav" aria-label="Favorita" aria-pressed="false"><svg width="23" height="23" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z"/></svg></button>
+  </div></div>
+  <div class="scroller" id="scroller"><div class="wrap">
+    <div class="infoline"><button class="toolbtn" id="reset" hidden>Volver al tono original</button><p class="capo" id="capo" hidden></p></div>
+    <div class="segwrap" id="segwrap"><div class="segs" id="segs"></div></div>
+    <div id="txt"></div>
+    <div class="block" id="vinfo"></div>
+    <div class="block" id="diagrams"></div>
+    <div class="rowbtns" id="vbtns"></div>
+  </div></div>
+  <div class="dock"><div class="wrap">
+    <div class="speed" id="speedrow" hidden></div>
+  </div><div class="wrap">
+    <div class="dgrp" role="group" aria-label="Tono">
+      <button id="down" aria-label="Bajar medio tono">−</button>
+      <div class="keysel" id="keysel"><b id="keyname">—</b><small id="keyorig"></small></div>
+      <button id="up" aria-label="Subir medio tono">+</button>
+    </div>
+    <div class="dgrp" role="group" aria-label="Tamaño de la letra"><button id="zout" aria-label="Achicar">A</button><button id="zin" aria-label="Agrandar">A</button></div>
+    <div class="dgrp"><button class="play" id="play" aria-pressed="false" aria-label="Desplazar la letra sola"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 4v16M6 14l6 6 6-6"/></svg></button>
+      <button id="stage" aria-label="Pantalla completa"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>
+  </div></div>
+</section>
+
+<section id="wview" class="sheet" hidden aria-label="Canción en internet">
+  <div class="vbar"><div class="wrap">
+    <button class="iconbtn back" aria-label="Volver"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="vtitle"><h2 id="wt"></h2></div>
+    <button class="iconbtn addlist" aria-label="Agregar a la misa" aria-pressed="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 6h11M4 12h11M4 18h7"/><path d="M18 14v8M14 18h8"/></svg></button>
+    <button class="iconbtn fav" aria-label="Favorita" aria-pressed="false"><svg width="23" height="23" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z"/></svg></button>
+  </div></div>
+  <div class="scroller"><div class="wrap wbody" id="wbody"></div></div>
+</section>
+
+<section id="gview" class="sheet" hidden aria-label="Cómo se usa">
+  <div class="vbar"><div class="wrap">
+    <button class="iconbtn back" aria-label="Volver"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="vtitle"><h2>Cómo se usa</h2></div>
+  </div></div>
+  <div class="scroller"><div class="wrap guide">
+    <p class="note">Tocá un tema para verlo. Podés volver a esta guía cuando quieras desde <b>Más › Cómo se usa</b>.</p>
+    <details class="gd"><summary>Primeros pasos</summary><div><p>La app tiene cinco pestañas abajo:</p><ul><li><b>Hoy</b>: el domingo que viene, su tiempo litúrgico, el salmo y cantos sugeridos.</li><li><b>Cantos</b>: todo el cancionero para buscar.</li><li><b>Misa</b>: donde armás la lista de cantos de la celebración.</li><li><b>Favoritas</b>: los cantos que marcaste con la estrella ☆.</li><li><b>Más</b>: tus canciones, enviar cantos, salmos del domingo, aspecto y esta guía.</li></ul><p>El color de la app cambia según el tiempo litúrgico del próximo domingo (verde, morado, blanco, rojo).</p></div></details><details class="gd"><summary>Buscar un canto</summary><div><ul><li>En <b>Cantos</b>, escribí parte del <b>título</b>, una frase de la <b>letra</b> o el <b>autor</b> (por ejemplo «Gallego» o «Athenas»).</li><li>Arriba elegís dónde buscar: <b>Todos</b>, <b>En la app</b> (con acordes, funcionan sin internet), <b>En internet</b> o <b>Mis canciones</b>.</li><li>Con <b>Filtrar</b> elegís el momento de la misa (Entrada, Gloria, Comunión…), el tiempo litúrgico, el tema, el clima o la ocasión (bautismo, casamiento, difuntos…).</li></ul></div></details><details class="gd"><summary>Tocar un canto: tono, letra y acordes</summary><div><ul><li>Abajo, con <b>–</b> y <b>+</b> cambiás el tono. Si conviene, te dice en qué traste poner la <b>cejilla</b> para tocar con los acordes originales. Tocando el tono volvés al original.</li><li>Con <b>A A</b> agrandás o achicás la letra. También podés pellizcar.</li><li>La flecha <b>↓</b> hace que el canto baje solo; elegís la velocidad.</li><li>El botón de <b>pantalla completa</b> esconde todo lo demás para tocar cómodo. La pantalla no se apaga mientras tenés un canto abierto.</li><li>Más abajo están los <b>dibujos de los acordes</b>, ya en el tono que elegiste. En los salmos de Bevilacqua los acordes van escritos en la partitura y no cambian de tono, pero abajo tenés sus dibujos con <b>−</b> y <b>+</b> para verlos en otro tono.</li><li>La app recuerda el tono y el tamaño que usaste en cada canto.</li></ul></div></details><details class="gd"><summary>Favoritas</summary><div><p>Dentro de un canto tocá la estrella ☆ de arriba. Aparece en la pestaña <b>Favoritas</b> y en las listas con una estrella dorada.</p></div></details><details class="gd"><summary>Armar la Misa</summary><div><ul><li>En <b>Misa</b> están todos los momentos de la celebración. Tocá <b>Agregar</b> en cada uno: te muestra primero los cantos que sirven para ese momento y ese tiempo litúrgico.</li><li>También podés sumar un canto desde adentro del canto, con el botón de lista de arriba.</li><li>Con <b>⇅</b> cambiás el momento de un canto y con <b>×</b> lo sacás.</li><li><b>Compartir</b> manda la lista por WhatsApp u otra app. El mensaje lleva un código con la misa: quien lo recibe lo mantiene apretado, toca <b>Copiar</b> y abre la app, y le aparece la misa armada. También puede usar <b>Misa › Cargar una misa que me compartieron</b>, o en WhatsApp elegir <b>Compartir › Cancionero Católico</b>. La misa queda además en sus <b>Misas guardadas</b>.</li><li><b>Guardar</b> la deja en <b>Misas guardadas</b>, abajo, para volver a usarla (por ejemplo, el mismo domingo del año que viene). <b>Nueva</b> empieza otra.</li></ul></div></details>
+    <details class="gd"><summary>Diapositivas para proyectar la letra</summary><div><p>Para que los fieles sigan el canto en la tele o el proyector.</p><ul><li>Con la misa armada, en <b>Misa</b> tocá <b>▣ Diapositivas para proyectar</b>.</li><li>La <b>primera diapositiva</b> muestra la celebración (por ejemplo «Domingo I de Adviento»), para dejarla proyectada hasta que empiece la misa. Podés cambiar el texto.</li><li>Después va la <b>letra grande, sin acordes</b>, con las mayúsculas solo donde corresponden, y una <b>diapositiva vacía</b> entre canto y canto.</li><li>Revisá la letra de cada canto: las estrofas van separadas por un renglón en blanco y el estribillo empieza con <b>Estribillo:</b>, así se repite entre estrofas. Si un canto dice «Sin letra», pegala. Lo que corrijas queda guardado.</li><li>Los colores siguen el <b>tiempo litúrgico</b>.</li><li>Tocá <b>Generar PowerPoint</b> o <b>Generar PDF</b>. En el teléfono se guarda en <b>Descargas › Cancionero</b> y lo podés abrir o compartir por WhatsApp, mail o pendrive.</li></ul></div></details><details class="gd"><summary>Durante la misa: «Empezar la misa»</summary><div><p>En <b>Misa</b>, tocá <b>▶ Empezar la misa</b>. Se abre el primer canto y abajo aparece una barra que dice cuál sigue. Con <b>›</b> pasás al siguiente canto y con <b>‹</b> volvés, sin salir a la lista. En el último canto, <b>✓</b> termina.</p></div></details><details class="gd"><summary>Salmos del domingo</summary><div><p>En <b>Hoy</b> y en <b>Más › Salmos del domingo</b> está el salmo de cada domingo y fiesta, en los tres ciclos, con las versiones que hay en la app para cantarlo:</p><ul><li><b>Athenas</b>: letra y acordes que cambian de tono.</li><li><b>Bevilacqua</b>: la partitura de la «Salmodia responsorial» del P. José Bevilacqua, con los acordes escritos en el tono original. También están sus aclamaciones antes del Evangelio y 41 melodías para el Aleluia (en el momento Aleluya).</li><li><b>Pueblo de Dios</b>: con audio y partitura.</li></ul></div></details><details class="gd"><summary>Cantos de internet</summary><div><ul><li>Los cantos de <b>Pastoral de Música</b>, <b>Cancionero Web</b> y <b>LaCuerda</b> se abren en su página; hace falta conexión. Con <b>Guardar sin conexión</b> queda una copia en el teléfono.</li><li>Los de <b>Jésed</b> abren su cancionero oficial en PDF, directo en la página del canto. En <b>Más</b> podés bajar todos los cancioneros de Jésed para usarlos sin internet.</li><li>Los del <b>Grupo Pueblo de Dios</b> tienen partitura y audio. Si la hoja trae dos páginas, se muestran una debajo de la otra. Ampliá pellizcando; con <b>Girar</b> ponés la pantalla horizontal y con <b>Hoja entera</b> ves la hoja original.</li><li>En la ficha de cada canto de internet están los <b>dibujos de sus acordes</b>, con <b>−</b> y <b>+</b> para verlos en otro tono antes de abrirlo.</li><li>En el título o en la lista, una etiqueta te dice de dónde viene cada canto.</li></ul></div></details><details class="gd"><summary>Qué significan las etiquetas</summary><div><ul><li><b>Litúrgico</b>: en el Perdón, Gloria, Santo, Cordero y Padrenuestro, sigue el texto del Misal.</li><li><b>No litúrgico</b>: cambia el texto; se usa en muchas comunidades, pero no es el texto oficial.</li><li><b>Origen evangélico</b>: canto nacido en iglesias evangélicas, con una reseña que explica su origen. Va muy bien en retiros y oración; para la misa conviene elegir otro.</li><li><b>Athenas</b>, <b>Pascua Joven</b>, <b>Pueblo de Dios</b>, <b>Jésed</b>: de qué cancionero viene.</li><li><b>Comunidad</b>: canto que mandó otro músico y fue revisado.</li></ul></div></details><details class="gd"><summary>Cargar tus propias canciones</summary><div><ul><li>Tocá el <b>+</b> en Cantos (o <b>Más › Agregar una canción</b>).</li><li>Escribí o pegá la letra con los <b>acordes en la línea de arriba</b> de cada verso, como en cualquier cancionero. La app los reconoce solos (en cifrado americano —C, Am, G7— o en español —DO, lam, SOL7—) y los puede transponer.</li><li>En <b>Para escucharla</b> podés pegar el enlace de YouTube o tocar <b>🎙 Grabar audio</b> y grabarte con la guitarra (la primera vez, la app pide permiso para el micrófono). La grabación se sube al cancionero, así la escuchan también los que reciben tu misa o ven el canto en la comunidad.</li><li>Quedan en <b>Cantos › Mis canciones</b>, guardadas en el teléfono. Las podés editar o borrar desde adentro del canto.</li></ul></div></details><details class="gd"><summary>Compartir un canto con todos</summary><div><ul><li>Dentro de una canción tuya, tocá <b>Enviar a la comunidad</b>, poné tu nombre y <b>Enviar</b>.</li><li>Lo revisa la persona que administra el cancionero. Cuando lo aprueba, aparece para todos en <b>Mis canciones › De la comunidad</b>.</li><li>Si preferís, <b>Mandar por correo</b> lo envía a cancionerocatolico.app@gmail.com.</li></ul></div></details><details class="gd"><summary>Sin conexión, modo noche y otros detalles</summary><div><ul><li>Todo el cancionero de la app, tus canciones, tus favoritas y tus misas funcionan <b>sin internet</b>. Los cantos de internet necesitan conexión, salvo los que guardaste.</li><li>En <b>Más › Aspecto</b> elegís el <b>modo noche</b>, útil en la iglesia con poca luz.</li><li>Las novedades de cada versión aparecen una vez en <b>Hoy</b>.</li></ul></div></details>
+  </div></div>
+</section>
+<section id="aview" class="sheet" hidden aria-label="Acerca de">
+  <div class="vbar"><div class="wrap">
+    <button class="iconbtn back" aria-label="Volver"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="vtitle"><h2>Acerca de</h2></div>
+  </div></div>
+  <div class="scroller"><div class="wrap about">
+    <div class="head"><img src="icon.webp" alt=""><div><h3>Cancionero Católico</h3><p class="note">Versión 4.6. Cancionero para misas y retiros, con cambio de tono y acordes.</p></div></div>
+    <div>
+      <h4>Autor</h4>
+      <p style="margin-top:6px">Idea, diseño y desarrollo de la aplicación: <b>Pablo J. Colombini</b>.</p>
+      <div class="mail" style="margin-top:8px"><span>Contacto:</span> <code id="mailaddr">cancionerocatolico.app@gmail.com</code> <button class="toolbtn" id="copymail">Copiar</button></div>
+      <p class="note" style="margin-top:10px">¿Querés colaborar para que el cancionero siga creciendo? Escribí a ese correo y te contamos cómo.</p>
+      <p class="note" style="margin-top:8px">© 2026 Pablo J. Colombini. Todos los derechos reservados sobre el diseño y el desarrollo de esta aplicación.</p>
+    </div>
+    <div>
+      <h4>Las canciones</h4>
+      <p class="note" style="margin-top:6px">Las letras y la música pertenecen a sus autores. La aplicación reúne o enlaza estos cancioneros:</p>
+      <ul style="margin-top:8px">
+        <li>Cancionero 2025 (cancionero de la comunidad)</li>
+        <li>Cancionero con acordes de Pascua Joven San Isidro</li>
+        <li>Grupo Pueblo de Dios (grupopueblodedios.org): letras, audios y usos litúrgicos</li>
+        <li>Jésed, Ministerio de Música: cancioneros oficiales en jesed.org</li>
+        <li>Pastoral de Música (pastoraldemusica.org.ar)</li>
+        <li>Cancionero Católico Web (recursoscatolicos.com.ar)</li>
+        <li>LaCuerda.net (canciones salesianas y de Eduardo Meana)</li>
+        <li>Pastoral Juvenil Salesiana: «40 canciones sobre Don Bosco»</li>
+        <li>Salmos responsoriales de Athenas y Tobías Buteler</li>
+      </ul>
+    </div>
+  </div></div>
+</section>
+
+<section id="xview" class="sheet" hidden aria-label="Filtros">
+  <div class="vbar"><div class="wrap">
+    <button class="iconbtn back" aria-label="Volver"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="vtitle"><h2>Filtrar cantos</h2></div>
+  </div></div>
+  <div class="scroller"><div class="wrap fgroups" id="fgroups"></div></div>
+  <div class="fdock"><div class="wrap"><button class="toolbtn" id="fclear">Limpiar</button><button class="primary" id="fgo">Ver cantos</button></div></div>
+</section>
+
+<section id="fview" class="sheet" hidden aria-label="Agregar canción">
+  <div class="vbar"><div class="wrap">
+    <button class="iconbtn back" aria-label="Cancelar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="vtitle"><h2 id="ft">Nueva canción</h2></div>
+  </div></div>
+  <div class="scroller"><div class="wrap">
+    <form class="form" id="form" novalidate>
+      <div class="field"><label for="f-t">Título</label><input id="f-t" required autocomplete="off" placeholder="Ej.: Pescador de hombres"></div>
+      <div class="two">
+        <div class="field"><label for="f-au">Autor o intérprete <small style="font-weight:500;color:var(--muted)">(opcional)</small></label><input id="f-au" autocomplete="off"></div>
+        <div class="field"><label for="f-mo">Momento de la misa <small style="font-weight:500;color:var(--muted)">(opcional)</small></label><input id="f-mo" autocomplete="off" list="momentos" placeholder="Entrada, Comunión…"></div>
+      </div>
+      <datalist id="momentos"><option>Entrada</option><option>Perdón</option><option>Gloria</option><option>Salmo</option><option>Aleluya</option><option>Ofrendas</option><option>Santo</option><option>Cordero</option><option>Comunión</option><option>Acción de gracias</option><option>Salida</option><option>Adoración</option><option>María</option></datalist>
+      <div class="field"><label for="f-tx">Letra y acordes</label>
+        <p class="help">Escribí o pegá los acordes en el renglón de arriba de cada verso, como en un cancionero. Sirven en C D E o en DO RE MI; también entre corchetes: [G]Señor, [Em]toma mi vida.</p>
+        <textarea id="f-tx" spellcheck="false" placeholder="G           D         Em&#10;Tú has venido a la orilla&#10;    C           D        G&#10;no has buscado ni a sabios ni a ricos"></textarea>
+      </div>
+      <div class="field"><label for="f-yt">Para escucharla <small style="font-weight:500;color:var(--muted)">(opcional)</small></label>
+        <p class="help">Pegá el enlace de YouTube o grabate cantándola. Lo escuchan también los que reciben tu misa o ven el canto en la comunidad.</p>
+        <input id="f-yt" autocomplete="off" inputmode="url" placeholder="https://youtu.be/…">
+        <div id="frec" style="margin-top:10px"></div></div>
+      <p class="err" id="ferr" hidden></p>
+      <div><button class="primary" type="submit" id="fsave">Guardar canción</button></div>
+      <p class="note" id="fwhere"></p>
+      <h3 class="prevh" id="prevh" hidden>Así se va a ver</h3>
+      <div id="fprev"></div>
+    </form>
+  </div></div>
+</section>
+
+<div class="splash" id="splash" role="presentation">
+  <div>
+    <img src="icon.webp" alt="">
+    <h1>Cancionero Católico</h1>
+    <p id="splashsub"></p>
+  </div>
+</div>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const store={get(k,d){try{const v=localStorage.getItem('cm:'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('cm:'+k,JSON.stringify(v))}catch(e){}}};
+// ---------- music (English notation) ----------
+const BASE={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+const SPB={DO:0,RE:2,MI:4,FA:5,SOL:7,LA:9,SI:11};
+const SH=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'], FL=['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
+const FLAT_MAJ=new Set([5,10,3,8,1]), FLAT_MIN=new Set([2,7,0,5,10,3]);
+function parse(c){const m=/^([A-G])(#|b)?(.*?)(?:\/([A-G])(#|b)?)?$/.exec(c||''); if(!m) return null;
+  const s=(BASE[m[1]]+(m[2]==='#'?1:m[2]==='b'?-1:0)+12)%12; const b=m[4]!=null?(BASE[m[4]]+(m[5]==='#'?1:m[5]==='b'?-1:0)+12)%12:null; return {s,q:m[3]||'',b}}
+function parseKey(k){const p=parse(k); return p?{s:p.s,minor:/^m(?!aj)/.test(p.q)}:null}
+function flats(key){return key?(key.minor?FLAT_MIN.has(key.s):FLAT_MAJ.has(key.s)):false}
+function tr(c,n,key){const p=parse(c); if(!p) return c; if(!n&&!key) return c;
+  const tk=key?{s:(key.s+n+12)%12,minor:key.minor}:null; let fl=flats(tk);
+  const ns=(p.s+n+120)%12; if(tk&&!fl){const iv=(ns-tk.s+12)%12; if([1,3,8,10].includes(iv)) fl=true}
+  const N=fl?FL:SH; return N[ns]+p.q+(p.b!=null?'/'+N[(p.b+n+120)%12]:'')}
+function keyName(key,n){ if(!key) return '—'; const s=(key.s+n+120)%12; return (flats({s,minor:key.minor})?FL:SH)[s]+(key.minor?'m':'') }
+// any notation (DO RE MI or C D E) -> English chord, or null if the token is not a chord
+const SUF=/^(?:maj|M|sus|add|dim|aug|min|º|°|ø|\+|\d|\(|\)|b(?=\d)|#(?=\d)|\/\d)*$/;
+function rootOf(t){ let m=/^(sol|do|re|mi|fa|la|si)/i.exec(t); if(m) return [SPB[m[1].toUpperCase()],m[1].length];
+  m=/^[A-G]/.exec(t); return m?[BASE[m[0]],1]:null }
+function toEng(tok){
+  const t=tok.trim(); if(!t) return null; const r=rootOf(t); if(!r) return null;
+  let [pc,j]=r; if(t[j]==='#'){pc++;j++} else if(t[j]==='b'&&!/^b[a-z]/i.test(t.slice(j+1)||'')){pc--;j++}
+  let rest=t.slice(j), bass=null; const sl=rest.search(/\/(sol|do|re|mi|fa|la|si|[A-G])/i);
+  if(sl>=0){ const bt=rest.slice(sl+1); rest=rest.slice(0,sl); const br=rootOf(bt); if(!br) return null; let bp=br[0],k=br[1];
+    if(bt[k]==='#'){bp++;k++} else if(bt[k]==='b'){bp--;k++} if(k!==bt.length) return null; bass=(bp+12)%12 }
+  let minor=false;
+  if(/^-/.test(rest)){minor=true;rest=rest.slice(1)} else if(/^min/.test(rest)){minor=true;rest=rest.slice(3)} else if(/^m(?!aj)/.test(rest)){minor=true;rest=rest.slice(1)}
+  if(!SUF.test(rest)) return null;
+  let q=rest.replace(/^M(?=\d)/,'maj').replace(/^M$/,'').replace('7maj','maj7').replace(/[º°]/g,'dim').replace('ø','m7b5');
+  if(q==='4') q='sus4';
+  return SH[(pc+12)%12]+(minor?'m':'')+q+(bass!=null?'/'+SH[bass]:'');
+}
+// ---------- diagrams ----------
+const OPEN={'0:':[-1,3,2,0,1,0],'0:7':[-1,3,2,3,1,0],'0:maj7':[-1,3,2,0,0,0],'2:':[-1,-1,0,2,3,2],'2:m':[-1,-1,0,2,3,1],'2:7':[-1,-1,0,2,1,2],'2:m7':[-1,-1,0,2,1,1],'2:maj7':[-1,-1,0,2,2,2],'2:sus4':[-1,-1,0,2,3,3],
+ '4:':[0,2,2,1,0,0],'4:m':[0,2,2,0,0,0],'4:7':[0,2,0,1,0,0],'4:m7':[0,2,0,0,0,0],'7:':[3,2,0,0,0,3],'7:7':[3,2,0,0,0,1],'9:':[-1,0,2,2,2,0],'9:m':[-1,0,2,2,1,0],'9:7':[-1,0,2,0,2,0],'9:m7':[-1,0,2,0,1,0],'9:maj7':[-1,0,2,1,2,0],'9:sus4':[-1,0,2,2,3,0],'11:7':[-1,2,1,2,0,2]};
+const ESH={'':[0,2,2,1,0,0],'m':[0,2,2,0,0,0],'7':[0,2,0,1,0,0],'m7':[0,2,0,0,0,0],'maj7':[0,-1,1,1,0,-1],'6':[0,-1,-1,1,2,0],'m6':[0,2,2,0,2,0],'sus4':[0,2,2,2,0,0],'9':[0,2,0,1,0,2],'dim':[0,1,2,0,-1,-1]};
+const ASH={'':[-1,0,2,2,2,0],'m':[-1,0,2,2,1,0],'7':[-1,0,2,0,2,0],'m7':[-1,0,2,0,1,0],'maj7':[-1,0,2,1,2,0],'6':[-1,0,2,2,2,2],'m6':[-1,0,2,2,1,2],'sus4':[-1,0,2,2,3,0],'sus2':[-1,0,2,2,0,0],'dim':[-1,0,1,2,1,-1],'aug':[-1,0,3,2,2,1],'9':[-1,0,2,4,2,3],'add9':[-1,0,2,4,2,0],'m7b5':[-1,0,1,0,1,-1],'dim7':[-1,0,1,2,1,2]};
+function shapeFor(s,q){q=q.replace(/^4$/,'sus4').replace(/^2$/,'sus2').replace(/^min/,'m');
+  if(OPEN[s+':'+q]) return OPEN[s+':'+q];
+  const c=[]; if(ESH[q]) c.push([(s-4+12)%12,ESH[q]]); if(ASH[q]) c.push([(s-9+12)%12,ASH[q]]);
+  if(!c.length){const b=/^m(?!aj)/.test(q)?'m':''; c.push([(s-4+12)%12,ESH[b]],[(s-9+12)%12,ASH[b]])}
+  c.sort((a,b)=>(a[0]||.5)-(b[0]||.5)); const [f,sh]=c[0]; return sh.map(v=>v<0?-1:v+f)}
+function svg(shape){const x0=10,y0=16,dx=10,dy=13;const fr=shape.filter(v=>v>0);let base=1;if(fr.length&&Math.max(...fr)>4)base=Math.min(...fr);
+  let s='<svg viewBox="0 0 70 84" aria-hidden="true">';
+  for(let i=0;i<6;i++)s+=`<line x1="${x0+i*dx}" y1="${y0}" x2="${x0+i*dx}" y2="${y0+4*dy}" stroke="currentColor"/>`;
+  for(let j=0;j<5;j++)s+=`<line x1="${x0}" y1="${y0+j*dy}" x2="${x0+5*dx}" y2="${y0+j*dy}" stroke="currentColor" stroke-width="${j===0&&base===1?3:1}"/>`;
+  if(base>1)s+=`<text x="${x0+5*dx+3}" y="${y0+dy*.7}" font-size="9" fill="currentColor">${base}</text>`;
+  const mf=fr.length?Math.min(...fr):0, at=shape.map((v,i)=>v===mf?i:-1).filter(i=>i>=0);
+  if(mf>0&&at.length>=3){const a=at[0],b=at[at.length-1];s+=`<rect x="${x0+a*dx-3}" y="${y0+(mf-base+.5)*dy-3.5}" width="${(b-a)*dx+6}" height="7" rx="3.5" fill="currentColor"/>`}
+  shape.forEach((v,i)=>{const x=x0+i*dx;if(v<0)s+=`<text x="${x}" y="${y0-4}" font-size="8" text-anchor="middle" fill="currentColor">×</text>`;else if(v===0)s+=`<circle cx="${x}" cy="${y0-6}" r="2.6" fill="none" stroke="currentColor"/>`;else s+=`<circle cx="${x}" cy="${y0+(v-base+.5)*dy}" r="4" fill="currentColor"/>`});
+  return s+'</svg>'}
+const LIT=(()=>{
+  const DAY=864e5;
+  const D=(y,m,d)=>new Date(y,m-1,d);
+  const add=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
+  const diff=(a,b)=>Math.round((a-b)/DAY);
+  const same=(a,b)=>diff(a,b)===0;
+  const ROM=['','i','ii','iii','iv','v','vi','vii','viii','ix','x','xi','xii','xiii','xiv','xv','xvi','xvii','xviii','xix','xx','xxi','xxii','xxiii','xxiv','xxv','xxvi','xxvii','xxviii','xxix','xxx','xxxi','xxxii','xxxiii','xxxiv'];
+  function easter(y){ const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1; return D(y,mo,da) }
+  function adv1(y){ const x=D(y,12,25); const adv4=add(x,-(x.getDay()===0?7:x.getDay())); return add(adv4,-21) }
+  function cycle(d){ const y=d>=adv1(d.getFullYear())?d.getFullYear()+1:d.getFullYear(); return ['C','A','B'][y%3] }
+  function epiphany(y){ for(let k=2;k<=8;k++){ const x=D(y,1,k); if(x.getDay()===0) return x } }
+  // Returns {name, key} for a given date, or null if it is an ordinary weekday
+  function day(d){
+    d=D(d.getFullYear(),d.getMonth()+1,d.getDate()); const y=d.getFullYear(), sun=d.getDay()===0;
+    const E=easter(y), A1=adv1(y), ash=add(E,-46);
+    const fixed=[[12,25,'Navidad','natividad del senor'],[1,1,'Santa María, Madre de Dios','madre de dios'],[8,15,'Asunción de la Virgen María','asuncion'],[11,1,'Todos los Santos','todos los santos'],[12,8,'Inmaculada Concepción','inmaculada'],[11,2,'Conmemoración de los Fieles Difuntos','fieles difuntos']];
+    for(const [m,dd,n,k] of fixed){ if(d.getMonth()+1===m&&d.getDate()===dd){ if(k==='inmaculada'&&sun) break; return {name:n,key:k} } }
+    if(same(d,ash)) return {name:'Miércoles de Ceniza',key:'ceniza'};
+    if(same(d,add(E,-3))) return {name:'Jueves Santo',key:'jueves santo en la cena'};
+    if(same(d,add(E,-2))) return {name:'Viernes Santo',key:'viernes santo'};
+    if(!sun) return null;
+    // Christmas season (start of the year)
+    const ep=epiphany(y); let bap=add(ep,7); if(ep.getDate()>=7) bap=null; // Baptism moves to Monday
+    if(d<ep) return {name:'Domingo después de Navidad',key:'sagrada familia'};
+    if(same(d,ep)) return {name:'Epifanía del Señor',key:'epifania'};
+    if(bap&&same(d,bap)) return {name:'Bautismo del Señor',key:'bautismo'};
+    // Advent / Christmas season (end of the year)
+    if(d>=A1&&d<D(y,12,25)){ const k=1+diff(d,A1)/7; return {name:ROM[k].toUpperCase()+' Domingo de Adviento',key:ROM[k]+' domingo de adviento'} }
+    if(d>D(y,12,25)) return {name:'Sagrada Familia',key:'sagrada familia'};
+    // Lent and Easter
+    if(d>ash&&d<add(E,-7)){ const k=1+diff(d,add(ash,4))/7; return {name:ROM[k].toUpperCase()+' Domingo de Cuaresma',key:ROM[k]+' domingo de cuaresma'} }
+    if(same(d,add(E,-7))) return {name:'Domingo de Ramos',key:'domingo de ramos'};
+    if(same(d,E)) return {name:'Domingo de Pascua',key:'resurreccion del senor: misa del dia'};
+    if(d>E&&d<add(E,42)){ const k=1+diff(d,E)/7; return {name:ROM[k].toUpperCase()+' Domingo de Pascua',key:ROM[k]+' domingo de pascua'} }
+    if(same(d,add(E,42))) return {name:'Ascensión del Señor',key:'ascension'};
+    if(same(d,add(E,49))) return {name:'Pentecostés',key:'pentecostes'};
+    if(same(d,add(E,56))) return {name:'Santísima Trinidad',key:'trinidad'};
+    if(same(d,add(E,63))) return {name:'Cuerpo y Sangre de Cristo',key:'cuerpo y sangre'};
+    // Ordinary Time
+    if(d<ash){ const first=bap?add(bap,7):add(ep,7); const n=2+diff(d,first)/7; return {name:ROM[n].toUpperCase()+' Domingo del Tiempo Ordinario',key:ROM[n]+' domingo del tiempo ordinario'} }
+    const ck=add(A1,-7); const n=34-diff(ck,d)/7;
+    if(n===34) return {name:'Cristo Rey',key:'rey del universo'};
+    return {name:ROM[n].toUpperCase()+' Domingo del Tiempo Ordinario',key:ROM[n]+' domingo del tiempo ordinario'};
+  }
+  // Next Sunday (today if Sunday) plus any weekday solemnity before it
+  function upcoming(today){
+    const t=D(today.getFullYear(),today.getMonth()+1,today.getDate()); const out=[];
+    for(let i=0;i<7;i++){ const d=add(t,i); const r=day(d); if(r){ out.push({...r,date:d,cy:cycle(d)}); if(d.getDay()===0) break } }
+    return out;
+  }
+  // liturgical time and color of a date
+  const WHITE=/natividad|madre de dios|asuncion|todos los santos|inmaculada|jueves santo|resurreccion|ascension|trinidad|cuerpo y sangre|rey del universo|epifania|bautismo|sagrada familia/;
+  function season(d){
+    d=D(d.getFullYear(),d.getMonth()+1,d.getDate()); const y=d.getFullYear(), E=easter(y), A1=adv1(y), ash=add(E,-46);
+    const ep=epiphany(y), bap=ep.getDate()>=7?add(ep,1):add(ep,7);
+    let code='ord';
+    if(d>=A1&&d<D(y,12,25)) code='adv'; else if(d>=D(y,12,25)||d<=bap) code='nav';
+    else if(d>=ash&&d<add(E,-7)) code='cua'; else if(d>=add(E,-7)&&d<E) code='ss'; else if(d>=E&&d<=add(E,49)) code='pas';
+    let color={adv:'morado',cua:'morado',ss:'morado',nav:'blanco',pas:'blanco',ord:'verde'}[code];
+    const r=day(d), k=r?r.key:'';
+    if(same(d,add(A1,14))||same(d,add(E,-21))) color='rosa';
+    if(same(d,add(E,-7))||same(d,add(E,-2))||same(d,add(E,49))) color='rojo';
+    else if(k==='fieles difuntos') color='morado';
+    else if(WHITE.test(k)) color='blanco';
+    return {code,color};
+  }
+  return {cycle,upcoming,season,day};
+})();
+// ---------- data ----------
+let D=null, X=[], XM=new Map(), WBASE='', GBASE='https://grupopueblodedios.org/wp-content/uploads/', JBASE='https://www.jesed.org/_files/ugd/', RBASE='https://recursoscatolicos.com.ar/cancionero/?q=';
+let favs=new Set(store.get('favs',[])), list=store.get('list',[]), lm=store.get('lm',{}), recent=store.get('rec',[]);
+let tab='hoy', sub='all', cur=null, flt={}, DOM=null, GPS=new Map();
+const U=new Map(); // user songs: id -> {id,t,au,mo,tx,local}
+let db=null, dbState='loading';
+const bundles=new Map(), urls=new Map();
+function norm(s){return (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9ñ\n ]/g,' ').replace(/[ ]+/g,' ')}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+const TODAY=new Date();
+const UPS=LIT.upcoming(TODAY);
+const SUN=UPS.find(u=>u.date.getDay()===0)||UPS[UPS.length-1];
+const SEASON=LIT.season(SUN?SUN.date:TODAY);
+const HAS_APP=!!(window.App&&window.App.saveOffline);
+const SEASON_NAME={adv:'Adviento',nav:'Navidad',cua:'Cuaresma',ss:'Semana Santa',pas:'Pascua',ord:'Tiempo Ordinario'};
+const LITHEX={verde:['#2e6b4e','#7fbf9d'],morado:['#5e3f8f','#b59ae0'],blanco:['#94701d','#e1bb63'],rojo:['#a12b2b','#f08a84'],rosa:['#b0507a','#f0a2c4']};
+
+// ---------- appearance: liturgical color + light/night ----------
+function applyTheme(){
+  const t=store.get('theme','auto'), root=document.documentElement;
+  if(t==='auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme',t);
+  root.setAttribute('data-lit',SEASON.color);
+  const dark=t==='dark'||(t==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);
+  try{ if(window.App&&App.setBars) App.setBars(dark?'#1c1d21':'#ffffff',!dark) }catch(e){}
+}
+applyTheme();
+try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyTheme) }catch(e){}
+
+async function boot(){
+  try{ D=await (await fetch('data.json')).json() }catch(e){ $('main').innerHTML='<p class="empty wrap">No se pudo cargar el cancionero. Probá recargar.</p>'; return }
+  D.songs.forEach(s=>{s.t=up(s.t); s.nt=(norm(s.t)+(s.at?' | '+norm(s.at):'')+(s.au?' | '+norm(s.au):'')+(s.t0?' | '+norm(s.t0):'')).trim(); s.lines=s.l.split('\n'); s.nl=s.lines.map(norm); s.all=s.nl.join(' | ')});
+  loadLocalMine();
+  setTab(store.get('tab','hoy')==='misa'?'misa':'hoy',true); updCount();
+  window.addEventListener('hashchange',route); route();
+  loadExt(); initDb(); loadComm(); setTimeout(flushPending,4000);
+  getJ('dom.json').then(d=>{ DOM=d||{rows:[]}; if(!cur&&(tab==='hoy'||tab==='dom')) render() });
+}
+function getJ(u){ return fetch(u).then(r=>{if(!r.ok)throw 0;return r.json()}).catch(()=>null) }
+async function loadExt(){
+  const [wj,jj,rj,lj,gj,ly]=await Promise.all([getJ('web.json'),getJ('jesed.json'),getJ('rc.json'),getJ('lc.json'),getJ('gpd.json'),getJ('ly.json')]);
+  const all=[];
+  if(gj){ GBASE=gj.base; const used=new Set(); gj.songs.forEach(g=>{ let id='g'+norm(g.t).replace(/[^a-z0-9]/g,'').slice(0,34); let k=id,n=2; while(used.has(k)) k=id+(n++); used.add(k);
+    const x={ref:k,src:'gpd',badge:'Pueblo de Dios',t:g.t,m:g.m||[],tl:g.tl||[],au:[...(g.l||[]),...(g.mu||[])],raw:g,url:g.pdf?GBASE+g.pdf:'https://grupopueblodedios.org/',
+      nx:norm([g.t,...(g.l||[]),...(g.mu||[]),...g.al,'pueblo de dios'].join(' '))}; all.push(x);
+    const pm=/^salmo (\d+)/.exec(norm(g.t)); if(pm){ if(!GPS.has(pm[1])) GPS.set(pm[1],[]); GPS.get(pm[1]).push(x) } }) }
+  if(wj){ WBASE=wj.base; wj.songs.forEach(w=>{ all.push({ref:'w'+w.id,src:'pdm',badge:'Pastoral de Música',t:w.t,m:w.m||[],tl:w.tl||[],au:[...w.a,...w.au],raw:w,url:WBASE+w.id,
+    nx:norm([w.t,...w.a,...w.au,...(w.tg.m||[]),...(w.tg.tl||[]),...(w.tg.f||[])].join(' '))}) }) }
+  if(jj){ jj.songs.forEach(j=>{ all.push({ref:'j'+j.u.slice(7,15)+'p'+j.p,src:'jes',badge:'Jésed',t:j.t,m:j.m||[],tl:j.tl||[],au:j.au?[j.au]:[],raw:j,sp:j.sp||[],url:JBASE+j.u+'#page='+j.p,
+    nx:norm([j.t,j.al,j.au,'jesed'].join(' '))}) }) }
+  if(rj){ rj.songs.forEach(r=>{ all.push({ref:'r'+r.id,src:'rc',badge:'Cancionero Web',t:r.t,m:r.m||[],tl:r.tl||[],au:[],raw:r,url:RBASE+r.id,nx:norm(r.t)}) }) }
+  if(lj){ lj.songs.forEach(l=>{ all.push({ref:'l'+(l.p||l.t.toLowerCase()).replace(/[^a-z0-9]/g,'').slice(0,40),src:'lc',badge:l.b||'LaCuerda',t:l.t,m:l.m||[],tl:l.tl||[],sp:l.sp||[],au:l.a?[l.a]:[],raw:l,url:l.u||('https://acordes.lacuerda.net/'+l.p),nx:norm(l.t+' '+(l.a||'')+((l.sp||[]).length?' salesiana salesianas don bosco':''))}) }) }
+  const LY=ly||{}, lyOf=x=>{ const L=x.src==='pdm'?LY.w&&LY.w[x.raw.id]:x.src==='rc'?LY.r&&LY.r[x.raw.id]:x.src==='jes'?LY.j&&LY.j[x.raw.u.slice(7,15)+'p'+x.raw.p]:x.src==='gpd'?LY.g&&LY.g[x.raw.pdf]:''; return L?' '+L+' ':'' };
+  all.forEach(x=>{ x.t=up(x.t); x.ly=lyOf(x); x.nt=norm(x.t).trim(); x.hide=x.raw.hide!=null; if(x.raw.at){ x.nx+=' '+norm(x.raw.at) } XM.set(x.ref,x) }); X=all;
+  if(!cur) render(); else route(); keepMarked();
+  takeShared(); if(HAS_APP) checkClip(false);
+}
+// ---------- YouTube ----------
+function ytQuery(t,extra){
+  let q=String(t||'').replace(/\((?:[A-G][#b]?m?|bis|[^)]*bpm[^)]*|[^)]*transporte[^)]*|cd[^)]*|int\.?[^)]*)\)/gi,' ')
+    .replace(/\s*[-–]\s*\d+\s*$/,'').replace(/[“”"]/g,'').replace(/\s+/g,' ').trim();
+  if(q===q.toUpperCase()) q=q.toLowerCase();
+  return 'https://www.youtube.com/results?search_query='+encodeURIComponent((q+' '+(extra||'')).trim());
+}
+function ytButton(t,extra){ return `<a class="golink second" href="${ytQuery(t,extra)}" target="_blank" rel="noopener">Buscar en YouTube</a>` }
+// ---------- offline copies (Android app) ----------
+function savable(x){ return HAS_APP&&x&&x.src!=='jes'&&x.src!=='gpd'&&!/\.pdf(#|$)/i.test(x.url) }
+function keepOffline(ref){ const x=XM.get(ref); if(savable(x)) try{ App.saveOffline(x.url) }catch(e){} }
+function keepMarked(){ if(!HAS_APP) return; new Set([...favs,...list].filter(r=>typeof r==='string'&&/^[wrl]/.test(r))).forEach(keepOffline) }
+function jesedNames(){ return [...new Set([...X.filter(x=>x.src==='jes').map(x=>x.raw.u),...D.songs.filter(s=>s.j).map(s=>s.j.u)])] }
+window.onAppEvent=function(type,a,b){
+  if(type==='saved'){ if(cur&&cur.kind==='w'&&cur.s&&cur.s.url===a) offlineLine(); }
+  else if(type==='jesed'){ const el=$('jesprog'); if(el) el.textContent=`Descargando… ${a} de ${b}`; }
+  else if(type==='focus'){ checkClip(false) }
+  else if(type==='shared'){ takeShared() }
+  else if(type==='jesedEnd'){ const el=$('jesprog'); if(el) el.textContent=+a?`Listo, pero ${a} no se pudieron bajar. Probá de nuevo con buena conexión.`:'Listo: todos los cancioneros de Jésed están en el teléfono.'; const bt=$('jesbtn'); if(bt){bt.disabled=false;bt.textContent='Descargar los que falten'} toast(+a?'Faltaron algunos cancioneros de Jésed':'Jésed descargado: anda sin internet'); }
+};
+function offlineLine(){ const el=$('offl'); if(!el||!cur||!cur.s) return; const x=cur.s; let ok=false; try{ ok=App.isSaved(x.url) }catch(e){}
+  el.innerHTML=ok?'<b>Guardada en el teléfono:</b> la podés abrir sin conexión.':'<button class="toolbtn" id="offbtn">Guardar sin conexión</button> <span class="note">Se guarda una copia en el teléfono para abrirla sin internet.</span>';
+  const bt=$('offbtn'); if(bt) bt.onclick=()=>{ keepOffline(x.ref); bt.disabled=true; bt.textContent='Guardando…' } }
+// ---------- user songs ----------
+function loadLocalMine(){ (store.get('mine',[])||[]).forEach(s=>{ if(s&&s.id) U.set(s.id,{...s,local:true}) }); U.forEach(prepUser) }
+function saveLocalMine(){ store.set('mine',[...U.values()].filter(s=>s.local).map(({id,t,au,mo,tx,creado,yt,ad,pend})=>({id,t,au,mo,tx,creado,yt:yt||'',ad:ad||'',pend:!!pend}))) }
+function prepUser(s){ s.nt=norm(s.t).trim(); const lyr=parseSong(s.tx).filter(l=>!l.ch).map(l=>l.text); s.lines=lyr; s.nl=lyr.map(norm); s.all=s.nl.join(' | ') }
+async function initDb(){
+  try{ db=window.claude&&window.claude.use?await window.claude.use('db'):null }catch(e){ db=null }
+  if(!db){ dbState='off'; return }
+  dbState='on';
+  db.collection('canciones').onSnapshot(snap=>{
+    for(const [id,s] of [...U]) if(!s.local&&!s.comm) U.delete(id);
+    snap.docs.forEach(d=>{ const v=d.data(); if(!v||!v.t) return; const s={id:d.id,t:String(v.t),au:v.au||'',mo:v.mo||'',tx:String(v.tx||''),creado:v.creado||'',yt:v.yt||'',ad:v.ad||''}; prepUser(s); U.set(d.id,s) });
+    if(!cur&&$('fview').hidden&&$('xview').hidden) render(); else if(cur&&cur.kind==='u'&&U.has(cur.id)){ cur.s=U.get(cur.id); renderUserBody() }
+  },()=>{ dbState='off' });
+}
+// parse free text: chord lines (all tokens chords) + inline [C]
+function isChordLine(line){ const toks=line.trim().split(/\s+/).filter(Boolean); if(!toks.length) return false;
+  let n=0; for(const t of toks){ if(/^(\||\/|x\d+|\(?bis\)?|\(x?\d+\)|-|\.\.\.?)$/i.test(t)) continue; const c=t.replace(/^\(|\)$/g,''); if(!toEng(c)) return false; n++ } return n>0 }
+function parseSong(tx){ return (tx||'').replace(/\r/g,'').split('\n').map(text=>({text,ch:isChordLine(text)})) }
+function songChords(s){ const out=[]; parseSong(s.tx).forEach(l=>{ if(l.ch) l.text.trim().split(/\s+/).forEach(t=>{const e=toEng(t.replace(/^\(|\)$/g,'')); if(e) out.push(e)}); else (l.text.match(/\[([^\]]+)\]/g)||[]).forEach(b=>{const e=toEng(b.slice(1,-1)); if(e) out.push(e)}) }); return out }
+function userKey(s){ const c=songChords(s)[0]; if(!c) return null; const p=parse(c); return p?(SH[p.s]+(/^m(?!aj)/.test(p.q)?'m':'')):null }
+function renderText(s,n){
+  const key=s.key?parseKey(s.key):null;
+  return parseSong(s.tx).map(l=>{
+    if(l.ch){ // rebuild keeping columns
+      let out='', re=/\S+/g, m;
+      while((m=re.exec(l.text))){ const raw=m[0], inner=raw.replace(/^\(|\)$/g,''), e=toEng(inner); let t=raw;
+        if(e) t=raw.replace(inner, tr(e,n,key));
+        const col=Math.max(m.index, out.length?out.length+1:0); out+=' '.repeat(col-out.length)+t }
+      return `<span class="ch">${esc(out)}</span>` }
+    return esc(l.text).replace(/\[([^\]]+)\]/g,(all,c)=>{ const e=toEng(c.replace(/&amp;/g,'&')); return e?`<span class="ch">[${esc(tr(e,n,key))}]</span>`:all });
+  }).join('\n');
+}
+// ---------- refs: number = song from the book, letter+id = internet, "u…" = mine ----------
+function refInfo(ref){
+  if(typeof ref==='number'){ const s=D.songs[ref]; return s&&{t:s.t,sn:songSub(s),k:keyFor(s),hash:'c'+s.i,m:s.m||[]} }
+  if(/^[wjrlg][a-z0-9]+$/.test(ref)){ const x=XM.get(ref); return x?{t:x.t,sn:extSub(x),k:'',hash:ref,web:true,m:x.m}:{t:'Canción de internet',sn:'Se carga con conexión',k:'',hash:ref,web:true,m:[]} }
+  if(/^u/.test(ref)){ const s=U.get(ref.slice(1)); if(!s) return null; const MOv=MO_TXT[norm(s.mo||'').trim()]; return {t:up(s.t),sn:s.au||'',k:'mía',hash:ref,mine:true,m:MOv?[MOv]:[]} }
+  return null }
+function keyFor(s){ const tk=store.get('t:'+s.i,0); return tk&&s.key?keyName(parseKey(s.key),tk):(s.key||'') }
+function webSub(w){ return okAu(w.a[0])||okAu(w.au[0]) }
+function okAu(a){ a=(a||'').trim(); return /^(desconocido|an[óo]nimo|varios|lit[úu]rgico|-|\?)$/i.test(a)||/https?:|www\./i.test(a)?'':a }
+function songSub(s){ const a=s.ath; return a?(a.cel+(a.cy&&!/ciclo/i.test(a.cel)?' · Ciclo '+a.cy:'')+' · '+a.ref):(s.au||'') }
+// ---------- search ----------
+function searchSongs(pool,nq,words){
+  const tit=[], lyr=[];
+  for(const s of pool){
+    if(words.every(w=>s.nt.includes(w))){ tit.push({s,score:(s.nt.startsWith(nq)?0:s.nt.includes(nq)?1:2)}); continue; }
+    let li=-1, sc=9;
+    for(let i=0;i<s.nl.length;i++){ if(s.nl[i].includes(nq)){li=i;sc=0;break} }
+    if(li<0) for(let i=0;i<s.nl.length;i++){ if(words.every(w=>s.nl[i].includes(w))){li=i;sc=1;break} }
+    if(li<0 && words.length>1 && words.every(w=>s.all.includes(w))){ li=s.nl.findIndex(l=>l.includes(words[0])); sc=2 }
+    if(li>=0) lyr.push({s,li,score:sc});
+  }
+  tit.sort((a,b)=>a.score-b.score||a.s.nt.localeCompare(b.s.nt));
+  lyr.sort((a,b)=>a.score-b.score||a.s.nt.localeCompare(b.s.nt));
+  return {tit,lyr};
+}
+const LYSTOP=new Set('a la las el los de del y o e u en que al un una lo le les se me te mi tu su no'.split(' '));
+function searchWebLyr(words,pool,skip){ const w=words.filter(x=>!LYSTOP.has(x)&&x.length>1); if(!w.length) return []; const last=w.length-1;
+  return pool.filter(x=>x.ly&&!skip.has(x)&&w.every((q,i)=>x.ly.includes(' '+q+(i===last?'':' ')))).sort((a,b)=>a.nt.localeCompare(b.nt)) }
+function searchWeb(nq,words,pool){ return (pool||X).filter(w=>words.every(x=>w.nx.includes(x))).sort((a,b)=>(b.nt.includes(nq)-a.nt.includes(nq))||a.nt.localeCompare(b.nt)) }
+function normKeepLen(s){return s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().split('').map(ch=>/[a-z0-9ñ]/.test(ch)?ch:' ').join('')}
+function hl(text,words,phrase){
+  const nt=normKeepLen(text.normalize('NFC')); text=text.normalize('NFC'); const marks=new Array(text.length).fill(false);
+  const mark=(w)=>{let i=0; while(w&&(i=nt.indexOf(w,i))>=0){ if(i===0||nt[i-1]===' '){for(let k=i;k<i+w.length;k++)marks[k]=true} i+=w.length }};
+  const ph=phrase.trim(); const before=marks.slice();
+  if(ph.includes(' ')) { mark(ph.replace(/ +/g,' ')); }
+  if(marks.every((m,i)=>m===before[i])) words.filter(w=>w.length>1||words.length===1).forEach(mark);
+  let out='',on=false; for(let i=0;i<text.length;i++){ if(marks[i]&&!on){out+='<mark>';on=true} if(!marks[i]&&on){out+='</mark>';on=false} out+=esc(text[i]) } if(on) out+='</mark>'; return out;
+}
+function evBox(ev,evo){ if(!ev) return '';
+  return `<div class="evbox" role="note"><b>Canto de origen evangélico</b><p>Este canto nació en el ámbito de las iglesias cristianas evangélicas. Es un lindo canto de alabanza y se usa mucho en retiros, encuentros y momentos de oración. Para la Misa conviene elegir cantos de la tradición católica, más ajustados a la liturgia.</p>${evo?`<p class="evo"><b>Reseña:</b> ${esc(evo)}</p>`:''}</div>` }
+function up(t){ return (t||'').toLocaleUpperCase('es') }
+function li(t,sn,k,hash,opts={}){
+  const el=document.createElement('li'); const b=document.createElement('a'); b.className='r'; b.href='#'+hash;
+  const star=opts.fav?'<span style="color:var(--gold)">★</span> ':'';
+  const src=opts.src?`<span class="src${opts.gpd?' gpd':''}">${esc(opts.src)}</span>`:'';
+  const ev=opts.ev?'<span class="src ev">Origen evangélico</span>':'';
+  b.innerHTML=`<span class="t">${star}${esc(up(t))}${src}${ev}</span><span class="sn">${sn}</span><span class="k${opts.ico?' ico':''}">${esc(k)}</span>`;
+  el.appendChild(b); return el }
+function itemSong(s,snip){ const a=s.ath; return li(s.t, snip||esc(songSub(s)), '', 'c'+s.i, {fav:favs.has(s.i),ev:s.ev,src:s.src==='pj'?'Pascua Joven':(s.src==='ath'||s.src==='ach')?'Athenas':s.src==='bev'?'Bevilacqua':''}) }
+function itemUser(s,snip){ return li(s.t, snip||esc(s.comm?[s.au,s.by?'enviado por '+s.by:''].filter(Boolean).join(' · '):(s.au||'')), s.comm?'':'mía', 'u'+s.id, {fav:favs.has('u'+s.id),ico:true,src:s.comm?'Comunidad':''}) }
+function itemWeb(x){ return li(x.t, esc(extSub(x)), x.src==='gpd'&&x.raw.mp3?'♪':'', x.ref, {fav:favs.has(x.ref),ev:x.raw.ev,src:x.badge,gpd:x.src==='gpd',ico:true}) }
+function extSub(x){
+  if(x.src==='gpd') return okAu((x.raw.l||[])[0]);
+  if(x.src==='jes') return okAu(x.raw.au);
+  if(x.src==='rc') return okAu(x.raw.a);
+  if(x.src==='lc') return okAu(x.raw.a);
+  return webSub(x.raw) }
+function group(m,title,n,items,paged){
+  const h=document.createElement('div'); h.className='group-h'; h.innerHTML=`${esc(title)} <small>${esc(n)}</small>`; m.appendChild(h);
+  const ul=document.createElement('ul'); ul.className='res'; m.appendChild(ul);
+  let shown=0; const step=paged?80:40;
+  const more=document.createElement('button'); more.className='more';
+  function add(){ items.slice(shown,shown+step).forEach(x=>ul.appendChild(typeof x.el==='function'?x.el():x)); shown+=step; more.hidden=shown>=items.length; more.textContent=`Ver ${Math.min(step,items.length-shown)} más`; }
+  more.onclick=add; m.appendChild(more); add();
+}
+// ---------- tags ----------
+const MOM=[['ent','Entrada'],['per','Perdón'],['glo','Gloria'],['sal','Salmo'],['ale','Aleluya'],['ofr','Ofrendas'],['san','Santo'],['pad','Padre Nuestro'],['cor','Cordero'],['com','Comunión'],['acc','Acción de gracias'],['env','Salida'],['mar','María']];
+const TIM=[['adv','Adviento'],['nav','Navidad'],['cua','Cuaresma'],['ss','Semana Santa'],['pas','Pascua']];
+const THM=[['ala','Alabanza'],['ado','Adoración'],['gra','Acción de gracias'],['esp','Espíritu Santo'],['con','Confianza y abandono'],['prd','Perdón y conversión'],['amo','Amor de Dios'],['seg','Seguimiento y vocación'],['fra','Fraternidad y servicio'],['pal','Palabra de Dios'],['evt','Esperanza y vida eterna'],['mis','Misión'],['igl','Iglesia y unidad'],['cre','Creación'],['paz','Paz y justicia']];
+const CLI=[['fer','Ferviente'],['ctp','Contemplativo'],['alg','Alegre'],['ref','Reflexivo']];
+const OCC=[['bau','Bautismo'],['pco','Primera Comunión'],['cnf','Confirmación'],['mat','Matrimonio'],['dif','Difuntos y exequias'],['enf','Enfermos y consuelo'],['rec','Reconciliación'],['sts','Santos'],['rey','Cristo Rey'],['sco','Sagrado Corazón'],['tri','Santísima Trinidad'],['fam','Familia'],['nin','Niños'],['jov','Jóvenes'],['voc','Sacerdotes y vocaciones'],['ben','Bendición y cumpleaños'],['pat','Patria']];
+const SPC=[['ath','Salmos de Athenas'],['sdb','Don Bosco y salesianas'],['gpd','Grupo Pueblo de Dios']];
+const LT=[['lit','Litúrgico'],['nol','No litúrgico']];
+const GROUPS=[['m','Momento de la misa',MOM,''],['lt','Letra de las partes de la misa',LT,'Para el Perdón, el Gloria, el Santo, el Cordero y el Padrenuestro. Litúrgico: respeta la letra del Misal. No litúrgico: cambia la letra; se usa a veces, pero no es el texto oficial.'],['tl','Tiempo litúrgico',TIM,''],['th','Temas',THM,'De qué habla el canto.'],
+  ['cl','Clima',CLI,'Ferviente: para encender, de pie y con palmas. Contemplativo: suave, para orar en silencio. Alegre: para empezar o cerrar en comunidad. Reflexivo: para meditar un mensaje.'],
+  ['oc','Ocasiones',OCC,'Sacramentos, celebraciones y grupos.'],['sp','Cancioneros especiales',SPC,'']];
+const MO_TXT={entrada:'ent',perdon:'per',gloria:'glo',salmo:'sal',aleluya:'ale',ofrendas:'ofr',ofrenda:'ofr',santo:'san','padre nuestro':'pad',cordero:'cor',comunion:'com','accion de gracias':'acc',salida:'env',maria:'mar',adoracion:'com'};
+const nameIn=(arr,c)=>(arr.find(x=>x[0]===c)||[])[1];
+const namesOf=(arr,cs)=>(cs||[]).map(c=>nameIn(arr,c)).filter(Boolean);
+function filtering(){ return GROUPS.some(([k])=>flt[k]) }
+function filterName(){ return GROUPS.filter(([k])=>flt[k]).map(([k,,a])=>nameIn(a,flt[k])).join(' · ') }
+function passCodes(o){ return GROUPS.every(([k])=>!flt[k]||(o[k]||[]).includes(flt[k])) }
+function passLocal(s){ return passCodes({lt:s.lt?[s.lt]:[],m:s.m,tl:s.tl,th:s.th,cl:s.cl,oc:s.oc,sp:s.src==='ath'?['ath']:s.gp?['gpd',...(s.sp||[])]:s.sp}) }
+function passWeb(w){ const r=w.raw||{}; return passCodes({lt:r.lt?[r.lt]:[],m:w.m,tl:w.tl,sp:w.src==='gpd'||r.gp?['gpd']:w.sp,th:r.th,cl:r.cl,oc:r.oc}) }
+function passUser(s){ if(!filtering()) return true; if(flt.th||flt.cl||flt.oc||flt.tl||flt.lt) return false; const c=MO_TXT[norm(s.mo||'').trim()]; return passCodes({m:c?[c]:[],sp:/bosco|salesian|auxiliadora/.test(norm((s.mo||'')+' '+s.t))?['sdb']:[]}) }
+function tagLinks(o){ const out=[]; [['m',MOM,o.m],['lt',LT,o.lt?[o.lt]:[]],['tl',TIM,o.tl],['th',THM,o.th],['cl',CLI,o.cl],['oc',OCC,o.oc]].forEach(([k,arr,cs])=>(cs||[]).forEach(c=>{ const n=nameIn(arr,c); if(n) out.push(`<a href="#ver-${k}-${c}">${esc(n)}</a>`) })); return out.length?`<div class="tags">${out.join('')}</div>`:'' }
+function goFilter(k,c){ flt={}; flt[k]=c; sub='all'; $('q')&&($('q').value=''); qv=''; setTab('cantos') }
+
+// ---------- screens ----------
+let qv='';
+function setTab(t,silent){ tab=t; if(t==='hoy'||t==='misa') store.set('tab',t);
+  document.querySelectorAll('.nav button').forEach(b=>b.removeAttribute('aria-current'));
+  const nb=document.querySelector(`.nav [data-tab="${t==='dom'?'hoy':t}"]`); if(nb) nb.setAttribute('aria-current','page');
+  if(!silent){ if(location.hash&&location.hash!=='#') history.replaceState(null,'',location.pathname+location.search); }
+  header(); render(); window.scrollTo(0,0) }
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{ if(cur||!$('fview').hidden||!$('xview').hidden||!$('aview').hidden){ hideAll(); cur=null } if(b.dataset.tab===tab&&$('q')){ $('q').focus(); return } if(b.dataset.tab!==tab){ flt={}; qv='' } setTab(b.dataset.tab) });
+const ICON={plus:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  back:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 5l-7 7 7 7"/></svg>',
+  share:'<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>',
+  search:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
+  filter:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>'};
+function header(){
+  const sc=$('screen'); let h='';
+  if(tab==='hoy') h='';
+  else if(tab==='cantos'||tab==='fav'){
+    h=`<header class="top"><div class="wrap"><h1>${tab==='fav'?'Favoritas':'Cantos'}</h1><button class="round lit" id="addsong" aria-label="Agregar una canción">${ICON.plus}</button></div>
+    <div class="wrap searchbar"><div class="srow"><label class="search" for="q">${ICON.search}<input id="q" type="search" placeholder="Título o parte de la letra" autocomplete="off" enterkeyhint="search"></label>
+    <button class="fbtn" id="fbtn" aria-pressed="false">${ICON.filter}<span id="fbtxt">Filtrar</span></button></div></div>
+    ${tab==='cantos'?`<div class="wrap"><div class="seg-ctl" role="group" aria-label="Qué cantos ver">${[['all','Todos'],['book','En la app'],['web','En internet'],['mine','Mis canciones']].map(([k,n])=>`<button data-sub="${k}" aria-pressed="${sub===k}">${n}</button>`).join('')}</div></div>`:''}</header>`;
+  }
+  else if(tab==='misa') h='';
+  else if(tab==='mas') h=`<header class="top"><div class="wrap"><h1>Más</h1></div></header>`;
+  else if(tab==='dom') h=`<header class="top"><div class="wrap"><button class="round" id="domback" aria-label="Volver">${ICON.back}</button><h1>Salmos del domingo</h1></div>
+    <div class="wrap searchbar"><label class="search" for="q">${ICON.search}<input id="q" type="search" placeholder="Domingo, tiempo o número de salmo" autocomplete="off"></label></div></header>`;
+  sc.innerHTML=h;
+  const q=$('q'); if(q){ q.value=qv; let t; q.addEventListener('input',()=>{ qv=q.value; clearTimeout(t); t=setTimeout(render,150) }) }
+  if($('addsong')) $('addsong').onclick=()=>{location.hash='nueva'};
+  if($('fbtn')) $('fbtn').onclick=()=>{location.hash='filtros'};
+  if($('domback')) $('domback').onclick=()=>setTab('hoy');
+  sc.querySelectorAll('[data-sub]').forEach(b=>b.onclick=()=>{ sub=b.dataset.sub; sc.querySelectorAll('[data-sub]').forEach(x=>x.setAttribute('aria-pressed',x===b)); render(); window.scrollTo(0,0) });
+}
+function render(){
+  if(!D) return;
+  const m=$('main'); m.innerHTML=''; updFbtn();
+  const nq=norm(qv).trim(), words=nq.split(' ').filter(Boolean);
+  if(tab==='hoy') return renderHoy(m);
+  if(tab==='misa') return renderMisa(m);
+  if(tab==='mas') return renderMas(m);
+  if(tab==='dom') return renderDom(m,nq,words);
+  const w=document.createElement('div'); w.className='wrap'; m.appendChild(w);
+  if(tab==='cantos'&&sub==='web') return renderWeb(w,nq,words);
+  if(tab==='cantos'&&sub==='mine') return renderMine(w,nq,words);
+  renderSongs(w,nq,words,tab==='fav',tab==='cantos'&&sub==='book');
+}
+function renderSongs(m,nq,words,fav,bookOnly){
+  let pool=D.songs, upool=[...U.values()], wpool=bookOnly?[]:X;
+  if(fav){ pool=pool.filter(s=>favs.has(s.i)); upool=upool.filter(s=>favs.has('u'+s.id)); wpool=X.filter(x=>favs.has(x.ref)) }
+  else { pool=pool.filter(s=>s.hide==null); wpool=wpool.filter(x=>!x.hide) }
+  activeBar(m);
+  pool=pool.filter(passLocal); upool=upool.filter(passUser); wpool=wpool.filter(passWeb);
+  if(nq.length>=2){
+    const A=searchSongs(pool,nq,words), B=searchSongs(upool,nq,words), WW=searchWeb(nq,words,wpool);
+    const WL=searchWebLyr(words,wpool,new Set(WW));
+    const T=[...B.tit.map(x=>itemUser(x.s)),...A.tit.map(x=>itemSong(x.s))];
+    const L=[...B.lyr.map(x=>itemUser(x.s,hl(x.s.lines[x.li],words,nq))),...A.lyr.map(x=>itemSong(x.s,hl(x.s.lines[x.li],words,nq)))];
+    if(!T.length&&!L.length&&!WW.length&&!WL.length){ m.insertAdjacentHTML('beforeend',`<p class="empty">No encontré «${esc(qv)}» ni en títulos ni en letras. Probá con menos palabras o con otra frase de la canción.</p>`); return }
+    if(T.length) group(m,'En el título',T.length,T);
+    if(L.length) group(m,'En la letra',L.length,L);
+    if(WW.length) group(m,'En internet',`${WW.length}, por título, autor o momento`,WW.map(itemWeb));
+    if(WL.length) group(m,'En la letra, en internet',`${WL.length}, se abren en su página`,WL.map(itemWeb));
+    return;
+  }
+  const athOrd=flt.sp==='ath';
+  const items=[...upool.map(s=>({nt:s.nt,el:()=>itemUser(s)})),...pool.map(s=>({nt:s.nt,lt:s.lt,o:s.ath?s.ath.o:0,el:()=>itemSong(s)})),...wpool.map(w=>({nt:w.nt,lt:w.raw.lt,el:()=>itemWeb(w)}))].sort((a,b)=>athOrd?((a.o||999)-(b.o||999)||a.nt.localeCompare(b.nt)):a.nt.localeCompare(b.nt));
+  if(!items.length){ m.insertAdjacentHTML('beforeend', fav&&!filtering()?'<p class="empty">Todavía no marcaste favoritas. Abrí una canción y tocá la estrella de arriba.</p>':'<p class="empty">No hay cantos con ese filtro.</p>'); return }
+  const title=filtering()?filterName():(fav?'Tus favoritas':bookOnly?'Guardadas en la app':'Todos los cantos');
+  const nweb=wpool.length;
+  if(['per','glo','san','cor','pad'].includes(flt.m)&&!flt.lt){
+    const parts=[['lit','Litúrgicos','respetan la letra del Misal'],['nol','No litúrgicos','cambian la letra'],[undefined,'Otros','sin la letra para comparar']];
+    parts.forEach(([k,n,d])=>{ const its=items.filter(x=>x.lt===k||(k===undefined&&!x.lt)); if(its.length) group(m,`${title}: ${n}`,`${its.length}, ${d}`,its,true) });
+  } else group(m,title,`${items.length.toLocaleString('es-AR')}${nweb?`, ${nweb.toLocaleString('es-AR')} de internet`:''}`,items,true);
+  const f=document.createElement('footer'); f.className='foot';
+  f.innerHTML=HAS_APP?'Las que tienen una etiqueta de otro cancionero (Pueblo de Dios, Jésed, Pastoral de Música…) necesitan conexión; las demás andan sin internet.':'Las que tienen una etiqueta de otro cancionero (Pueblo de Dios, Jésed, Pastoral de Música…) se abren con conexión; las demás están guardadas en la app.';
+  m.appendChild(f);
+}
+function activeBar(m){
+  if(!filtering()) return;
+  const d=document.createElement('div'); d.className='actf';
+  GROUPS.forEach(([k,,a])=>{ if(!flt[k]) return; const b=document.createElement('button'); b.className='chip'; b.setAttribute('aria-pressed','true');
+    b.innerHTML=`${esc(nameIn(a,flt[k]))} <span aria-hidden="true">×</span>`; b.setAttribute('aria-label','Quitar filtro '+nameIn(a,flt[k]));
+    b.onclick=()=>{ flt[k]=null; render() }; d.appendChild(b) });
+  const c=document.createElement('button'); c.className='clearf'; c.textContent='Limpiar'; c.onclick=()=>{ flt={}; render() }; d.appendChild(c);
+  m.appendChild(d);
+}
+function updFbtn(){ const b=$('fbtn'); if(!b) return; const n=GROUPS.filter(([k])=>flt[k]).length; b.setAttribute('aria-pressed',n>0); $('fbtxt').textContent=n?`Filtros (${n})`:'Filtrar'; b.hidden=tab==='cantos'&&sub==='mine' }
+function countMatches(){ const web=tab==='cantos'&&sub==='web', fav=tab==='fav', book=tab==='cantos'&&sub==='book';
+  let n=book?0:X.filter(x=>(fav?favs.has(x.ref):!x.hide)&&passWeb(x)).length;
+  if(!web) n+=D.songs.filter(s=>(fav?favs.has(s.i):s.hide==null)&&passLocal(s)).length+[...U.values()].filter(s=>(!fav||favs.has('u'+s.id))&&passUser(s)).length;
+  return n }
+function renderFilters(){
+  const box=$('fgroups'); box.innerHTML='';
+  GROUPS.forEach(([k,title,arr,help])=>{ const sec=document.createElement('div');
+    sec.innerHTML=`<h3>${esc(title)}</h3>${help?`<p class="help">${esc(help)}</p>`:''}`;
+    const d=document.createElement('div'); d.className='chips'; d.setAttribute('role','group'); d.setAttribute('aria-label',title);
+    arr.forEach(([code,name])=>{ const b=document.createElement('button'); b.className='chip'; b.type='button'; b.textContent=name; b.setAttribute('aria-pressed',flt[k]===code);
+      b.onclick=()=>{ flt[k]=flt[k]===code?null:code; renderFilters() }; d.appendChild(b) });
+    sec.appendChild(d); box.appendChild(sec) });
+  const n=countMatches(); $('fgo').textContent=n?`Ver ${n.toLocaleString('es-AR')} cantos`:'Ningún canto con estos filtros'; $('fgo').disabled=!n;
+}
+$('fclear').onclick=()=>{ flt={}; renderFilters() };
+$('fgo').onclick=()=>{ if(history.length>1) history.back(); else location.hash='' };
+function renderWeb(m,nq,words){
+  if(!X.length){ m.insertAdjacentHTML('beforeend','<p class="empty">Para ver los cantos de internet hace falta conexión. Volvé a intentar cuando tengas señal.</p>'); return }
+  activeBar(m);
+  let pool=X.filter(x=>!x.hide&&passWeb(x));
+  let WL=[]; if(nq.length>=2){ const base=pool; pool=searchWeb(nq,words,base); WL=searchWebLyr(words,base,new Set(pool)); }
+  if(!pool.length&&WL.length){ group(m,'En la letra',`${WL.length}, se abren en su página`,WL.map(itemWeb)); return }
+  if(!pool.length){ m.insertAdjacentHTML('beforeend','<p class="empty">No hay cantos de internet con ese filtro.</p>'); return }
+  const cnt=k=>pool.filter(x=>x.src===k).length;
+  group(m,filtering()?filterName():'En internet',`${pool.length.toLocaleString('es-AR')}: Pueblo de Dios ${cnt('gpd')}, Jésed ${cnt('jes')}, Pastoral de Música ${cnt('pdm')}, Cancionero Web ${cnt('rc')}, LaCuerda ${cnt('lc')}`,pool.sort((a,b)=>a.nt.localeCompare(b.nt)).map(itemWeb),true);
+  if(WL.length) group(m,'En la letra',`${WL.length}, se abren en su página`,WL.map(itemWeb));
+}
+function renderMine(m,nq,words){
+  let all=[...U.values()];
+  if(nq.length>=2){ const B=searchSongs(all,nq,words); all=[...B.tit,...B.lyr].map(x=>x.s) } else all.sort((a,b)=>a.nt.localeCompare(b.nt));
+  const pool=all.filter(s=>!s.comm), cpool=all.filter(s=>s.comm);
+  const h=document.createElement('div'); h.className='group-h'; h.innerHTML=`Mis canciones <small>${pool.length}</small>`; m.appendChild(h);
+  if(![...U.values()].some(s=>!s.comm)){ m.insertAdjacentHTML('beforeend','<p class="empty">Acá van las canciones que cargues vos. Escribí o pegá la letra con los acordes y queda guardada con búsqueda y cambio de tono, igual que las demás.</p>') }
+  const ul=document.createElement('ul'); ul.className='res'; pool.forEach(s=>ul.appendChild(itemUser(s))); m.appendChild(ul);
+  const b=document.createElement('button'); b.className='primary'; b.style.marginTop='16px'; b.textContent='Agregar una canción'; b.onclick=()=>{location.hash='nueva'}; m.appendChild(b);
+  const ch=document.createElement('div'); ch.className='group-h'; ch.style.marginTop='26px'; ch.innerHTML=`De la comunidad <small>${cpool.length}</small>`; m.appendChild(ch);
+  m.insertAdjacentHTML('beforeend',`<p class="note">${cpool.length?'Cantos que mandaron otros músicos y fueron revisados antes de publicarse.':(commState==='err'?'No se pudieron traer los cantos de la comunidad. Revisá la conexión.':'Todavía no hay cantos de la comunidad. Cargá uno y tocá «Enviar a la comunidad».')}</p>`);
+  const cl=document.createElement('ul'); cl.className='res'; cpool.forEach(s=>cl.appendChild(itemUser(s))); m.appendChild(cl);
+}
+
+// ---------- HOY ----------
+const fmtDay=d=>d.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
+function seasonPool(code){ return [...D.songs.filter(s=>s.hide==null&&(s.tl||[]).includes(code)),...X.filter(x=>!x.hide&&(x.tl||[]).includes(code))] }
+function momentCount(code){ return D.songs.filter(s=>s.hide==null&&(s.m||[]).includes(code)).length+X.filter(x=>!x.hide&&x.m.includes(code)).length }
+function renderHoy(m){
+  const sun=SUN, others=UPS.filter(u=>u!==sun);
+  const today=others.find(u=>sameDay(u.date,TODAY));
+  const isToday=sameDay(sun.date,TODAY);
+  const hero=document.createElement('section'); hero.className='hero';
+  hero.innerHTML=`<div class="stole" aria-hidden="true"></div><div class="wrap">
+    <p class="when">${isToday?'Hoy, ':''}${esc(fmtDay(sun.date))}</p>
+    <h2>${esc(sun.name)}</h2>
+    <p class="cy">Ciclo ${sun.cy} · ${esc(SEASON_NAME[SEASON.code])} · color ${esc(SEASON.color)}</p>
+    ${today?`<p class="also">Hoy: ${esc(today.name)}</p>`:others.length?`<p class="also">Antes: ${others.map(u=>esc(u.name)+' ('+esc(u.date.toLocaleDateString('es-AR',{weekday:'long',day:'numeric'}))+')').join('; ')}</p>`:''}
+    <div class="acts"><button class="pill on-lit" id="gomisa">Preparar la misa</button><button class="pill ghost" id="gosal">Salmos del domingo</button></div></div>`;
+  m.appendChild(hero);
+  hero.querySelector('#gomisa').onclick=()=>setTab('misa');
+  hero.querySelector('#gosal').onclick=()=>{ qv=''; setTab('dom') };
+  const w=document.createElement('div'); w.className='wrap'; m.appendChild(w);
+  if(!store.get('guideSeen',false)){ const g=document.createElement('div'); g.className='sec news';
+    g.innerHTML=`<h3>¿Primera vez en la app?</h3><p class="note">Mirá la guía rápida: cómo buscar, cambiar el tono, armar la misa y más. Siempre la tenés en <b>Más › Cómo se usa</b>.</p><div class="mbar" style="margin-top:10px"><a class="primary" href="#ayuda" style="text-decoration:none">Ver la guía</a><button class="toolbtn" id="gno">Ahora no</button></div>`;
+    w.appendChild(g); g.querySelector('#gno').onclick=()=>{ store.set('guideSeen',true); g.remove() }; g.querySelector('a').addEventListener('click',()=>setTimeout(()=>g.remove(),300)) }
+  if(!store.get('v46seen',false)){ const n=document.createElement('div'); n.className='sec news';
+    n.innerHTML=`<h3>Novedades de la versión 4.6</h3><ul>
+      <li><b>Dibujos de acordes</b> en casi todos los cantos de internet (Pastoral de Música, Recursos Católicos, Jésed, LaCuerda y gran parte de Pueblo de Dios) y en los salmos de Bevilacqua, con <b>−</b> y <b>+</b> para verlos en otro tono.</li>
+      <li><b>Diapositivas para proyectar</b>: en <b>Misa</b>, la app arma un PowerPoint o PDF con la letra grande, sin acordes, para la tele.</li></ul><button class="toolbtn" id="newsok46">Entendido</button>`;
+    w.appendChild(n); n.querySelector('#newsok46').onclick=()=>{ ['v46seen','v45seen','v44seen','v43seen','v41seen','v40seen'].forEach(k=>store.set(k,true)); n.remove() } }
+  else if(!store.get('v45seen',false)){ const n=document.createElement('div'); n.className='sec news';
+    n.innerHTML=`<h3>Novedades de la versión 4.5</h3><ul>
+      <li><b>Diapositivas para proyectar</b>: en <b>Misa</b>, con los cantos elegidos, la app arma un PowerPoint o un PDF con la letra grande y sin acordes para la tele, con la portada de la celebración y una diapositiva vacía entre canto y canto.</li>
+      <li><b>Salmodia del P. José Bevilacqua</b>: los salmos de todos los domingos y fiestas de los ciclos A, B y C, con partitura y acordes.</li>
+      <li>La guía <b>Más › Cómo se usa</b> ya explica todo lo nuevo.</li></ul><button class="toolbtn" id="newsok45">Entendido</button>`;
+    w.appendChild(n); n.querySelector('#newsok45').onclick=()=>{ ['v45seen','v44seen','v43seen','v41seen','v40seen'].forEach(k=>store.set(k,true)); n.remove() } }
+  else if(!store.get('v44seen',false)){ const n=document.createElement('div'); n.className='sec news';
+    n.innerHTML=`<h3>Novedades de la versión 4.4</h3><ul>
+      <li><b>Salmodia responsorial del P. José Bevilacqua</b>: los salmos de todos los domingos y fiestas de los ciclos A, B y C, con partitura y acordes. En <b>Hoy</b> aparece el del domingo que viene, y en <b>Salmos del domingo</b> están todos.</li>
+      <li>También sus <b>aclamaciones antes del Evangelio</b> (Cuaresma y Semana Santa) y <b>41 melodías para el Aleluia</b>, en el momento Aleluya.</li></ul><button class="toolbtn" id="newsok44">Entendido</button>`;
+    w.appendChild(n); n.querySelector('#newsok44').onclick=()=>{ ['v44seen','v43seen','v41seen','v40seen'].forEach(k=>store.set(k,true)); n.remove() } }
+  else if(!store.get('v43seen',false)){ const n=document.createElement('div'); n.className='sec news';
+    n.innerHTML=`<h3>Novedades de la versión 4.3</h3><ul>
+      <li><b>Misa compartida</b>: cuando tocás <b>Compartir</b> en Misa, el mensaje lleva la misa adentro. El que la recibe copia el mensaje de WhatsApp y abre la app: le aparece la misa armada, con cada canto en su momento.</li>
+      <li><b>Escuchar tus cantos</b>: al cargar o editar una canción podés pegar el enlace de YouTube o <b>grabarte</b> con el teléfono. La grabación la escuchan también los que reciben tu misa o ven el canto en la comunidad.</li></ul><button class="toolbtn" id="newsok43">Entendido</button>`;
+    w.appendChild(n); n.querySelector('#newsok43').onclick=()=>{ store.set('v43seen',true); store.set('v41seen',true); store.set('v40seen',true); n.remove() } }
+  else if(!store.get('v41seen',false)){ const n=document.createElement('div'); n.className='sec news';
+    n.innerHTML=`<h3>Novedades de la versión 4.2</h3><ul>
+      <li><b>Cancionero de Athenas</b>: se sumaron 94 cantos con letra y acordes (alabanza, Espíritu Santo, eucarísticos, María, sanación, Navidad, animación, los 20 misterios del Rosario y salmos de la Vigilia Pascual). Buscá «Athenas» o mirá la etiqueta junto al título.</li>
+      <li>Si un canto ya estaba en el cancionero, la versión de Athenas aparece dentro del canto, en «También está como», para no repetirlo en la lista.</li>
+      <li><b>Cantos de la comunidad</b>: cargá una canción en «Agregar una canción» y tocá «Enviar a la comunidad». Después de revisarla, la ven todos en <b>Mis canciones › De la comunidad</b>.</li></ul><button class="toolbtn" id="newsok41">Entendido</button>`;
+    w.appendChild(n); n.querySelector('#newsok41').onclick=()=>{ store.set('v41seen',true); store.set('v40seen',true); n.remove() } }
+  else if(!store.get('v40seen',false)){ const n=document.createElement('div'); n.className='sec news';
+    n.innerHTML=`<h3>Novedades de la versión 4.0</h3><ul>
+      <li><b>Empezar la misa</b>: abre el primer canto y abajo te muestra cuál sigue; con <b>›</b> pasás al siguiente sin volver a la lista.</li>
+      <li><b>Misas guardadas</b>: guardá cada celebración (domingos, retiros, casamientos) y volvé a usarla cuando quieras.</li>
+      <li>Las partituras de Pueblo de Dios y los PDF de Jésed se ven <b>mucho más grandes</b>: si la hoja trae dos páginas, se muestran una debajo de la otra, sin márgenes, y se amplían pellizcando.</li>
+      <li>Los cantos de origen evangélico documentado tienen un aviso con su reseña.</li></ul><button class="toolbtn" id="newsok">Entendido</button>`;
+    w.appendChild(n); n.querySelector('#newsok').onclick=()=>{ store.set('v40seen',true); n.remove() } }
+  // psalm of the coming sunday
+  const ps=document.createElement('div'); ps.className='sec';
+  const rows=DOM?domRowsFor(sun):[];
+  ps.innerHTML=`<h3>Salmo de este domingo</h3>`;
+  const ul=document.createElement('ul'); ul.className='res';
+  if(!DOM) ul.innerHTML='<li class="note" style="padding:8px 0">Cargando…</li>';
+  else if(!rows.length) ul.innerHTML='<li class="note" style="padding:8px 0">No tengo el salmo de esta celebración en la lista.</li>';
+  rows.forEach(r=>{ ul.appendChild(domItem(r)); const e=domExtra(r); if(e) ul.appendChild(e); gpdPsalms(r).forEach(x=>ul.appendChild(itemWeb(x))) });
+  ps.appendChild(ul); w.appendChild(ps);
+  // season shelf
+  if(SEASON.code!=='ord'&&X.length){ const pool=seasonPool(SEASON.code); if(pool.length){
+    const s=document.createElement('div'); s.className='sec'; s.innerHTML=`<h3>Cantos de ${esc(SEASON_NAME[SEASON.code])} <a href="#ver-tl-${SEASON.code}">Ver los ${pool.length}</a></h3>`;
+    const sh=document.createElement('div'); sh.className='shelf'; pool.slice().sort((a,b)=>(favs.has(b.i??b.ref)-favs.has(a.i??a.ref))||a.nt.localeCompare(b.nt)).slice(0,14).forEach(x=>sh.appendChild(shelfCard(x)));
+    s.appendChild(sh); w.appendChild(s) } }
+  // order of mass
+  const o=document.createElement('div'); o.className='sec';
+  o.innerHTML=`<h3>Cantos para cada momento</h3><p class="note">En el orden de la misa.</p>`;
+  const ol=document.createElement('ul'); ol.className='ordo';
+  ORDO.forEach(([part,codes])=>{ ol.insertAdjacentHTML('beforeend',`<li class="part">${esc(part)}</li>`);
+    codes.forEach(c=>ol.insertAdjacentHTML('beforeend',`<li><a href="#ver-m-${c}">${esc(c==='sal'?'Salmo':nameIn(MOM,c))}<small>${momentCount(c)}</small></a></li>`)) });
+  o.appendChild(ol); w.appendChild(o);
+  // recents
+  const rec=recent.map(r=>[r,refInfo(r)]).filter(x=>x[1]);
+  if(rec.length){ const s=document.createElement('div'); s.className='sec'; s.innerHTML='<h3>Abiertos hace poco</h3>';
+    const sh=document.createElement('div'); sh.className='shelf';
+    rec.slice(0,12).forEach(([r,i])=>{ const a=document.createElement('a'); a.href='#'+i.hash; a.className=typeof r==='number'?'k':''; a.innerHTML=`<b>${esc(i.t)}</b><span>${esc((i.mine?'':'')||namesOf(MOM,i.m).slice(0,1).join('')||' ')}</span>`; sh.appendChild(a) });
+    s.appendChild(sh); w.appendChild(s) }
+  // occasions
+  const oc=document.createElement('div'); oc.className='sec';
+  oc.innerHTML=`<h3>Celebraciones y sacramentos</h3><div class="occ">${['bau','pco','cnf','mat','dif','enf','rec','nin','jov','voc','pat'].map(c=>`<a href="#ver-oc-${c}">${esc(nameIn(OCC,c))}</a>`).join('')}<a href="#ver-m-mar">Virgen María</a><a href="#ver-sp-sdb">Don Bosco</a></div>`;
+  w.appendChild(oc);
+}
+function sameDay(a,b){ return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate() }
+function shelfCard(x){ const a=document.createElement('a'); const isC=typeof x.i==='number';
+  a.href='#'+(isC?'c'+x.i:x.ref); a.className=isC?'k':'';
+  a.innerHTML=`<b>${esc(x.t)}</b><span>${esc(isC?(namesOf(MOM,x.m).slice(0,1)[0]||''):(x.badge))}</span>`; return a }
+const ORDO=[['Ritos iniciales',['ent','per','glo']],['Liturgia de la Palabra',['sal','ale']],['Liturgia eucarística',['ofr','san','pad','cor','com','acc']],['Despedida',['env','mar']]];
+function gpdPsalms(r){ const n=/salmo\s+(\d+)/i.exec(r.ref); return n&&GPS.get(n[1])||[] }
+
+// ---------- salmos del domingo ----------
+function lnorm(x){ return String(x).replace(/ı/g,'i').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\s+/g,' ') }
+function domRowsFor(u){
+  const k=lnorm(u.key); const numbered=/^[ivx]+ domingo/.test(k);
+  return DOM.rows.filter(r=>{ const c=lnorm(r.cel); return (numbered?c.startsWith(k):c.includes(k)) && (r.cy.startsWith(u.cy)||r.cy.includes('B y C')) });
+}
+function domItem(r){
+  const s=r.ath!=null?D.songs[r.ath]:r.bev!=null?D.songs[r.bev]:null; const lab=r.ath!=null?'Athenas':'Bevilacqua'; const el=document.createElement('li'); const a=document.createElement('a'); a.className='r';
+  if(s){ a.href='#c'+s.i } else { a.href=r.yt; a.target='_blank'; a.rel='noopener' }
+  const ant=s&&r.ath!=null?s.t.replace(/^[^–]*–\s*/,''):'';
+  a.innerHTML=`<span class="t">${esc(r.cel)}<span class="src">${s?lab:'YouTube'}</span></span><span class="sn">Ciclo ${esc(r.cy)}, ${esc(r.ref)}${ant?', «'+esc(ant)+'»':''}</span><span class="k">${s?esc(s.key||''):''}</span>`;
+  el.appendChild(a); return el }
+function domExtra(r){ if(r.ath==null||r.bev==null) return null; const s=D.songs[r.bev]; const el=document.createElement('li'); const a=document.createElement('a'); a.className='r'; a.href='#c'+s.i;
+  a.innerHTML=`<span class="t">${esc(r.cel)}<span class="src">Bevilacqua</span></span><span class="sn">Ciclo ${esc(r.cy)}, ${esc(r.ref)}, partitura con acordes</span>`; el.appendChild(a); return el }
+let domCy=null;
+function renderDom(m,nq,words){
+  const w=document.createElement('div'); w.className='wrap'; m.appendChild(w);
+  if(!DOM){ w.innerHTML='<p class="empty">Cargando…</p>'; return }
+  const p=document.createElement('p'); p.className='note'; p.style.marginTop='14px';
+  p.innerHTML='Todos los domingos y solemnidades de los tres ciclos. Las que dicen <span class="src">Athenas</span> están con letra y acordes que cambian de tono; las de <span class="src">Bevilacqua</span> son la partitura de la «Salmodia responsorial» del P. José Bevilacqua, con los acordes en el tono original. Las que dicen YouTube buscan el salmo en internet. Debajo de cada una aparece el mismo salmo del Grupo Pueblo de Dios, con audio, cuando lo tienen.';
+  w.appendChild(p);
+  const d=document.createElement('div'); d.className='actf';
+  [['A','Ciclo A'],['B','Ciclo B'],['C','Ciclo C']].forEach(([c,lab])=>{ const b=document.createElement('button'); b.className='chip'; b.textContent=lab+(c===SUN.cy?' (este año)':''); b.setAttribute('aria-pressed',domCy===c); b.onclick=()=>{ domCy=domCy===c?null:c; render() }; d.appendChild(b) });
+  w.appendChild(d);
+  let rows=DOM.rows.filter(r=>!domCy||r.cy.startsWith(domCy)||r.cy.includes('B y C'));
+  if(nq.length>=2) rows=rows.filter(r=>{ const toks=norm(r.cel+' '+r.ref+' ciclo '+r.cy).split(/[^a-z0-9ñ]+/); return words.every(w=>/^[ivx]+$/.test(w)?toks.includes(w):toks.some(t=>t.startsWith(w))) });
+  if(!rows.length){ w.insertAdjacentHTML('beforeend','<p class="empty">No encontré ese domingo. Probá con el número en romanos (por ejemplo «xxvi ordinario») o con el tiempo litúrgico.</p>'); return }
+  const SEC={adv:'Adviento',nav:'Navidad',cua:'Cuaresma',ss:'Semana Santa',pas:'Pascua','':'Tiempo Ordinario y solemnidades'};
+  let last=null, ul=null;
+  rows.forEach(r=>{
+    if(r.tl!==last){ last=r.tl; const h=document.createElement('div'); h.className='group-h'; h.textContent=SEC[r.tl]||''; w.appendChild(h); ul=document.createElement('ul'); ul.className='res'; w.appendChild(ul) }
+    ul.appendChild(domItem(r)); const e=domExtra(r); if(e) ul.appendChild(e); gpdPsalms(r).forEach(x=>ul.appendChild(itemWeb(x))) });
+  const f=document.createElement('footer'); f.className='foot'; f.textContent='Las citas siguen el Leccionario de la Conferencia Episcopal Española; el número de salmo es el mismo que en Argentina, aunque algún versículo o la antífona pueden variar.'; w.appendChild(f);
+}
+
+// ---------- MISA: the songs of the celebration, in the order of the mass ----------
+const MORD=['ent','per','glo','sal','ale','ofr','san','pad','cor','com','acc','env','mar'];
+function lkey(r){ return String(r) }
+function momentOf(r){ return lm[lkey(r)]||null }
+function saveList(){ store.set('list',list); const keep={}; list.forEach(r=>{ const k=lkey(r); if(lm[k]) keep[k]=lm[k] }); lm=keep; store.set('lm',lm); updCount() }
+function updCount(){ const b=$('lcount'); b.hidden=!list.length; b.textContent=list.length }
+function addToMisa(ref,moment){
+  if(!list.includes(ref)) list.push(ref);
+  if(moment===undefined){ const i=refInfo(ref); const ms=(i&&i.m||[]).filter(c=>MORD.includes(c)); const free=ms.find(c=>!list.some(r=>r!==ref&&momentOf(r)===c)); moment=free||ms[0]||null }
+  if(moment) lm[lkey(ref)]=moment; else delete lm[lkey(ref)];
+  saveList(); if(typeof ref==='string') keepOffline(ref); return moment }
+function renderMisa(m){
+  const w=document.createElement('div'); w.className='wrap'; m.appendChild(w);
+  const title=store.get('misaT','')||SUN.name;
+  w.insertAdjacentHTML('beforeend',`<div class="misa-h"><h2 id="mtitle">${esc(title)}</h2><p class="note">${list.length?`${list.length} canto${list.length>1?'s':''} elegido${list.length>1?'s':''}. Tocá «Agregar» en cada momento o el botón de lista dentro de un canto.`:'Elegí los cantos de cada momento: te sugiero los que sirven para ese momento y, primero, los de este tiempo litúrgico.'}</p>
+    ${list.length?`<div class="mbar"><button class="pill on-lit" id="mrun" style="background:var(--lit);color:var(--lit-on)">▶ Empezar la misa</button><button class="pill ghost" id="mshare">${ICON.share} Compartir</button></div><div class="mbar" style="margin-top:8px"><button class="pill ghost" id="mslides">▣ Diapositivas para proyectar</button></div><div class="mbar" style="margin-top:8px"><button class="toolbtn" id="msave">Guardar</button><button class="toolbtn" id="mren">Cambiar el nombre</button><button class="toolbtn" id="mnew">Nueva</button></div>`:`<div class="mbar"><button class="toolbtn" id="mren">Cambiar el nombre</button></div>`}<div class="mbar" style="margin-top:8px"><button class="toolbtn" id="mpaste">Cargar una misa que me compartieron</button></div></div>`);
+  $('mpaste').onclick=()=>checkClip(true);
+  if($('mshare')) $('mshare').onclick=shareMisa;
+  if($('mslides')) $('mslides').onclick=openSlides;
+  if($('mrun')) $('mrun').onclick=startRun; if($('msave')) $('msave').onclick=saveMisa; if($('mnew')) $('mnew').onclick=newMisa;
+  $('mren').onclick=()=>{ const t=prompt('Nombre de esta misa o celebración',title); if(t!=null){ store.set('misaT',t.trim()); render() } };
+  const ol=document.createElement('ol'); ol.className='ord'; w.appendChild(ol);
+  ORDO.forEach(([part,codes])=>{ ol.insertAdjacentHTML('beforeend',`<li class="part">${esc(part)}</li>`); codes.forEach(c=>ol.appendChild(slot(c,nameIn(MOM,c)))) });
+  const loose=list.filter(r=>!momentOf(r));
+  if(loose.length) ol.appendChild(slot(null,'Otros cantos'));
+  savedBlock(w);
+}
+function slot(code,name){
+  const el=document.createElement('li'); const items=list.filter(r=>momentOf(r)===code);
+  if(items.length) el.className='has';
+  el.innerHTML=`<div class="mh"><b>${esc(name)}</b>${code?'<button class="addm">Agregar</button>':''}</div>`;
+  if(code) el.querySelector('.addm').onclick=()=>openPicker(code);
+  items.forEach(r=>{ const i=refInfo(r); if(!i) return; const row=document.createElement('div'); row.className='song';
+    const k=i.k&&!i.mine?` · ${i.k}`:'';
+    row.innerHTML=`<a href="#${i.hash}"><b>${esc(i.t)}</b><span>${esc((i.sn||'').slice(0,80))}</span></a>`;
+    const sel=document.createElement('select'); sel.className='mini'; sel.style.width='36px'; sel.setAttribute('aria-label','Mover a otro momento'); sel.style.appearance='none'; sel.style.textAlign='center';
+    sel.innerHTML='<option value="" disabled selected>⇅</option>'+MORD.map(c=>`<option value="${c}">${esc(nameIn(MOM,c))}</option>`).join('')+'<option value="-">Otros cantos</option>';
+    sel.onchange=()=>{ const v=sel.value; if(v==='-') delete lm[lkey(r)]; else lm[lkey(r)]=v; saveList(); render() };
+    const rm=mk('×','Quitar de la misa',()=>{ list=list.filter(x=>x!==r); saveList(); render() });
+    row.append(sel,rm); el.appendChild(row) });
+  return el }
+function mk(t,label,fn){const b=document.createElement('button');b.className='mini';b.textContent=t;b.setAttribute('aria-label',label);b.onclick=fn;return b}
+function openPicker(code){
+  const ov=document.createElement('div'); ov.className='pick'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-label','Elegir '+nameIn(MOM,code));
+  ov.innerHTML=`<div class="panel"><div class="ph"><div class="row"><h3>${esc(nameIn(MOM,code))}</h3><button class="iconbtn" aria-label="Cerrar">✕</button></div>
+    <label class="search">${ICON.search}<input type="search" placeholder="Buscar entre los de ${esc(nameIn(MOM,code).toLowerCase())}" autocomplete="off"></label></div><div class="list"></div></div>`;
+  document.body.appendChild(ov);
+  const close=()=>{ ov.remove() }; ov.querySelector('.iconbtn').onclick=close; ov.onclick=e=>{ if(e.target===ov) close() };
+  const inp=ov.querySelector('input'), box=ov.querySelector('.list');
+  const sea=SEASON.code;
+  const all=[...D.songs.filter(s=>s.hide==null&&(s.m||[]).includes(code)).map(s=>({ref:s.i,t:s.t,nt:s.nt,tl:s.tl||[],lt:s.lt,ev:s.ev,sub:'',fav:favs.has(s.i)})),
+    ...X.filter(x=>!x.hide&&x.m.includes(code)).map(x=>({ref:x.ref,t:x.t,nt:x.nt,tl:x.tl||[],lt:x.raw.lt,ev:x.raw.ev,sub:x.badge,fav:favs.has(x.ref)})),
+    ...[...U.values()].filter(s=>MO_TXT[norm(s.mo||'').trim()]===code).map(s=>({ref:'u'+s.id,t:s.t,nt:s.nt,tl:[],sub:'mía',fav:favs.has('u'+s.id)}))];
+  const score=x=>(sea!=='ord'&&x.tl.includes(sea)?0:sea==='ord'&&!x.tl.length?1:2)-(x.fav?2:0)+(sea==='ord'&&x.tl.length?2:0)+(x.lt==='nol'?1:0)+(x.ev?3:0);
+  all.sort((a,b)=>score(a)-score(b)||a.nt.localeCompare(b.nt));
+  function draw(){ const q=norm(inp.value).trim(), ws=q.split(' ').filter(Boolean); const res=ws.length?all.filter(x=>ws.every(w=>x.nt.includes(w))):all;
+    box.innerHTML=''; const ul=document.createElement('ul'); ul.className='res';
+    res.slice(0,120).forEach(x=>{ const l=document.createElement('li'); const b=document.createElement('button'); b.className='r';
+      const inS=sea!=='ord'&&x.tl.includes(sea);
+      b.innerHTML=`<span class="t">${x.fav?'<span style="color:var(--gold)">★</span> ':''}${esc(up(x.t))}</span><span class="sn">${esc([x.sub,x.lt==='lit'?'Litúrgico':x.lt==='nol'?'No litúrgico':'',x.ev?'Origen evangélico: mejor para retiros':'',inS?SEASON_NAME[sea]:''].filter(Boolean).join(' · '))}</span><span class="k">${list.includes(x.ref)?'✓':'+'}</span>`;
+      b.onclick=()=>{ addToMisa(x.ref,code); close(); render(); toast('Agregado a '+nameIn(MOM,code)) }; l.appendChild(b); ul.appendChild(l) });
+    if(!res.length) box.innerHTML='<p class="empty">No encontré cantos para este momento con esa búsqueda.</p>'; else box.appendChild(ul) }
+  inp.addEventListener('input',draw); draw();
+}
+async function shareMisa(){
+  const title=store.get('misaT','')||SUN.name;
+  const lines=[title,''];
+  const put=(name,rs)=>rs.forEach(r=>{ const i=refInfo(r); if(i) lines.push(`${name}: ${i.t.replace(/\s+/g,' ')}${i.k&&!i.mine&&!i.web?' ('+i.k+')':''}`) });
+  MORD.forEach(c=>put(nameIn(MOM,c),list.filter(r=>momentOf(r)===c)));
+  put('Otro',list.filter(r=>!momentOf(r)));
+  if(lines.length===2){ toast('Primero elegí algún canto'); return }
+  const code=await misaCode(); store.set('lastShared',code);
+  lines.push('','Para cargarla armada en tu Cancionero Católico: mantené apretado este mensaje, tocá Copiar y abrí la app.','',code);
+  const text=lines.join('\n');
+  try{ if(window.App&&App.share){ App.share(text); return } }catch(e){}
+  try{ if(navigator.share){ await navigator.share({text}); return } }catch(e){ if(e&&e.name==='AbortError') return }
+  try{ await navigator.clipboard.writeText(text); toast('Lista copiada: pegala en WhatsApp') }catch(e){ prompt('Copiá la lista',text) }
+}
+
+// ---------- MÁS ----------
+function renderMas(m){
+  const w=document.createElement('div'); w.className='wrap'; m.appendChild(w);
+  const th=store.get('theme','auto');
+  w.innerHTML=`<ul class="menu">
+    <li><a href="#ayuda"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M9 8h6"/></svg><span>Cómo se usa<small>Guía rápida de todo lo que hace la app</small></span></a></li>
+    <li><a href="#nueva">${ICON.plus}<span>Agregar una canción<small>Con letra y acordes, y cambio de tono</small></span></a></li>
+    <li><button id="gosend"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg><span>Enviar un canto a la comunidad<small>Lo revisamos y, si se aprueba, lo ven todos</small></span></button></li>
+    <li><button id="gomine"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg><span>Mis canciones<small>${(()=>{ const n=[...U.values()].filter(x=>!x.comm).length, c=[...U.values()].filter(x=>x.comm).length; return (n?n+' cargada'+(n===1?'':'s'):'Todavía ninguna')+(c?' · '+c+' de la comunidad':'') })()}</small></span></button></li>
+    <li><button id="godom"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><span>Salmos del domingo<small>Los tres ciclos, con letra o audio</small></span></button></li>
+    <li><a href="#acerca"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><span>Acerca de la aplicación<small>Autor, contacto y cancioneros</small></span></a></li>
+  </ul>
+  <div class="sec"><h3>Aspecto</h3><p class="note">La app se viste con el color del tiempo litúrgico: ahora, ${esc(SEASON.color)}. El modo noche ayuda en la iglesia con poca luz.</p>
+    <div class="opt" role="group" aria-label="Aspecto">${[['auto','Como el teléfono'],['light','Claro'],['dark','Noche']].map(([k,n])=>`<button class="chip" data-th="${k}" aria-pressed="${th===k}">${n}</button>`).join('')}</div></div>`;
+  w.querySelector('#gomine').onclick=()=>{ sub='mine'; setTab('cantos') };
+  const col=document.createElement('div'); col.className='sec';
+  col.innerHTML=`<h3>Colaborar con el cancionero</h3><p class="note">La app es gratuita. Si querés hacer un aporte para sostener su crecimiento, escribinos a <b>cancionerocatolico.app@gmail.com</b> y te contamos cómo.</p><button class="toolbtn" id="colab">Escribir un correo</button>`;
+  setTimeout(()=>{ w.appendChild(col); col.querySelector('#colab').onclick=()=>mailTo('Quiero colaborar con el Cancionero Católico','Hola, me gustaría hacer un aporte para sostener el Cancionero Católico. ¿Cómo puedo hacerlo?\n\nGracias.') },0);
+  w.querySelector('#gosend').onclick=sendInfo;
+  w.querySelector('#godom').onclick=()=>{ qv=''; setTab('dom') };
+  w.querySelectorAll('[data-th]').forEach(b=>b.onclick=()=>{ store.set('theme',b.dataset.th); applyTheme(); render() });
+  if(HAS_APP&&X.length){ const names=jesedNames(); let have=0; try{ have=App.jesedCount(JSON.stringify(names)) }catch(e){}
+    const d=document.createElement('div'); d.className='sec';
+    d.innerHTML=`<h3>Jésed sin conexión</h3><p class="note">${have===names.length?'Los '+names.length+' cancioneros de Jésed ya están en el teléfono: sus canciones se abren sin internet.':`Hay ${have} de ${names.length} cancioneros de Jésed guardados en el teléfono. Descargalos todos (unos 23 MB) para abrir sus canciones sin internet.`}</p>${have===names.length?'':'<div style="margin-top:10px"><button class="primary" id="jesbtn">Descargar todos</button></div>'}<p class="note" id="jesprog" style="margin-top:6px"></p>`;
+    w.appendChild(d); const bt=d.querySelector('#jesbtn'); if(bt) bt.onclick=()=>{ bt.disabled=true; bt.textContent='Descargando…'; try{ App.downloadJesed(JSON.stringify(names)) }catch(e){} } }
+}
+$('copymail').onclick=async()=>{ const t=$('mailaddr').textContent; try{ await navigator.clipboard.writeText(t); toast('Correo copiado') }catch(e){ const r=document.createRange(); r.selectNodeContents($('mailaddr')); const sel=getSelection(); sel.removeAllRanges(); sel.addRange(r); toast('Correo seleccionado: copialo') } };
+(()=>{ const sp=$('splash'); $('splashsub').textContent=SUN.name; let gone=false; const hide=()=>{ if(gone) return; gone=true; sp.classList.add('out'); setTimeout(()=>sp.remove(),450) };
+  sp.addEventListener('click',hide); setTimeout(hide,1800); })();
+// ---------- page images ----------
+async function pageURL(p){
+  if(urls.has(p)) return urls.get(p);
+  const [f,o,n]=D.pages[p];
+  if(!bundles.has(f)) bundles.set(f,fetch('pages/'+f+'.webp').then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}));
+  const buf=await bundles.get(f); const u=URL.createObjectURL(new Blob([buf.slice(o,o+n)],{type:'image/webp'})); urls.set(p,u); return u;
+}
+function segX(s,seg){ return seg.length>=5?[seg[3],seg[4]]:s.x }
+function buildSegs(){
+  const box=$('segs'); box.innerHTML=''; const s=cur.s;
+  s.s.forEach(seg=>{ const [p,y0,y1]=seg; const [x0,x1]=segX(s,seg); const sw=x1-x0;
+    const d=document.createElement('div'); d.className='seg'; Object.assign(d.dataset,{p,y0,y1,x0,x1});
+    d.style.aspectRatio=`${sw}/${y1-y0}`;
+    d.innerHTML='<div class="load">Cargando…</div>'; box.appendChild(d);
+    pageURL(p).then(u=>{ const im=new Image(); im.src=u; im.alt='';
+      im.style.width=(D.pw/sw*100)+'%'; im.style.marginLeft=(-x0/sw*100)+'%'; im.style.marginTop=(-y0/sw*100)+'%';
+      d.innerHTML=''; d.appendChild(im); const ov=document.createElement('div'); ov.className='ov'; ov.style.cssText='position:absolute;inset:0'; d.appendChild(ov); paint(d) })
+     .catch(()=>{ d.innerHTML='<div class="load">No se pudo cargar. Revisá la conexión.</div>' });
+  });
+}
+function paint(d){
+  const ov=d.querySelector('.ov'); if(!ov||!cur||cur.kind!=='c') return;
+  const s=cur.s, p=+d.dataset.p, y0=+d.dataset.y0, y1=+d.dataset.y1, x0=+d.dataset.x0, x1=+d.dataset.x1, sw=x1-x0, sh=y1-y0;
+  const px=d.clientWidth/sw, n=cur.n, key=s.key?parseKey(s.key):null, cols=p>=1000; let h='';
+  // primero tapa los acordes originales, después escribe los nuevos sin que uno pise al otro
+  const W=d.clientWidth, H=sh*px, items=[];
+  s.c.forEach(c=>{ if(c[0]!==p||c[2]<y0-2||c[4]>y1+2||(cols&&(c[1]<x0-2||c[3]>x1+2))) return; const es=c[6]===1;
+    if(!n&&!es) return;
+    const hh=(c[4]-c[2]), fs=Math.max(8,hh*px*0.86);
+    items.push({l:(c[1]-x0)*px,t:(c[2]-y0)*px,w:(c[3]-c[1])*px,h:hh*px,fs,txt:tr(c[5],n,key)}) });
+  const cv=paint.cv||(paint.cv=document.createElement('canvas').getContext('2d'));
+  // agrupa en renglones (aunque la altura varíe un poco) y ordena cada renglón de izquierda a derecha
+  items.sort((a,b)=>a.t-b.t); const rows=[];
+  items.forEach(it=>{ const r=rows[rows.length-1]; if(r&&Math.abs(it.t-r.t)<it.h*0.6) r.a.push(it); else rows.push({t:it.t,a:[it]}) });
+  rows.forEach(r=>{ r.a.sort((a,b)=>a.l-b.l); let edge=-1e9;
+    r.a.forEach((it,k)=>{ const nx=r.a[k+1]; if(nx){ const g=nx.l-(it.l+it.w); if(g>0&&g<it.fs*0.6) it.w=nx.l-it.l } });
+    r.a.forEach(it=>{ cv.font=`700 ${it.fs.toFixed(1)}px Arial, Helvetica, sans-serif`; it.tw=cv.measureText(it.txt).width+2;
+      it.x=Math.max(it.l,Math.min(edge+it.fs*0.3,it.l+it.fs*1.5)); edge=Math.max(edge,it.x+it.tw) }) });
+  items.forEach(it=>{
+    h+=`<div class="cb" style="left:${(it.l/W*100).toFixed(3)}%;top:${(it.t/H*100).toFixed(3)}%;width:${(it.w/W*100).toFixed(3)}%;height:${(it.h/H*100).toFixed(3)}%"></div>` });
+  items.forEach(it=>{ h+=`<div class="cc" style="left:${(it.x/W*100).toFixed(3)}%;top:${(it.t/H*100).toFixed(3)}%;min-width:${(it.w/W*100).toFixed(3)}%;height:${(it.h/H*100).toFixed(3)}%;font-size:${it.fs.toFixed(1)}px">${esc(it.txt)}</div>` });
+  ov.innerHTML=h;
+}
+function paintAll(){ document.querySelectorAll('#segs .seg').forEach(paint) }
+window.addEventListener('resize',()=>{ if(cur&&cur.kind==='c') paintAll() });
+// ---------- routing ----------
+function hideAll(){ ['view','wview','fview','aview','xview','gview'].forEach(id=>$(id).hidden=true); document.body.style.overflow=''; stopScroll(); stage(false); awake(false) }
+function route(){
+  const h=decodeURIComponent(location.hash.slice(1)); let m;
+  if((m=/^ver-(m|tl|th|cl|oc|sp)-([a-z]+)$/.exec(h))){ history.replaceState(null,'',location.pathname+location.search); hideAll(); cur=null; goFilter(m[1],m[2]); return }
+  if((m=/^c(\d+)$/.exec(h))&&D.songs[+m[1]]) return openSong(D.songs[+m[1]]);
+  if(/^[wjrlg][a-z0-9]+$/.test(h)) return openWeb(h);
+  if((m=/^u([a-z0-9]+)$/i.exec(h))&&U.has(m[1])) return openUser(U.get(m[1]));
+  if(h==='nueva') return openForm(null);
+  if(h==='acerca'){ cur=null; showSheet('aview'); return }
+  if(h==='ayuda'){ cur=null; store.set('guideSeen',true); showSheet('gview'); return }
+  if(h==='filtros'){ cur=null; showSheet('xview'); renderFilters(); return }
+  if((m=/^editar-([a-z0-9]+)$/i.exec(h))&&U.has(m[1])) return openForm(U.get(m[1]));
+  const had=!!cur||!$('fview').hidden||!$('xview').hidden; hideAll(); cur=null; if(had) render();
+}
+document.querySelectorAll('.back').forEach(b=>b.onclick=()=>{ if(history.length>1) history.back(); else location.hash='' });
+function showSheet(id){ hideAll(); $(id).hidden=false; document.body.style.overflow='hidden' }
+function refOf(){ return cur.kind==='c'?cur.s.i:cur.kind==='w'?cur.id:'u'+cur.id }
+function remember(r){ recent=[r,...recent.filter(x=>x!==r)].slice(0,16); store.set('rec',recent) }
+function setPressed(){ const r=refOf(), on=favs.has(r);
+  document.querySelectorAll('.fav').forEach(b=>{b.setAttribute('aria-pressed',on); b.querySelector('path').setAttribute('fill',on?'currentColor':'none')});
+  document.querySelectorAll('.addlist').forEach(b=>b.setAttribute('aria-pressed',list.includes(r))) }
+document.querySelectorAll('.fav').forEach(b=>b.onclick=()=>{ const r=refOf(); favs.has(r)?favs.delete(r):favs.add(r); store.set('favs',[...favs]); setPressed(); if(favs.has(r)&&typeof r==='string') keepOffline(r); toast(favs.has(r)?'Agregada a favoritas':'Quitada de favoritas') });
+document.querySelectorAll('.addlist').forEach(b=>b.onclick=()=>{ const r=refOf(); if(list.includes(r)){ list=list.filter(x=>x!==r); saveList(); setPressed(); toast('Quitada de la misa'); return }
+  const mo=addToMisa(r); setPressed(); toast(mo?`Agregada a la misa: ${nameIn(MOM,mo)}`:'Agregada a la misa') });
+// keep the screen on while a song is open
+let wl=null;
+async function awake(on){ try{ if(window.App&&App.keepAwake) App.keepAwake(!!on) }catch(e){}
+  try{ if(on&&navigator.wakeLock&&!wl){ wl=await navigator.wakeLock.request('screen'); wl.addEventListener('release',()=>{wl=null}) } else if(!on&&wl){ wl.release(); wl=null } }catch(e){} }
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'&&cur&&cur.kind!=='w') awake(true) });
+// ---------- song from the book ----------
+function openSong(s){
+  cur={kind:'c',s,n:store.get('t:'+s.i,0)}; remember(s.i);
+  $('vt').textContent=s.t; showSheet('view'); $('scroller').scrollTop=0; $('segwrap').scrollLeft=0; setPressed(); awake(true);
+  $('txt').innerHTML=''; $('vbtns').innerHTML='';
+  const pg=s.s.map(x=>x[0]); const first=pg[0], last=pg[pg.length-1];
+  const num=p=>p>=4000?(p-4000)%200+1:p>=3000?p-3000-1:p>=2000?p-2000+1:p>=1000?p-1000+1:p+1;
+  const book=s.src==='pj'?'del Cancionero Pascua Joven':s.src==='ath'?'de los Salmos de Athenas':s.src==='ach'?'del Cancionero de Athenas':s.src==='bev'?`del cuadernillo «Salmodia responsorial», año ${s.ath&&s.ath.cy?esc(s.ath.cy[0]):''}, del P. José Bevilacqua`:'del cancionero';
+  let info='';
+  if(s.ath) info+=`<p style="margin:0 0 8px"><b>${esc(s.ath.cel)}${s.ath.cy&&!/ciclo/i.test(s.ath.cel)?', ciclo '+esc(s.ath.cy):''}</b><br>${esc(s.ath.ref)}</p>`;
+  info+=evBox(s.ev,s.evo);
+  if(s.fix) info+=`<p class="note" style="margin:0 0 8px">Los acordes van escritos en la partitura, en el tono original (en esta hoja no se puede cambiar el tono).</p>`;
+  if(!s.ath) info+=(s.au?`<p style="margin:0 0 8px"><span class="note">Autor o intérprete:</span> <b>${esc(s.au)}</b></p>`:'')+tagLinks(s);
+  info+=`<p class="note">${s.src==='bev'?'Partitura '+book.replace(/^del/,'del'):'Página '+num(first)+(last!==first?'–'+num(last):'')+' '+book}.`+(s.w?` También está en <a href="${esc(WBASE||'https://www.pastoraldemusica.org.ar/cancionero/cancion.php?id=')}${s.w}" target="_blank" rel="noopener">Pastoral de Música</a>, con audio y otras versiones.`:'')+'</p>';
+  info+=altBlock(s.alt,s.hide);
+  if(s.gp) info+=gpdBlock(s.gp);
+  if(s.j) info+=`<a class="golink second" style="margin-top:12px" href="${JBASE+s.j.u}#page=${s.j.p}" target="_blank" rel="noopener">Ver la versión de Jésed</a><p class="note" style="margin-top:6px">PDF oficial de Jésed, álbum «${esc(s.j.al)}», página ${s.j.p}.</p>`;
+  $('vinfo').innerHTML=info;
+  $('vbtns').innerHTML=s.y?`<a class="golink second" href="${esc(s.y)}" target="_blank" rel="noopener">${/results\?/.test(s.y)?'Buscar el video de Athenas':'Ver el video en YouTube'}</a>`:ytButton(s.t,s.au||(/\(/.test(s.t)?'':'canción católica'));
+  cur.z=store.get('z:'+s.i,1); buildSegs(); updKey(); applyZoom(false);
+  runBar(s.i);
+}
+function altBlock(alt,hide){ const refs=[...(hide!=null?[hide]:[]),...(alt||[])]; const out=refs.map(r=>{ const i=refInfo(r); if(!i) return ''; const where=typeof r==='number'?((D.songs[r]&&D.songs[r].src==='ach'?'versión del Cancionero de Athenas':'en la app')+(i.k?', tono '+i.k:'')):(XM.get(r)?XM.get(r).badge:'internet'); return `<li><a href="#${i.hash}">${esc(i.t)}</a> <span class="note">(${esc(where)})</span></li>` }).filter(Boolean);
+  return out.length?`<div style="margin-top:12px"><p style="margin:0;font-weight:800">${hide!=null?'Es el mismo canto que':'También está como'}</p><ul style="margin:4px 0 0;padding-left:20px">${out.join('')}</ul></div>`:'' }
+function gpdBlock(g){ return `<div class="player" style="margin-top:12px"><p>Así lo canta el Grupo Pueblo de Dios</p>${g.mp3?`<audio controls preload="none" src="${esc(GBASE+g.mp3)}"></audio><a class="note" href="${esc(GBASE+g.mp3)}" target="_blank" rel="noopener">Si no suena, abrí el audio aparte</a>`:''}${g.us?`<p class="note" style="font-weight:500">Para usarlo: ${esc(g.us)}</p>`:''}${g.pdf?`<a class="note" href="${esc(GBASE+g.pdf)}" target="_blank" rel="noopener" style="font-weight:700;color:var(--lit)">Ver su partitura o letra (PDF)</a>`:''}</div>` }
+function chordsOf(){ return cur.kind==='c'?cur.s.c.map(c=>c[5]):songChords(cur.s) }
+function updKey(){
+  const s=cur.s, key=s.key?parseKey(s.key):null, n=cur.n, has=chordsOf().length;
+  $('keysel').parentElement.hidden=!!s.fix;
+  $('keyname').textContent=key?keyName(key,n):(n?((n>0?'+':'')+n):'—');
+  $('keyorig').textContent=!has?'sin acordes':(n===0?'original':`orig. ${s.key||''} ${n>0?'+':''}${n}`);
+  $('keysel').classList.toggle('changed',n!==0); $('reset').hidden=n===0;
+  const up=((n%12)+12)%12;
+  $('capo').innerHTML=(n!==0&&up>=1&&up<=7)?`O cejilla en el traste <b>${up}</b> y tocás los acordes originales.`:''; $('capo').hidden=!$('capo').innerHTML;
+  if(cur.kind==='c'){ paintAll(); store.set('t:'+s.i,n) } else { renderUserBody(); store.set('t:u'+s.id,n) }
+  diagrams();
+}
+function diagrams(){
+  const s=cur.s, key=s.key?parseKey(s.key):null, seen=[];
+  chordsOf().forEach(c=>{const t=tr(c,cur.n,key).split('/')[0]; if(!seen.includes(t)) seen.push(t)});
+  const box=$('diagrams'); if(!seen.length&&cur.kind==='c'&&cur.s.ch){ diagBlock(box,cur.s.ch,'Leídos de la partitura: puede faltar o sobrar alguno.'); return }
+  if(!seen.length){ box.innerHTML=cur.s.fix?'':'<h3>Acordes</h3><p class="note">Esta canción no tiene acordes cargados.</p>'; return }
+  box.innerHTML=`<h3>Acordes${cur.n?' en el tono nuevo':''}</h3><div class="dgrid">`+seen.map(t=>{const p=parse(t); const sh=p?shapeFor(p.s,p.q):null; return `<div class="dg">${sh?svg(sh):''}<b>${esc(t)}</b></div>`}).join('')+'</div>';
+}
+$('up').onclick=()=>{ cur.n=cur.n>=6?cur.n-11:cur.n+1; updKey() };
+$('down').onclick=()=>{ cur.n=cur.n<=-5?cur.n+11:cur.n-1; updKey() };
+$('reset').onclick=()=>{ cur.n=0; updKey() };
+// ---------- auto-scroll and full screen, for playing ----------
+let scr=null;
+function speed(){ return store.get('speed',4) }
+function stopScroll(){ if(scr){ cancelAnimationFrame(scr.raf); scr=null } $('play').setAttribute('aria-pressed','false'); $('speedrow').hidden=true; $('speedrow').parentElement.style.display='none' }
+function startScroll(){
+  const sc=$('scroller'); let last=performance.now(), acc=0;
+  scr={raf:0}; $('play').setAttribute('aria-pressed','true');
+  const row=$('speedrow'); row.parentElement.style.display=''; row.hidden=false;
+  row.innerHTML=`<span>Velocidad</span><input type="range" min="1" max="10" step="1" value="${speed()}" aria-label="Velocidad de desplazamiento"><span id="spv" style="min-width:20px;text-align:right">${speed()}</span>`;
+  row.querySelector('input').oninput=e=>{ store.set('speed',+e.target.value); $('spv').textContent=e.target.value };
+  const step=t=>{ const dt=Math.min(100,t-last); last=t; acc+=dt*(speed()*speed()*0.6+4)/1000; const px=Math.floor(acc); if(px>0){ acc-=px; sc.scrollTop+=px }
+    if(sc.scrollTop+sc.clientHeight>=sc.scrollHeight-2){ stopScroll(); return } if(scr) scr.raf=requestAnimationFrame(step) };
+  scr.raf=requestAnimationFrame(step);
+}
+$('speedrow').parentElement.style.display='none';
+$('play').onclick=()=>{ scr?stopScroll():startScroll() };
+function stage(on){ document.body.classList.toggle('stage',on); let b=document.querySelector('.stagehint');
+  if(on&&!b){ b=document.createElement('button'); b.className='stagehint'; b.textContent='Salir de pantalla completa'; b.onclick=()=>stage(false); document.body.appendChild(b) }
+  if(!on&&b) b.remove();
+  try{ if(window.App&&App.fullscreen){ App.fullscreen(!!on); return } }catch(e){}
+  try{ if(on&&document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{}); else if(!on&&document.fullscreenElement) document.exitFullscreen().catch(()=>{}) }catch(e){} }
+$('stage').onclick=()=>stage(!document.body.classList.contains('stage'));
+// ---------- my songs ----------
+function openUser(s){
+  s.key=userKey(s); remember('u'+s.id);
+  cur={kind:'u',id:s.id,s,n:store.get('t:u'+s.id,0),z:store.get('z:u'+s.id,1)};
+  $('vt').textContent=up(s.t); showSheet('view'); $('scroller').scrollTop=0; setPressed(); awake(true);
+  $('segs').innerHTML=''; $('segs').style.width=''; $('vinfo').innerHTML=`<p class="note">${s.comm?'Canto de la comunidad'+(s.by?', enviado por <b>'+esc(s.by)+'</b>':'')+'. Fue revisado antes de publicarse.':s.local?'Guardada en este teléfono.':'Guardada en tu cancionero: la ven todos los que lo usan.'}</p>`;
+  const ed=document.createElement('button'); ed.className='toolbtn'; ed.textContent='Editar'; ed.onclick=()=>{location.hash='editar-'+s.id};
+  const del=document.createElement('button'); del.className='toolbtn dangerbtn'; del.textContent='Borrar canción';
+  let armed=false; del.onclick=async()=>{ if(!armed){armed=true;del.textContent='Tocá de nuevo para borrarla';setTimeout(()=>{armed=false;del.textContent='Borrar canción'},3000);return}
+    try{ await removeUser(s); toast('Canción borrada'); location.hash='' }catch(e){ toast('No se pudo borrar. Revisá la conexión.') } };
+  const lb=listenBlock(s); if(lb) $('vinfo').appendChild(lb);
+  $('vbtns').innerHTML=ytLink(s.yt)?'':ytButton(s.t,s.au||'canción católica'); if(!s.comm) $('vbtns').append(sendBtn(s),ed,del);
+  updKey();
+  runBar('u'+s.id);
+}
+function renderUserBody(){ const s=cur.s; s.key=userKey(s);
+  $('txt').innerHTML=`<div class="txtsong"><h2 class="tt">${esc(up(s.t))}</h2>${(s.au||s.mo)?`<p class="meta">${esc([s.au,s.mo].filter(Boolean).join(' · '))}</p>`:''}<pre>${renderText(s,cur.n)}</pre></div>`; applyZoom(false) }
+// ---------- zoom (buttons + two-finger pinch), remembered per song ----------
+const ZMIN=1, ZMAX=3, ZSTEPS=[1,1.25,1.5,1.75,2,2.5,3];
+function zkey(){ return 'z:'+(cur.kind==='c'?cur.s.i:'u'+cur.id) }
+function applyZoom(save){
+  if(!cur||cur.kind==='w') return; const z=cur.z||1;
+  if(cur.kind==='c'){ $('segs').style.width=(z*100)+'%'; paintAll() }
+  else { const pre=document.querySelector('#txt pre'); if(pre) pre.style.fontSize=(14.5*z).toFixed(1)+'px' }
+  $('zout').disabled=z<=ZMIN+0.001; $('zin').disabled=z>=ZMAX-0.001;
+  if(save) store.set(zkey(),Math.round(z*100)/100);
+}
+function setZoom(z,cx,cy){ const sc=$('scroller'), sw=$('segwrap'), old=cur.z||1; z=Math.max(ZMIN,Math.min(ZMAX,z)); if(Math.abs(z-old)<0.005) return;
+  const px=(cx==null?0:cx), py=(cy==null?0:cy), fx=(sw.scrollLeft+px)/old, fy=(sc.scrollTop+py)/old;
+  cur.z=z; applyZoom(false); sw.scrollLeft=fx*z-px; if(cur.kind==='c') sc.scrollTop=fy*z-py }
+$('zin').onclick=()=>{ const z=cur.z||1; setZoom(ZSTEPS.find(v=>v>z+0.01)||ZMAX); applyZoom(true) };
+$('zout').onclick=()=>{ const z=cur.z||1; setZoom([...ZSTEPS].reverse().find(v=>v<z-0.01)||ZMIN); applyZoom(true) };
+(()=>{ const sc=$('scroller'); let d0=0,z0=1,raf=0,last=null;
+  const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
+  sc.addEventListener('touchstart',e=>{ if(e.touches.length===2&&cur&&cur.kind!=='w'){ d0=dist(e.touches); z0=cur.z||1 } },{passive:true});
+  sc.addEventListener('touchmove',e=>{ if(e.touches.length!==2||!d0) return; e.preventDefault();
+    const r=sc.getBoundingClientRect(); last={z:z0*dist(e.touches)/d0, cx:(e.touches[0].clientX+e.touches[1].clientX)/2-r.left, cy:(e.touches[0].clientY+e.touches[1].clientY)/2-r.top};
+    if(!raf) raf=requestAnimationFrame(()=>{ raf=0; if(last) setZoom(last.z,last.cx,last.cy) }) },{passive:false});
+  sc.addEventListener('touchend',e=>{ if(d0&&e.touches.length<2){ d0=0; applyZoom(true) } },{passive:true});
+})();
+async function removeUser(s){
+  if(s.local){ U.delete(s.id); saveLocalMine() } else { await db.doc('canciones/'+s.id).delete(); U.delete(s.id) }
+  list=list.filter(r=>r!=='u'+s.id); saveList(); favs.delete('u'+s.id); store.set('favs',[...favs]) }
+// ---------- form ----------
+let editing=null;
+function openForm(s){
+  editing=s; cur=null; showSheet('fview');
+  $('ft').textContent=s?'Editar canción':'Nueva canción';
+  $('f-t').value=s?s.t:''; $('f-au').value=s?s.au||'':''; $('f-mo').value=s?s.mo||'':''; $('f-tx').value=s?s.tx:''; $('f-yt').value=s?s.yt||'':''; recUI(s);
+  $('ferr').hidden=true; $('fsave').disabled=false;
+  $('fwhere').textContent=dbState==='on'?'Se guarda en tu cancionero y la van a ver todos los que lo usan, en cualquier dispositivo.':'Se guarda en este teléfono.';
+  preview();
+}
+function preview(){ const tx=$('f-tx').value; if(!tx.trim()){ $('fprev').innerHTML=''; $('prevh').hidden=true; return }
+  $('prevh').hidden=false; const tmp={tx}; tmp.key=userKey(tmp);
+  const n=songChords(tmp).length;
+  $('fprev').innerHTML=`<div class="txtsong"><p class="meta">${n?`${n} acordes reconocidos${tmp.key?' · tono '+esc(tmp.key):''}`:'Todavía no reconozco acordes: dejalos solos en el renglón de arriba del verso.'}</p><pre>${renderText(tmp,0)}</pre></div>` }
+let pt; $('f-tx').addEventListener('input',()=>{clearTimeout(pt);pt=setTimeout(preview,200)});
+$('form').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const t=$('f-t').value.trim(), tx=$('f-tx').value.replace(/\s+$/,'');
+  const err=m=>{$('ferr').textContent=m;$('ferr').hidden=false};
+  if(!t) return err('Falta el título.'); if(!tx.trim()) return err('Falta la letra.');
+  $('ferr').hidden=true; $('fsave').disabled=true;
+  const id=editing?editing.id:(Date.now().toString(36)+Math.random().toString(36).slice(2,7));
+  const ytv=$('f-yt').value.trim(); if(ytv&&!ytLink(ytv)){ $('fsave').disabled=false; return err('El enlace tiene que ser de YouTube (youtube.com o youtu.be).') }
+  if(recBlob) $('fsave').textContent='Subiendo la grabación…';
+  const au=await recCommit(id,t,editing); $('fsave').textContent='Guardar canción';
+  const body={t,au:$('f-au').value.trim(),mo:$('f-mo').value.trim(),tx,creado:editing&&editing.creado||new Date().toISOString(),yt:ytLink(ytv),ad:au.ad};
+  let local=editing?!!editing.local:dbState!=='on', msg='Canción guardada';
+  if(!local){ try{ await db.doc('canciones/'+id).set(body) }catch(ex){
+      if(ex&&ex.code==='quota_exceeded'){ $('fsave').disabled=false; return err('El cancionero llegó al límite de canciones guardadas. Borrá alguna que no uses y volvé a probar.') }
+      local=true; msg='Guardada en este teléfono (no tenés permiso para guardar en el cancionero compartido)' } }
+  const s={id,...body,local,pend:local&&au.pend}; prepUser(s); U.set(id,s); if(local) saveLocalMine();
+  toast(msg); location.replace('#u'+id);
+});
+let tt; function toast(m){ let t=document.querySelector('.toast'); if(!t){t=document.createElement('div');t.className='toast';t.setAttribute('role','status');document.body.appendChild(t)} t.textContent=m; clearTimeout(tt); tt=setTimeout(()=>t.remove(),2600) }
+// ---------- internet song ----------
+function openWeb(ref){
+  const x=XM.get(ref); cur={kind:'w',id:ref,s:x}; if(x) remember(ref);
+  $('wt').textContent=x?x.t:'Canción de internet'; showSheet('wview'); setPressed();
+  if(!x){ $('wbody').innerHTML=`<p class="note">Sin conexión no puedo mostrar los datos de esta canción.</p>`; return }
+  const row=(k,v)=>v&&v.length?`<dt>${k}</dt><dd>${esc(Array.isArray(v)?v.join(', '):v)}</dd>`:'';
+  const tags=tagLinks({m:x.m,lt:x.raw.lt,tl:x.tl,th:x.raw.th,cl:x.raw.cl,oc:x.raw.oc});
+  let who, rows, btn, note, extra='';
+  if(x.src==='gpd'){ const g=x.raw; who='Grupo Pueblo de Dios';
+    rows=`${row('Letra',g.l)}${row('Música',g.mu)}${row('Álbum',g.al)}`;
+    if(g.mp3) extra+=`<div class="player"><p>Escuchar</p><audio controls preload="none" src="${esc(GBASE+g.mp3)}"></audio><a class="note" href="${esc(GBASE+g.mp3)}" target="_blank" rel="noopener">Si no suena, abrí el audio aparte</a></div>`;
+    if(g.us||g.n) extra+=`<div class="usos">${g.us?`<h4>Cuándo cantarlo</h4><p>${esc(g.us)}</p>`:''}${g.n?`<p style="margin-top:${g.us?'10px':'0'};font-style:italic">${esc(g.n)}</p>`:''}</div>`;
+    btn=g.pdf?'Ver la letra (PDF)':'Ver en la página del grupo'; note='La letra, la partitura y el audio son del Grupo Pueblo de Dios, que permite usarlos en celebraciones citando la fuente. Se abren con conexión.'; }
+  else if(x.src==='pdm'){ const w=x.raw, tg=w.tg; who='Pastoral de Música';
+    rows=`${row('Intérprete',w.a)}${row('Letra y música',w.au)}${row('Álbum',w.al)}${row('Fiesta',tg.f)}${row('Sacramento',tg.sa)}${row('Estilo',[...(tg.e||[]),...(tg.g||[])])}`;
+    btn='Abrir letra y acordes'; note=`Se abre en el navegador y necesita conexión. Ahí podés cambiar el tono${w.v>1?` y elegir entre ${w.v} versiones`:''}.`; }
+  else if(x.src==='jes'){ const j=x.raw; who='Jésed, Ministerio de Música';
+    rows=`${row('Álbum',j.al)}${row('Autor',j.au)}${row('Página',String(j.p))}${row('También en',j.also)}`;
+    btn='Abrir letra y acordes (PDF de Jésed)'; note=`Se abre el cancionero oficial de Jésed (PDF). La canción está en la página ${j.p}. Necesita conexión. Jésed permite descargar sus cancioneros solo desde su página, por eso la canción no está copiada en la app.`; }
+  else if(x.src==='lc'&&x.raw.n){ who='Pastoral Juvenil Salesiana'; rows=`${row('Cancionero','40 canciones sobre Don Bosco')}${row('Página',String(x.raw.pg))}`;
+    btn='Abrir la letra (PDF)'; note=`Es un PDF de la Pastoral Juvenil Salesiana de España con la letra, sin acordes; la canción está en la página ${x.raw.pg}. Necesita conexión.`; }
+  else if(x.src==='lc'&&x.raw.site){ who=x.raw.b; rows=`${row('Autor',x.raw.a)}`;
+    btn='Abrir la letra'; note='Se abre en '+x.raw.site+' y necesita conexión.'; }
+  else if(x.src==='lc'){ who=x.raw.a?'LaCuerda':'Canción salesiana en LaCuerda'; rows=`${row('Autor',x.raw.a)}`;
+    btn='Abrir letra y acordes'; note='Se abre en acordes.lacuerda.net y necesita conexión. Ahí podés cambiar el tono.'; }
+  else { who='Cancionero Católico Web'; rows=`${row('Autor',x.raw.a)}`;
+    btn='Abrir letra y acordes'; note='Se abre en recursoscatolicos.com.ar y necesita conexión. Ahí podés cambiar el tono y ocultar los acordes.'; }
+  extra+=altBlock(x.raw.alt,x.raw.hide);
+  if(x.src!=='gpd'&&x.raw.gp) extra+=gpdBlock(x.raw.gp);
+  const yt=x.src==='gpd'&&x.raw.yt?`<a class="golink second" href="${esc(x.raw.yt)}" target="_blank" rel="noopener">Ver el video en YouTube</a>`:x.src==='pdm'?'':ytButton(x.t,x.src==='jes'?'Jésed':x.src==='gpd'?'Grupo Pueblo de Dios':(x.raw.a||'canción católica'));
+  $('wbody').innerHTML=`<p class="who">${esc(who)}</p><h3>${esc(x.t)}</h3>${tags}${evBox(x.raw.ev,x.raw.evo)}${rows?`<dl class="meta">${rows}</dl>`:''}${extra}
+    <a class="golink" href="${x.url}" target="_blank" rel="noopener">${btn}</a>${yt}
+    <p class="note">${note}${savable(x)?' Si la marcás con la estrella o la agregás a la misa, queda guardada en el teléfono.':''}</p>${savable(x)?'<div id="offl" class="note"></div>':''}<div id="wdiag"></div>`;
+  if(x.raw.ch&&x.raw.ch.length) diagBlock($('wdiag'),x.raw.ch,x.src==='gpd'&&x.raw.cho?'Leídos de la partitura escaneada: revisalos con la hoja.':'');
+  offlineLine(); runBar(ref);
+}
+// dibujos de acordes para cantos que se abren afuera o con la partitura fija; con -/+ para verlos en otro tono
+function diagBlock(box,chs,note){ let n=0; const draw=()=>{ const seen=[]; chs.forEach(c=>{ const t=tr(c,n,null).split('/')[0]; if(!seen.includes(t)) seen.push(t) });
+    box.innerHTML=`<div class="sec" style="margin-top:14px"><h3>Acordes${n?' en otro tono':''}</h3><div class="mbar" style="margin:4px 0 8px"><button class="toolbtn" data-d="-1" aria-label="Bajar medio tono">−</button><span class="note" style="align-self:center">${n?(n>0?'+':'')+n+' semitonos':'tono original'}</span><button class="toolbtn" data-d="1" aria-label="Subir medio tono">+</button></div><div class="dgrid">`+seen.map(t=>{const p=parse(t); const sh=p?shapeFor(p.s,p.q):null; return `<div class="dg">${sh?svg(sh):''}<b>${esc(t)}</b></div>`}).join('')+`</div>${note?`<p class="note">${esc(note)}</p>`:''}</div>`;
+    box.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{ n+=+b.dataset.d; if(n>11) n-=12; if(n<-11) n+=12; draw() }) };
+  draw() }
+// ---------- Enviar cantos al cancionero ----------
+const SEND_TO='cancionerocatolico.app@gmail.com';
+function mailTo(subject,body){ const u='mailto:'+SEND_TO+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+  const a=document.createElement('a'); a.href=u; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove() }
+function mailBody(s){ return ['Hola, te mando este canto para sumarlo al Cancionero Católico.','',
+  'Título: '+s.t, 'Autor o intérprete: '+(s.au||'(no sé)'), 'Momento: '+(s.mo||'(sin indicar)'), 'Tono: '+(userKey(s)||'(sin indicar)'),'',
+  '— Letra y acordes —', s.tx||'', '', 'Enviado desde la app Cancionero Católico.'].join('\n') }
+function sendBtn(s){
+  const box=document.createElement('div'); box.className='sendbox';
+  const sent=store.get('sent:'+s.id,'');
+  box.innerHTML=`<button class="golink second" id="sbopen">${sent?'Ya la enviaste a la comunidad ✓':'Enviar a la comunidad'}</button>
+    <div id="sbform" hidden><p class="note">Va a la persona que revisa el cancionero. Cuando la apruebe, la van a ver todos los que usan la app.</p>
+    <label class="note" for="sbname">Tu nombre (aparece como «enviado por»)</label>
+    <input id="sbname" class="tin" maxlength="60" autocomplete="name" placeholder="Por ejemplo: Juan, coro de San Roque">
+    <div class="mbar" style="margin-top:10px"><button class="primary" id="sbgo">Enviar</button><button class="toolbtn" id="sbmail">Mandar por correo</button></div></div>`;
+  const form=box.querySelector('#sbform'), name=box.querySelector('#sbname'); name.value=store.get('myname','');
+  box.querySelector('#sbopen').onclick=()=>{ form.hidden=!form.hidden; if(!form.hidden) name.focus() };
+  box.querySelector('#sbmail').onclick=()=>mailTo('Canto para el cancionero: '+s.t, mailBody(s));
+  box.querySelector('#sbgo').onclick=async()=>{ const go=box.querySelector('#sbgo'); const nm=name.value.trim(); store.set('myname',nm);
+    go.disabled=true; go.textContent='Enviando…';
+    const ok=await postComm({titulo:s.t,autor:s.au||'',momento:s.mo||'',tono:userKey(s)||'',letra:s.tx||'',enviado_por:nm,enlace:ytLink(s.yt),audio:AID.test(s.ad||'')?s.ad:''});
+    if(ok){ store.set('sent:'+s.id,new Date().toISOString()); form.hidden=true; box.querySelector('#sbopen').textContent='Ya la enviaste a la comunidad ✓'; toast('¡Enviada! Cuando la aprueben la van a ver todos') }
+    else { go.disabled=false; go.textContent='Enviar'; toast('No se pudo enviar. Revisá la conexión o mandala por correo') } };
+  return box }
+// ---------- Cantos de la comunidad (buzón en Google, con moderación) ----------
+const COMM_URL='https://script.google.com/macros/s/AKfycbzvQVRr7icnbhjNbYKK1WebXIsEC2lZ77nZPGY-8xBANlvmdekDWSLGa4nnaClcGhaL/exec';
+let commState='';
+function putComm(list){
+  for(const [id,s] of [...U]) if(s.comm) U.delete(id);
+  (list||[]).forEach(c=>{ if(!c||!c.id||!c.titulo||!c.letra) return;
+    const s={id:String(c.id),t:String(c.titulo),au:String(c.autor||''),mo:String(c.momento||''),tx:String(c.letra),by:String(c.enviado_por||''),yt:String(c.enlace||''),ad:String(c.audio||''),comm:true}; prepUser(s); U.set(s.id,s) }) }
+async function loadComm(){
+  putComm(store.get('comm',[]));
+  try{ const ctl=new AbortController(); const tm=setTimeout(()=>ctl.abort(),15000);
+    const r=await fetch(COMM_URL,{signal:ctl.signal,cache:'no-store'}); clearTimeout(tm);
+    const j=await r.json(); if(!j||!j.ok) throw 0;
+    const before=JSON.stringify(store.get('comm',[]));
+    store.set('comm',j.cantos||[]); putComm(j.cantos||[]); commState='ok';
+    if(before!==JSON.stringify(j.cantos||[])&&!cur&&$('fview').hidden&&$('xview').hidden) render();
+  }catch(e){ commState='err' } }
+async function postComm(obj){
+  try{ const r=await fetch(COMM_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(obj)});
+    try{ const j=await r.json(); return !!(j&&j.ok) }catch(e){ return r.ok||r.type==='opaque' } }
+  catch(e){ try{ await fetch(COMM_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(obj)}); return true }catch(e2){ return false } } }
+function sendInfo(){
+  const ov=document.createElement('div'); ov.className='sec news'; ov.style.margin='16px 0';
+  ov.innerHTML=`<h3>Enviar un canto</h3><p class="note">Cargalo en <b>Agregar una canción</b> (con letra y acordes) y, dentro del canto, tocá <b>Enviar a la comunidad</b>. Cuando se apruebe, aparece para todos en <b>Mis canciones › De la comunidad</b>.</p>
+    <p class="note">También podés escribir directamente a <b>${SEND_TO}</b> con el título, el autor y la letra; si tenés una foto o un PDF, adjuntalo.</p>
+    <div class="mbar" style="margin-top:10px"><button class="primary" id="snew">Cargar un canto</button><button class="toolbtn" id="smail">Escribir un correo</button></div>`;
+  const w=document.querySelector('#main .wrap')||document.body; w.prepend(ov); window.scrollTo(0,0);
+  ov.querySelector('#snew').onclick=()=>{ location.hash='nueva' };
+  ov.querySelector('#smail').onclick=()=>mailTo('Canto para el cancionero',['Hola, te mando un canto para sumarlo al Cancionero Católico.','','Título:','Autor o intérprete:','Momento de la misa:','','Letra y acordes (o adjuntá una foto o PDF):',''].join('\n'));
+}
+// ================= 4.0 =================
+// ---------- Mis misas: guardar varias celebraciones ----------
+function misas(){ return store.get('misas',[])||[] }
+function saveMisa(){
+  if(!list.length){ toast('Primero elegí algún canto'); return }
+  const t=store.get('misaT','')||SUN.name; const all=misas(); const id=store.get('misaId','')||('m'+Date.now().toString(36));
+  const item={id,t,d:new Date().toISOString(),list:list.slice(),lm:{...lm}};
+  const rest=all.filter(m=>m.id!==id); store.set('misas',[item,...rest].slice(0,60)); store.set('misaId',id); toast('Misa guardada'); render() }
+function newMisa(){ list=[]; lm={}; store.set('misaT',''); store.set('misaId',''); saveList(); render() }
+function loadMisa(id){ const m=misas().find(x=>x.id===id); if(!m) return; list=m.list.slice(); lm={...m.lm}; store.set('misaT',m.t); store.set('misaId',m.id); saveList(); render(); window.scrollTo(0,0); toast('Abriste «'+m.t+'»') }
+function delMisa(id){ store.set('misas',misas().filter(m=>m.id!==id)); if(store.get('misaId','')===id) store.set('misaId',''); render() }
+function savedBlock(w){
+  const all=misas(); const s=document.createElement('div'); s.className='sec saved';
+  s.innerHTML=`<h3>Misas guardadas</h3>`+(all.length?'':'<p class="note">Cuando guardes una misa va a aparecer acá, para volver a usarla o copiarla otro año.</p>');
+  const ul=document.createElement('ul'); ul.className='res';
+  all.forEach(m=>{ const li=document.createElement('li'); li.className='savedrow';
+    const d=new Date(m.d); const when=d.toLocaleDateString('es-AR',{day:'numeric',month:'short',year:'numeric'});
+    const a=document.createElement('button'); a.className='r'; a.innerHTML=`<span class="t">${esc(m.t)}</span><span class="sn">${m.list.length} cantos · guardada el ${esc(when)}</span>`; a.onclick=()=>loadMisa(m.id);
+    let armed=false; const x=mk('×','Borrar esta misa',()=>{ if(!armed){ armed=true; x.textContent='¿Borrar?'; x.style.width='auto'; setTimeout(()=>{armed=false;x.textContent='×';x.style.width=''},3000); return } delMisa(m.id) });
+    li.append(a,x); ul.appendChild(li) });
+  s.appendChild(ul); w.appendChild(s) }
+
+// ---------- Modo celebración: pasar de un canto al siguiente en el orden de la misa ----------
+function misaSeq(){ const seq=[]; MORD.forEach(c=>list.filter(r=>momentOf(r)===c).forEach(r=>seq.push(r))); list.filter(r=>!momentOf(r)).forEach(r=>seq.push(r)); return seq }
+let run=store.get('run',null);
+function startRun(){ const seq=misaSeq(); if(!seq.length){ toast('Primero elegí algún canto'); return } run={seq,i:0}; store.set('run',run); go(seq[0]) }
+function stopRun(){ run=null; store.set('run',null); const b=$('runbar'); if(b) b.remove() }
+function go(r){ location.hash=refInfo(r)?refInfo(r).hash:'' }
+function runBar(ref){
+  let b=$('runbar'); if(b) b.remove();
+  if(!run) return; const i=run.seq.findIndex(r=>String(r)===String(ref)); if(i<0) return; run.i=i; store.set('run',run);
+  const sheet=[...document.querySelectorAll('.sheet')].find(s=>!s.hidden); if(!sheet) return;
+  const prev=run.seq[i-1], next=run.seq[i+1], ni=next!=null?refInfo(next):null, mo=momentOf(ref);
+  b=document.createElement('div'); b.id='runbar'; b.className='runbar';
+  b.innerHTML=`<button class="rb-prev" ${prev==null?'disabled':''} aria-label="Canto anterior">‹</button>
+    <div class="rb-mid"><small>${esc(mo?nameIn(MOM,mo):'Otros cantos')} · ${i+1} de ${run.seq.length}</small><b>${ni?'Sigue: '+(momentOf(next)?esc(nameIn(MOM,momentOf(next)))+' · ':'')+esc(ni.t):'Último canto de la misa'}</b></div>
+    <button class="rb-next" aria-label="${ni?'Canto siguiente':'Terminar'}">${ni?'›':'✓'}</button>`;
+  b.querySelector('.rb-prev').onclick=()=>{ if(prev!=null) go(prev) };
+  b.querySelector('.rb-next').onclick=()=>{ if(next!=null) go(next); else { stopRun(); location.hash=''; setTab('misa'); toast('¡Misa terminada!') } };
+  const dock=sheet.querySelector('.dock'); if(dock) sheet.insertBefore(b,dock); else sheet.appendChild(b) }
+
+
+// ---------- Misa compartida: el mensaje lleva un código y la app la carga armada ----------
+const CODE_RE=/CCM([01])\.([A-Za-z0-9_-]{8,})/;
+function b64u(bytes){ let s=''; for(let i=0;i<bytes.length;i+=8192) s+=String.fromCharCode.apply(null,bytes.subarray(i,i+8192)); return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'') }
+function unb64u(s){ const b=atob(s.replace(/-/g,'+').replace(/_/g,'/')); const a=new Uint8Array(b.length); for(let i=0;i<b.length;i++) a[i]=b.charCodeAt(i); return a }
+async function pipe(bytes,Stream){ const r=new Blob([bytes]).stream().pipeThrough(new Stream('deflate-raw')); return new Uint8Array(await new Response(r).arrayBuffer()) }
+async function misaCode(){
+  const own={};
+  list.forEach(r=>{ if(typeof r==='string'&&/^u/.test(r)){ const s=U.get(r.slice(1)); if(s&&!s.comm) own[s.id]={t:s.t,au:s.au||'',mo:s.mo||'',tx:s.tx||'',yt:ytLink(s.yt),ad:AID.test(s.ad||'')?s.ad:''} } });
+  const p={v:1,t:store.get('misaT','')||SUN.name,r:list.map(r=>[r,momentOf(r)||0])}; if(Object.keys(own).length) p.s=own;
+  const raw=new TextEncoder().encode(JSON.stringify(p));
+  try{ if(window.CompressionStream) return 'CCM1.'+b64u(await pipe(raw,CompressionStream)) }catch(e){}
+  return 'CCM0.'+b64u(raw) }
+async function readCode(text){
+  const m=CODE_RE.exec(text||''); if(!m) return null;
+  try{ let b=unb64u(m[2]); if(m[1]==='1') b=await pipe(b,DecompressionStream);
+    const p=JSON.parse(new TextDecoder().decode(b)); if(!p||!Array.isArray(p.r)) return null; p.code=m[0]; return p }catch(e){ return null } }
+function codeId(c){ let h=0; for(let i=0;i<c.length;i++) h=(h*31+c.charCodeAt(i))|0; return 'h'+(h>>>0).toString(36)+c.length }
+function seenCodes(){ return store.get('seenCodes',[])||[] }
+function markSeen(c){ store.set('seenCodes',[codeId(c),...seenCodes().filter(x=>x!==codeId(c))].slice(0,80)) }
+function importMisa(p){
+  if(p.s) Object.entries(p.s).forEach(([id,s])=>{ if(!U.has(id)&&s&&s.t){ const v={id,t:String(s.t),au:s.au||'',mo:s.mo||'',tx:String(s.tx||''),creado:new Date().toISOString(),yt:ytLink(s.yt),ad:AID.test(s.ad||'')?s.ad:'',local:true}; prepUser(v); U.set(id,v) } });
+  if(p.s) saveLocalMine();
+  if(list.length&&!store.get('misaId','')) saveMisa();             // lo que tenías armado queda en «Misas guardadas»
+  const refs=p.r.map(([r])=>r).filter(r=>typeof r==='number'?!!D.songs[r]:typeof r==='string');
+  const id='m'+Date.now().toString(36); const item={id,t:String(p.t||'Misa compartida'),d:new Date().toISOString(),list:refs,lm:{}};
+  p.r.forEach(([r,m])=>{ if(m&&refs.includes(r)) item.lm[lkey(r)]=m });
+  store.set('misas',[item,...misas()].slice(0,60)); markSeen(p.code);
+  loadMisa(id); setTab('misa'); refs.forEach(r=>{ if(typeof r==='string') keepOffline(r) }) }
+function offerMisa(p,manual){
+  if(!p){ if(manual) toast('No encontré una misa en lo que copiaste'); return }
+  if(!manual&&(seenCodes().includes(codeId(p.code))||store.get('lastShared','')===p.code)) return;
+  const old=$('shm'); if(old) old.remove();
+  const n=p.r.length, mine=store.get('lastShared','')===p.code;
+  const ov=document.createElement('div'); ov.id='shm'; ov.className='shm'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-label','Misa compartida');
+  ov.innerHTML=`<div class="shm-card"><small>${mine?'Esta es la misa que compartiste':'Te compartieron una misa'}</small><h3>${esc(String(p.t||'Misa'))}</h3>
+    <p class="note">${n} canto${n===1?'':'s'}, cada uno en su momento de la misa.${p.s?' Incluye cantos cargados a mano, que se suman a tus canciones.':''}</p>
+    <div class="mbar" style="margin-top:12px"><button class="primary" id="shmok">Cargar la misa</button><button class="toolbtn" id="shmno">Ahora no</button></div></div>`;
+  document.body.appendChild(ov);
+  ov.querySelector('#shmok').onclick=()=>{ ov.remove(); importMisa(p) };
+  ov.querySelector('#shmno').onclick=()=>{ ov.remove(); markSeen(p.code) };
+  ov.onclick=e=>{ if(e.target===ov){ ov.remove(); markSeen(p.code) } } }
+async function checkClip(manual){
+  let t='';
+  try{ if(window.App&&App.readClip) t=App.readClip()||''; else if(manual&&navigator.clipboard&&navigator.clipboard.readText) t=await navigator.clipboard.readText() }catch(e){}
+  if(!t&&manual){ t=prompt('Pegá acá el mensaje de WhatsApp con la misa')||''; if(!t) return }
+  offerMisa(await readCode(t),manual) }
+async function takeShared(){ try{ if(window.App&&App.takeShared){ const t=App.takeShared(); if(t) offerMisa(await readCode(t),true) } }catch(e){} }
+
+// ---------- Audio y enlace de YouTube en los cantos propios ----------
+// La grabación se sube a la carpeta «Audios Cancionero» de la cuenta del cancionero (por el buzón),
+// así la escuchan también los que reciben la misa o ven el canto en «De la comunidad».
+const AID=/^[A-Za-z0-9_-]{10,80}$/;
+let idbP=null;
+function idb(){ if(!idbP) idbP=new Promise((ok,ko)=>{ try{ const r=indexedDB.open('cancionero-audio',1); r.onupgradeneeded=()=>r.result.createObjectStore('a'); r.onsuccess=()=>ok(r.result); r.onerror=()=>ko(r.error) }catch(e){ ko(e) } }); return idbP }
+async function aGet(k){ try{ const d=await idb(); return await new Promise(ok=>{ const q=d.transaction('a').objectStore('a').get(k); q.onsuccess=()=>ok(q.result||null); q.onerror=()=>ok(null) }) }catch(e){ return null } }
+async function aPut(k,v){ try{ const d=await idb(); await new Promise(ok=>{ const t=d.transaction('a','readwrite'); v==null?t.objectStore('a').delete(k):t.objectStore('a').put(v,k); t.oncomplete=ok; t.onerror=ok }) }catch(e){} }
+function blobB64(b){ return new Promise(ok=>{ const r=new FileReader(); r.onload=()=>ok(String(r.result).split(',')[1]||''); r.onerror=()=>ok(''); r.readAsDataURL(b) }) }
+async function uploadAudio(blob,name){
+  if(!blob||blob.size>9e6) return null;
+  try{ const r=await fetch(COMM_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({accion:'audio',nombre:String(name||'canto').slice(0,80),mime:blob.type||'audio/webm',b64:await blobB64(blob)})});
+    const j=await r.json(); if(j&&j.ok&&AID.test(j.id)){ await aPut(j.id,blob); return j.id } }catch(e){}
+  return null }
+async function audioBlob(id){
+  if(!AID.test(id||'')) return null; const c=await aGet(id); if(c) return c;
+  try{ const r=await fetch(COMM_URL+'?a='+encodeURIComponent(id),{cache:'no-store'}); const j=await r.json(); if(!j||!j.ok) return null;
+    const b=new Blob([unb64u(j.b64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''))],{type:j.mime||'audio/webm'}); await aPut(id,b); return b }catch(e){ return null } }
+function ytLink(u){ u=String(u||'').trim(); return /^https?:\/\/(www\.|m\.|music\.)?(youtube\.com|youtu\.be)\//i.test(u)?u:'' }
+// bloque para escuchar, dentro del canto
+function listenBlock(s){
+  const yt=ytLink(s.yt), has=AID.test(s.ad||'')||s.pend;
+  if(!yt&&!has) return null;
+  const d=document.createElement('div'); d.className='player'; d.style.marginTop='10px';
+  d.innerHTML=`<p>Escuchar${s.au?' · '+esc(s.au):''}</p>${has?'<button class="toolbtn" id="aplay">▶ Escuchar la grabación</button>':''}${yt?`<a class="golink" href="${esc(yt)}" target="_blank" rel="noopener">Ver en YouTube</a>`:''}`;
+  const b=d.querySelector('#aplay');
+  if(b) b.onclick=async()=>{ b.disabled=true; b.textContent='Cargando la grabación…';
+    const bl=s.pend?await aGet('pend:'+s.id):await audioBlob(s.ad);
+    if(!bl){ b.disabled=false; b.textContent='▶ Escuchar la grabación'; toast('No se pudo cargar el audio. Revisá la conexión.'); return }
+    const a=document.createElement('audio'); a.controls=true; a.src=URL.createObjectURL(bl); b.replaceWith(a); a.play().catch(()=>{}) };
+  return d }
+// grabador dentro del formulario
+let recBlob=null, recDrop=false, recM=null;
+function recUI(s){
+  const box=$('frec'); if(!box) return; recBlob=null; recDrop=false; if(recM&&recM.state!=='inactive') try{ recM.stop() }catch(e){}
+  const had=s&&(AID.test(s.ad||'')||s.pend);
+  const draw=(mode,extra)=>{
+    if(mode==='rec'){ box.innerHTML=`<div class="recbar"><span class="recdot"></span><b id="rtime">0:00</b><button type="button" class="primary" id="rstop">■ Detener</button></div>`; return }
+    const cur=recBlob||(!recDrop&&had);
+    box.innerHTML=cur?`<div class="recbar"><span class="note">${recBlob?'Grabación nueva lista: se guarda con el canto.':'Este canto tiene una grabación.'}</span></div><div id="rprev"></div><div class="mbar"><button type="button" class="toolbtn" id="rgo">🎙 Grabar de nuevo</button><button type="button" class="toolbtn dangerbtn" id="rdel">Quitar la grabación</button></div>`
+      :`<button type="button" class="toolbtn" id="rgo">🎙 Grabar audio</button> <span class="note">Grabate con la guitarra para que sepan cómo va (hasta 10 minutos).</span>`;
+    if(recBlob){ const a=document.createElement('audio'); a.controls=true; a.src=URL.createObjectURL(recBlob); a.style.width='100%'; box.querySelector('#rprev').appendChild(a) }
+    else if(cur){ const l=listenBlock({...s,yt:''}); if(l){ l.style.marginTop='6px'; box.querySelector('#rprev').appendChild(l) } }
+    box.querySelector('#rgo').onclick=start;
+    const del=box.querySelector('#rdel'); if(del) del.onclick=()=>{ recBlob=null; recDrop=true; draw('idle') } };
+  async function start(){
+    let st; try{ st=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:true}}) }
+    catch(e){ toast('Necesito permiso para usar el micrófono'); return }
+    const mt=['audio/mp4;codecs=mp4a.40.2','audio/mp4','audio/webm;codecs=opus','audio/webm'].find(t=>window.MediaRecorder&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||'';
+    const parts=[]; recM=new MediaRecorder(st,mt?{mimeType:mt,audioBitsPerSecond:64000}:{});
+    recM.ondataavailable=e=>{ if(e.data&&e.data.size) parts.push(e.data) };
+    recM.onstop=()=>{ st.getTracks().forEach(t=>t.stop()); clearInterval(tk); if(parts.length){ recBlob=new Blob(parts,{type:recM.mimeType||mt||'audio/webm'}); recDrop=false } draw('idle') };
+    recM.start(1000); const t0=Date.now(); draw('rec');
+    const tk=setInterval(()=>{ const s2=Math.floor((Date.now()-t0)/1000); const el=$('rtime'); if(el) el.textContent=Math.floor(s2/60)+':'+String(s2%60).padStart(2,'0'); if(s2>=600) recM.stop() },500);
+    box.querySelector('#rstop').onclick=()=>recM.stop() }
+  draw('idle') }
+// al guardar el canto: sube la grabación nueva (o la deja pendiente si no hay conexión)
+async function recCommit(id,t,prev){
+  if(recM&&recM.state==='recording'){ await new Promise(ok=>{ const o=recM.onstop; recM.onstop=()=>{ o&&o(); ok() }; recM.stop() }) }
+  if(recDrop&&!recBlob){ await aPut('pend:'+id,null); return {ad:'',pend:false} }
+  if(!recBlob) return {ad:prev&&prev.ad||'',pend:!!(prev&&prev.pend)};
+  const up=await uploadAudio(recBlob,t);
+  if(up){ await aPut('pend:'+id,null); return {ad:up,pend:false} }
+  await aPut('pend:'+id,recBlob); toast('La grabación quedó en el teléfono: se sube sola cuando haya conexión'); return {ad:'',pend:true} }
+async function flushPending(){
+  for(const s of [...U.values()]) if(s.local&&s.pend){ const b=await aGet('pend:'+s.id); if(!b){ s.pend=false; continue }
+    const id=await uploadAudio(b,s.t); if(id){ s.ad=id; s.pend=false; await aPut('pend:'+s.id,null) } }
+  saveLocalMine() }
+
+// ================= Diapositivas para proyectar (solo letra) =================
+let LETRAS=null;
+async function letras(){ if(LETRAS) return LETRAS; try{ LETRAS=await getJ('letras.json') }catch(e){} return LETRAS||(LETRAS={}) }
+function loadScript(src){ return new Promise((ok,ko)=>{ if(document.querySelector(`script[data-src="${src}"]`)) return ok(); const s=document.createElement('script'); s.src=src; s.dataset.src=src; s.onload=ok; s.onerror=ko; document.head.appendChild(s) }) }
+// estrofas [{k:'C'|'V', t}] del canto r
+function lyricsOf(r,L){
+  const fromArr=a=>a?a.map(x=>({k:x[0],t:x[1]})):null;
+  if(typeof r==='number'){ const s=D.songs[r]; return fromArr(L.s&&L.s[r])||(s&&s.l?plainStanzas(s.l):null) }
+  if(typeof r==='string'&&r[0]==='u'){ const s=U.get(r.slice(1)); if(!s) return null;
+    const lines=parseSong(s.tx||'').filter(l=>!l.ch).map(l=>l.text.replace(/\[[^\]]+\]/g,'').replace(/\s{2,}/g,' ').trimEnd());
+    return plainStanzas(lines.join('\n')) }
+  const x=XM.get(r); if(!x) return null; const w=x.raw;
+  const key=x.src==='pdm'?['w',w.id]:x.src==='rc'?['r',w.id]:x.src==='jes'?['j',w.u.slice(7,15)+'p'+w.p]:x.src==='lc'?['l',w.p||w.t]:x.src==='gpd'?['g',w.pdf]:null;
+  return key&&L[key[0]]?fromArr(L[key[0]][key[1]]):null }
+function plainStanzas(txt){ const out=[]; String(txt||'').split(/\n\s*\n/).forEach(b=>{ const t=b.split('\n').map(x=>x.trim()).filter(Boolean).join('\n'); if(t) out.push({k:/^\s*(estribillo|coro|r\.)/i.test(t)?'C':'V',t:t.replace(/^\s*(estribillo|coro)\s*:?\s*\n?/i,'')}) }); return out.length?out:null }
+// texto editable: estrofas separadas por renglón en blanco; el estribillo empieza con «Estribillo:»
+function toEditable(st){ return (st||[]).map(s=>(s.k==='C'?'Estribillo:\n':'')+s.t).join('\n\n') }
+function fromEditable(txt){ return String(txt||'').split(/\n\s*\n/).map(b=>b.trim()).filter(Boolean).map(b=>{ const m=/^(estribillo|coro)\s*:?\s*\n?/i.exec(b); return {k:m?'C':'V',t:m?b.slice(m[0].length).trim():b} }).filter(s=>s.t) }
+// orden final con el estribillo repetido entre estrofas
+function arrange(st){
+  const n=t=>norm(t).replace(/\s+/g,' ').trim();
+  st=st.map(x=>({k:x.k,t:x.t}));
+  let full=st.find(s=>s.k==='C'&&s.t.split('\n').length>=2)||st.find(s=>s.k==='C');
+  // referencia al estribillo al final de una estrofa: «… gratitud. Gloria…»
+  const tailRef=(t,ch)=>{ const lines=t.split('\n'), last=lines[lines.length-1];
+    const m=/^(.*?[.!?;:,])?\s*([^.!?;:,]{2,40}?)\s*(\.\.\.|…)?\s*$/.exec(last); if(!m) return null;
+    const frag=n(m[2]); if(!frag) return null; const start=n(ch).split(' ').slice(0,frag.split(' ').length).join(' ');
+    if(frag!==start||(!m[3]&&!m[1])) return null;
+    const keep=m[1]?(lines.slice(0,-1).concat([m[1].trim()])):lines.slice(0,-1); return keep.filter(x=>x.trim()).join('\n') };
+  if(!full&&st.length>=3){ const c=st[0]; const refs=st.slice(1).filter(x=>tailRef(x.t,c.t)!=null).length; if(refs>=2){ c.k='C'; full=c } }
+  if(!full) return st.map(s=>s.t);
+  const fn=n(full.t), first=fn.split(' ').slice(0,3).join(' ');
+  const isRef=t=>{ const x=n(t); return x.length<fn.length&&(fn.startsWith(x)||x.startsWith(first)) };
+  const out=[]; let indicated=false;
+  st.forEach(s=>{
+    if(s.k==='C'){ out.push(full.t); if(s!==full) indicated=true; return }
+    let body=s.t, add=false; const lines=body.split('\n'), last=lines[lines.length-1];
+    if(/\bR\.?\s*$/.test(last)){ lines[lines.length-1]=last.replace(/\s*\bR\.?\s*$/,''); body=lines.join('\n'); add=true }
+    else if(/(\.\.\.|…)\s*$/.test(last)&&isRef(last.replace(/(\.\.\.|…)\s*$/,''))){ lines.pop(); body=lines.join('\n'); add=true }
+    else { const t=tailRef(body,full.t); if(t!=null){ body=t; add=true } }
+    body=body.split('\n').filter(l=>l.trim()).join('\n'); if(body) out.push(body);
+    if(add){ out.push(full.t); indicated=true } });
+  const times=out.filter(t=>t===full.t).length;
+  if(!indicated&&times===1){ const res=[]; const verses=out.filter(t=>t!==full.t);
+    if(out[0]===full.t) res.push(full.t);
+    verses.forEach(v=>{ res.push(v); res.push(full.t) });
+    return res }
+  return out }
+const COLHEX={verde:'2E7D4F',morado:'6A44A8',blanco:'C9A13A',rojo:'B3261E',rosa:'C2577F'};
+const COLBG={verde:'0E1D16',morado:'17112A',blanco:'1B1709',rojo:'220D0C',rosa:'24101A'};
+function portada(){
+  const n=SUN.name, M={'Cristo Rey':'Solemnidad de Nuestro Señor Jesucristo, Rey del Universo','Pentecostés':'Solemnidad de Pentecostés','Santísima Trinidad':'Solemnidad de la Santísima Trinidad','Cuerpo y Sangre de Cristo':'Solemnidad del Santísimo Cuerpo y Sangre de Cristo','Ascensión del Señor':'Solemnidad de la Ascensión del Señor','Domingo de Pascua':'Domingo de Pascua de la Resurrección del Señor','Domingo de Ramos':'Domingo de Ramos en la Pasión del Señor','Epifanía del Señor':'Solemnidad de la Epifanía del Señor'};
+  const rom=/^([IVXL]+) Domingo (de |del )(.*)$/.exec(n);
+  const t=M[n]||(rom?`Domingo ${rom[1]} ${rom[2]}${rom[3]}`:n);
+  const d=SUN.date.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  return {t, sub:`${SEASON_NAME[SEASON.code]||''}${SUN.cy?' · Ciclo '+SUN.cy:''}`, d:d.charAt(0).toUpperCase()+d.slice(1)} }
+function slideSeq(){
+  const seq=misaSeq(), cfg=store.get('slcfg',{});
+  return seq.map(r=>{ const i=refInfo(r); const mo=momentOf(r); return {r,t:i?i.t:'',mo:mo?nameIn(MOM,mo):'',au:i?(i.sn||''):''} }) }
+// reparte una estrofa en diapositivas sin achicar la letra
+function chunks(text,maxLines,cpl){
+  const lines=text.split('\n'), hs=lines.map(l=>Math.max(1,Math.ceil(l.length/cpl))), tot=hs.reduce((a,b)=>a+b,0);
+  if(tot<=maxLines) return [text];
+  const k=Math.ceil(tot/maxLines), target=Math.ceil(tot/k); const out=[]; let cur=[], used=0;
+  lines.forEach((l,i)=>{ if(cur.length&&(used+hs[i]>maxLines||(used>=target&&out.length<k-1))){ out.push(cur.join('\n')); cur=[]; used=0 } cur.push(l); used+=hs[i] });
+  if(cur.length) out.push(cur.join('\n')); return out }
+
+// mayúsculas solo donde van: comienzo de oración y nombres propios
+const PROPER={dios:'Dios',señor:'Señor',jesús:'Jesús',jesus:'Jesús',jesucristo:'Jesucristo',cristo:'Cristo',maría:'María',maria:'María',espíritu:'Espíritu',padre:'Padre',hijo:'Hijo',trinidad:'Trinidad',belén:'Belén',jerusalén:'Jerusalén',israel:'Israel',galilea:'Galilea',nazaret:'Nazaret',josé:'José',emmanuel:'Emmanuel',mesías:'Mesías',virgen:'Virgen',bosco:'Bosco',sión:'Sión'};
+const REPM=/\s*[(\[]\s*(\d\s*veces|bis|x\s*\d|\d\s*x)\s*[)\]]/gi;
+function upRatio(t){ const L=t.match(/\p{L}/gu)||[]; return L.length?L.filter(c=>c===c.toUpperCase()&&c!==c.toLowerCase()).length/L.length:0 }
+function sentcase(line,start){ const all=upRatio(line)>0.75; let prev='';
+  let s=line.split(' ').map(w=>{ const core=w.replace(/[^\p{L}]/gu,''); let o=w;
+    if(core&&core===core.toUpperCase()&&core!==core.toLowerCase()&&(core.length>=2||all)){ o=w.toLowerCase(); const k=o.replace(/[^\p{L}]/gu,'');
+      if(PROPER[k]&&!(['padre','hijo','virgen'].includes(k)&&['mi','tu','su','un','el','los','nuestro'].includes(prev))) o=o.replace(k,PROPER[k]);
+      if(k==='santo'&&prev==='espíritu') o=o.replace('santo','Santo') }
+    prev=o.toLowerCase().replace(/[^\p{L}]/gu,''); return o }).join(' ');
+  if(start) s=s.replace(/^([^\p{L}]*)(\p{Ll})/u,(m,a,b)=>a+b.toUpperCase());
+  return s.replace(/([.!?]\s+[¿¡«"“]?)(\p{Ll})/gu,(m,a,b)=>a+b.toUpperCase()) }
+function pdfSafe(t){ t=String(t).replace(/í\x81/g,'Á').normalize('NFC');
+  const M={'\x93':'“','\x94':'”','\x92':'’','\x91':'‘','ﬁ':'fi','ﬂ':'fl','‐':'-','\x96':'–','\x97':'—','\x85':'…'}; t=t.replace(/[\x93\x94\x92\x91ﬁﬂ‐\x96\x97\x85]/g,c=>M[c]);
+  t=t.replace(/[\uf000-\uf8ff\x00-\x08\x0b-\x1f\x7f-\x9f\u200b-\u200f\xad]/g,'');
+  // lo que el PDF no sabe dibujar se reemplaza por la letra base (si no, separa todas las letras)
+  const OK=/[\n\x20-\x7e\xa0-\xffŒœŠšŸŽžƒˆ˜–—‘’‚“”„†‡•…‰‹›€™]/;
+  return [...t].map(c=>OK.test(c)?c:c.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\x20-\x7e]/g,'')).join('') }
+// "paaaaz" → "paz", "Laáaazaro" → "Lázaro", "derrrama" → "derrama"
+function unstretch(t){ return t.replace(/[A-Za-zÀ-ÿ]+/g,w=>{ const ch=[...w]; let o='', i=0;
+  const base=c=>c.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+  while(i<ch.length){ let j=i; while(j<ch.length&&base(ch[j])===base(ch[i])) j++;
+    const run=ch.slice(i,j);
+    if(run.length>=3){ const b=base(run[0]); const acc=run.find(c=>c!==c.normalize('NFD').replace(/[̀-ͯ]/g,''));
+      let c=acc||run[0]; c=run[0]===run[0].toUpperCase()?c.toUpperCase():c.toLowerCase();
+      o+=(b==='r'||b==='l')?c+c.toLowerCase():c }
+    else o+=run.join('');
+    i=j }
+  return o }) }
+function tidy(t){ t=unstretch(pdfSafe(t)); const ls=t.split('\n').map(l=>l.replace(REPM,'').trimEnd()).filter(l=>l.trim());
+  return ls.map((l,i)=>sentcase(l,i===0||/[.!?»”"]\s*$/.test(ls[i-1]))).join('\n') }
+
+// estrofa como párrafo: renglones seguidos, cortada en partes cortas para que la letra sea grande
+function paragraph(t){ return t.split('\n').map(l=>l.trim()).filter(Boolean).join(' ').replace(/\s+([,.;:!?…])/g,'$1').replace(/\s{2,}/g,' ') }
+function pieces(t,max){
+  // unidades: cada renglón, y dentro de él cada oración o frase después de coma
+  const units=t.split('\n').map(l=>l.trim()).filter(Boolean).flatMap(l=>l.length>max*0.6?l.split(/(?<=[.;:!?…,])\s+/):[l]);
+  const keep=u=>u.map(x=>x.replace(/\s+([,.;:!?…])/g,'$1').replace(/\s{2,}/g,' ')).join('\n'); const total=paragraph(units.join('\n')).length; if(total<=max) return [keep(units)];
+  const k=Math.ceil(total/max), n=units.length, len=units.map(u=>u.length+1);
+  // partición en k partes lo más parejas posible
+  const pre=[0]; len.forEach(x=>pre.push(pre[pre.length-1]+x));
+  const memo={}; const best=(i,parts)=>{ const key=i+','+parts; if(key in memo) return memo[key];
+    if(parts===1){ return memo[key]=[pre[n]-pre[i],[n]] }
+    let res=[Infinity,null];
+    for(let j=i+1;j<=n-parts+1;j++){ const here=pre[j]-pre[i], [m,cuts]=best(j,parts-1), worst=Math.max(here,m); if(worst<res[0]) res=[worst,[j,...cuts]] }
+    return memo[key]=res };
+  const parts=Math.min(k,n); const [,cuts]=best(0,parts); const out=[]; let st=0;
+  cuts.forEach(c=>{ out.push(keep(units.slice(st,c))); st=c }); return out }
+// tamaño de letra que llena la pantalla (puntos, sobre 960×540)
+const MEAS=document.createElement('canvas').getContext('2d');
+function wrapAt(t,fs,maxW){ MEAS.font=`bold ${fs}px Arial, Helvetica, sans-serif`; const out=[]; let cur='';
+  t.split(' ').forEach(w=>{ const n=cur?cur+' '+w:w; if(cur&&MEAS.measureText(n).width>maxW){ out.push(cur); cur=w } else cur=n }); if(cur) out.push(cur); return out }
+// renglones parejos: mismo número de renglones pero con el ancho más chico posible (sin palabra suelta al final)
+const SHORTW=/^(y|e|o|u|a|de|la|el|en|que|mi|tu|su|los|las|con|por|del|al|se|me|te|lo|le|no|ni|un|una|sin|tus|mis|sus|nos|es)$/i;
+function balance(t,fs,maxW){ const ls=wrapAt(t,fs,maxW); if(ls.length<2) return ls;
+  let lo=maxW*0.4, hi=maxW;
+  for(let i=0;i<14;i++){ const mid=(lo+hi)/2; if(wrapAt(t,fs,mid).length<=ls.length) hi=mid; else lo=mid }
+  const out=wrapAt(t,fs,hi); MEAS.font=`bold ${fs}px Arial, Helvetica, sans-serif`;
+  for(let i=0;i<out.length-1;i++){ const ws=out[i].split(' '); const last=ws[ws.length-1];
+    if(ws.length>1&&SHORTW.test(last)){ const nx=last+' '+out[i+1]; if(MEAS.measureText(nx).width<=maxW){ out[i]=ws.slice(0,-1).join(' '); out[i+1]=nx } } }
+  return out }
+// corte de renglones "a lo editor": prefiere cortar en comas, puntos o donde terminaba el verso,
+// nunca deja una palabra sola en un renglón ni termina un renglón en "y", "de", "la"...
+function breakLines(t,fs,W){
+  MEAS.font=`bold ${fs}px Arial, Helvetica, sans-serif`;
+  const toks=[]; t.split('\n').forEach(l=>{ const ws=l.trim().split(/\s+/).filter(Boolean); ws.forEach((w,i)=>toks.push({w,eol:i===ws.length-1})) });
+  const n=toks.length, sp=MEAS.measureText(' ').width, wd=toks.map(x=>MEAS.measureText(x.w).width);
+  const best=new Array(n+1).fill(Infinity), from=new Array(n+1).fill(-1); best[0]=0;
+  for(let j=1;j<=n;j++){ let width=-sp;
+    for(let i=j-1;i>=0;i--){ width+=wd[i]+sp; if(width>W) break;
+      const last=j===n, words=j-i, lw=toks[j-1].w;
+      let c=last?Math.pow(Math.max(0,(W-width)/W-0.25),2)*0.5:Math.pow((W-width)/W,2);
+      if(words===1&&n>1) c+=4;
+      if(!last){ if(/[.;:!?…]$/.test(lw)) c-=0.35; else if(/,$/.test(lw)) c-=0.25; else if(toks[j-1].eol) c-=0.15;
+        if(SHORTW.test(lw.replace(/[^\wáéíóúñü]/gi,''))) c+=1.2 }
+      if(best[i]+c+0.2<best[j]){ best[j]=best[i]+c+0.2; from[j]=i } } }
+  if(!isFinite(best[n])) return null;
+  const ls=[]; for(let j=n;j>0;j=from[j]) ls.unshift(toks.slice(from[j],j).map(x=>x.w).join(' '));
+  return {ls,cost:best[n]} }
+function fitBig(t){ const W=(960-110)*0.92, H=540-90; let pick=null;
+  for(let fs=72;fs>=30;fs-=2){ const r=breakLines(t,fs,W); if(!r||r.ls.length*fs*1.18>H) continue;
+    const score=r.cost+(72-fs)*0.1; if(!pick||score<pick.score) pick={fs,ls:r.ls,score} }
+  return pick||{fs:30,ls:wrapAt(paragraph(t),30,W)} }
+function buildDeck(items,cover){
+  const S=[]; const FS=40, CPL=40, ML=7;
+  S.push({type:'cover',t:cover.t,sub:cover.sub,d:cover.d});
+  items.forEach((it,k)=>{
+    S.push({type:'blank'});
+    arrange(it.st.map(x=>({k:x.k,t:tidy(x.t)})).filter(x=>x.t)).forEach(st=>pieces(st,110).forEach(c=>{ const f=fitBig(c); S.push({type:'text',t:c,fs:f.fs,ls:f.ls}) }));
+  });
+  S.push({type:'blank'});
+  return S }
+async function makePptx(S,col){
+  await loadScript('lib/pptxgen.bundle.js');
+  const p=new PptxGenJS(); p.layout='LAYOUT_WIDE'; p.title=S[0].t;
+  const bg=COLBG[col]||'111111', ac=COLHEX[col]||'888888';
+  S.forEach(s=>{ const sl=p.addSlide(); sl.background={color:bg};
+    if(s.type==='blank') return;
+    sl.addShape(p.ShapeType.rect,{x:0,y:7.28,w:13.33,h:0.22,fill:{color:ac},line:{color:ac}});
+    if(s.type==='cover'){ sl.addShape(p.ShapeType.rect,{x:0,y:0,w:13.33,h:0.22,fill:{color:ac},line:{color:ac}});
+      sl.addText(s.t,{x:0.8,y:1.6,w:11.73,h:2.6,fontFace:'Arial',fontSize:48,bold:true,color:'FFFFFF',align:'center',valign:'middle',fit:'shrink'});
+      sl.addText(s.sub,{x:0.8,y:4.3,w:11.73,h:0.8,fontFace:'Arial',fontSize:28,color:ac,align:'center',bold:true});
+      sl.addText(s.d,{x:0.8,y:5.1,w:11.73,h:0.7,fontFace:'Arial',fontSize:22,color:'DDDDDD',align:'center'}); return }
+    if(s.type==='title'){ if(s.mo) sl.addText(s.mo.toUpperCase(),{x:0.8,y:1.7,w:11.73,h:0.8,fontFace:'Arial',fontSize:26,bold:true,color:ac,align:'center',charSpacing:4});
+      sl.addText(s.t,{x:0.8,y:2.5,w:11.73,h:2.4,fontFace:'Arial',fontSize:54,bold:true,color:'FFFFFF',align:'center',valign:'middle',fit:'shrink'});
+      if(s.au) sl.addText(s.au,{x:0.8,y:6.3,w:11.73,h:0.6,fontFace:'Arial',fontSize:16,color:'BBBBBB',align:'center'}); return }
+    sl.addText(s.ls.join('\n'),{x:0.55,y:0.4,w:12.23,h:6.6,fontFace:'Arial',fontSize:s.fs,bold:true,color:'FFFFFF',align:'center',valign:'middle',lineSpacingMultiple:1.05});
+  });
+  return await p.write({outputType:'base64'}) }
+async function makePdf(S,col){
+  await loadScript('lib/jspdf.umd.min.js');
+  const {jsPDF}=window.jspdf; const W=960,H=540; const doc=new jsPDF({orientation:'landscape',unit:'pt',format:[W,H]});
+  const hex=h=>[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];
+  const bg=hex(COLBG[col]||'111111'), ac=hex(COLHEX[col]||'888888');
+  const fitText=(txt,size,maxW,maxH,bold)=>{ let fs=size; doc.setFont('helvetica',bold?'bold':'normal');
+    for(;fs>14;fs-=2){ doc.setFontSize(fs); const ls=txt.split('\n').flatMap(l=>doc.splitTextToSize(l,maxW)); if(ls.length*fs*1.2<=maxH) return {ls,fs} }
+    doc.setFontSize(fs); return {ls:txt.split('\n').flatMap(l=>doc.splitTextToSize(l,maxW)),fs} };
+  const center=(ls,fs,cy)=>{ const h=ls.length*fs*1.2; let y=cy-h/2+fs*0.9; ls.forEach(l=>{ doc.text(l,W/2,y,{align:'center'}); y+=fs*1.2 }) };
+  S=S.map(x=>Object.fromEntries(Object.entries(x).map(([a,b])=>[a,typeof b==='string'?pdfSafe(b):b])));
+  S.forEach((s,k)=>{ if(k) doc.addPage([W,H],'landscape'); doc.setFillColor(...bg); doc.rect(0,0,W,H,'F');
+    if(s.type==='blank') return;
+    doc.setFillColor(...ac); doc.rect(0,H-16,W,16,'F');
+    if(s.type==='cover'){ doc.rect(0,0,W,16,'F'); doc.setTextColor(255,255,255); const a=fitText(s.t,48,W-120,190,true); center(a.ls,a.fs,190);
+      doc.setTextColor(...ac); doc.setFont('helvetica','bold'); doc.setFontSize(28); doc.text(s.sub,W/2,345,{align:'center'});
+      doc.setTextColor(221,221,221); doc.setFont('helvetica','normal'); doc.setFontSize(22); doc.text(s.d,W/2,395,{align:'center'}); return }
+    if(s.type==='title'){ if(s.mo){ doc.setTextColor(...ac); doc.setFont('helvetica','bold'); doc.setFontSize(26); doc.text(s.mo.toUpperCase(),W/2,150,{align:'center'}) }
+      doc.setTextColor(255,255,255); const a=fitText(s.t,54,W-120,200,true); center(a.ls,a.fs,270);
+      if(s.au){ doc.setTextColor(187,187,187); doc.setFont('helvetica','normal'); doc.setFontSize(16); doc.text(doc.splitTextToSize(s.au,W-120),W/2,480,{align:'center'}) } return }
+    doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(s.fs);
+    let fz=s.fs; doc.setFontSize(fz); while(fz>20&&Math.max(...s.ls.map(l=>doc.getTextWidth(l)))>W-90){ fz-=1; doc.setFontSize(fz) } const ls=s.ls; s={...s,fs:fz}; const h=ls.length*s.fs*1.18; let y=(H-16)/2-h/2+s.fs*0.88; ls.forEach(l=>{ doc.text(l,W/2,y,{align:'center'}); y+=s.fs*1.18 }) });
+  return doc.output('datauristring').split(',')[1] }
+async function deliver(name,mime,b64){
+  if(window.App&&App.saveFile){ const res=App.saveFile(name,mime,b64); if(res){ slDone(name,res,mime); return } toast('No se pudo guardar el archivo'); return }
+  const bin=atob(b64), u8=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u8[i]=bin.charCodeAt(i);
+  let dl=null; try{ if(window.claude&&claude.use) dl=await Promise.race([claude.use('downloads'),new Promise(r=>setTimeout(()=>r(null),1500))]) }catch(e){}
+  if(dl){ try{ await dl.save({filename:name,data:new Blob([u8])}); toast('Listo: «'+name+'»') }catch(e){ if(e&&e.code!=='declined') toast('No se pudo guardar el archivo') } return }
+  const url=URL.createObjectURL(new Blob([u8],{type:mime})); const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),60000);
+  toast('Listo: se descargó «'+name+'»') }
+function slDone(name,uri,mime){ const b=$('sldone'); if(!b) return; b.hidden=false;
+  b.innerHTML=`<p><b>Guardado en Descargas:</b> ${esc(name)}</p><div class="mbar"><button class="primary" id="slopen">Abrir</button><button class="toolbtn" id="slshare">Compartir</button></div>`;
+  $('slopen').onclick=()=>App.openFile(uri,mime); $('slshare').onclick=()=>App.shareFile(uri,mime) }
+async function openSlides(){
+  if(!list.length){ toast('Primero elegí los cantos de la misa'); return }
+  const L=await letras(); const its=slideSeq(); const cov=Object.assign(portada(),store.get('slcover',{}));
+  let ov=$('slv'); if(ov) ov.remove(); ov=document.createElement('div'); ov.id='slv'; ov.className='slv';
+  const col=SEASON.color;
+  ov.innerHTML=`<header class="top"><div class="wrap"><button class="round" id="slback" aria-label="Volver">${ICON.back}</button><h1>Diapositivas</h1></div></header>
+  <div class="wrap sl-body"><p class="note">Solo la letra, grande y sin acordes, para proyectar en la tele. Revisá cada canto: lo que corrijas queda guardado. Las estrofas van separadas por un renglón en blanco y el estribillo empieza con <b>Estribillo:</b>, así se repite entre estrofas.</p>
+  <div class="sl-prev" style="--ac:#${COLHEX[col]||'888'};--bg:#${COLBG[col]||'111'}"><b>${esc(cov.t)}</b><small>${esc(cov.sub)}</small></div>
+  <div class="sec"><h3>Primera diapositiva</h3><label class="field"><span>Celebración</span><input id="slct" value="${esc(cov.t)}"></label><label class="field"><span>Debajo</span><input id="slcs" value="${esc(cov.sub)}"></label><label class="field"><span>Fecha</span><input id="slcd" value="${esc(cov.d)}"></label></div>
+  <div id="slsongs"></div>
+  <div class="mbar sl-go"><button class="primary" id="slpptx">Generar PowerPoint</button><button class="toolbtn" id="slpdf">Generar PDF</button></div>
+  <div id="sldone" class="sec" hidden></div><p class="note">Entre canto y canto va una diapositiva vacía, para que no quede la letra anterior en pantalla.</p></div>`;
+  document.body.appendChild(ov); document.body.style.overflow='hidden';
+  const box=ov.querySelector('#slsongs');
+  its.forEach((it,k)=>{ const saved=store.get('ly:'+it.r,null); const st=saved?fromEditable(saved):lyricsOf(it.r,L);
+    const d=document.createElement('div'); d.className='sec sl-song';
+    d.innerHTML=`<div class="sl-h"><label><input type="checkbox" ${store.get('lyx:'+it.r,false)?'':'checked'}> <span><small>${esc(it.mo||'Canto')}</small><b>${esc(it.t)}</b></span></label><span class="sl-st ${st&&st.length?'ok':'no'}">${saved?'Corregida por vos':typeof it.r==='number'&&D.songs[it.r].src==='bev'&&st&&st.length?'Revisá la antífona':st&&st.length?'Letra encontrada':'Sin letra: pegala abajo'}</span></div>
+      <textarea rows="${st&&st.length?8:4}" spellcheck="true" placeholder="Pegá o escribí la letra. Separá las estrofas con un renglón en blanco y empezá el estribillo con «Estribillo:».">${esc(toEditable(st))}</textarea>`;
+    const ta=d.querySelector('textarea'), cb=d.querySelector('input');
+    ta.oninput=()=>{ store.set('ly:'+it.r,ta.value); d.querySelector('.sl-st').textContent='Corregida por vos'; d.querySelector('.sl-st').className='sl-st ok' };
+    cb.onchange=()=>store.set('lyx:'+it.r,!cb.checked);
+    it.ta=ta; it.cb=cb; box.appendChild(d) });
+  const collect=()=>{ const c={t:$('slct').value.trim(),sub:$('slcs').value.trim(),d:$('slcd').value.trim()}; store.set('slcover',{}); 
+    const items=its.filter(it=>it.cb.checked).map(it=>({t:up(it.t),mo:it.mo,au:it.au,st:fromEditable(it.ta.value)}));
+    return buildDeck(items,c) };
+  const fname=ext=>(norm($('slct').value)||'misa').trim().replace(/\s+/g,'_').slice(0,50)+'.'+ext;
+  const run=async(kind)=>{ const b=kind==='pptx'?$('slpptx'):$('slpdf'), lab=b.textContent; b.disabled=true; b.textContent='Armando…';
+    try{ const S=collect(); const b64=kind==='pptx'?await makePptx(S,col):await makePdf(S,col);
+      await deliver(fname(kind),kind==='pptx'?'application/vnd.openxmlformats-officedocument.presentationml.presentation':'application/pdf',b64) }
+    catch(e){ console.error(e); toast('No se pudo armar el archivo') } b.disabled=false; b.textContent=lab };
+  $('slpptx').onclick=()=>run('pptx'); $('slpdf').onclick=()=>run('pdf');
+  $('slback').onclick=()=>{ ov.remove(); document.body.style.overflow='' } }
+
+boot();
+
+})();
+</script>
+
+<script>
+if('serviceWorker' in navigator){ addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(r=>{ setTimeout(()=>r.active&&r.active.postMessage('prefetch'),6000) }).catch(()=>{}) }) }
+</script>
+</body></html>
