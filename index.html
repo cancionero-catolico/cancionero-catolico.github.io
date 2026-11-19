@@ -1183,7 +1183,7 @@ $('copymail').onclick=async()=>{ const t=$('mailaddr').textContent; try{ await n
 async function pageURL(p){
   if(urls.has(p)) return urls.get(p);
   const [f,o,n]=D.pages[p];
-  if(!bundles.has(f)) bundles.set(f,fetch('pages/'+f+'.webp').then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}));
+  if(!bundles.has(f)) bundles.set(f,fetch(''+f+'.webp').then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}));
   const buf=await bundles.get(f); const u=URL.createObjectURL(new Blob([buf.slice(o,o+n)],{type:'image/webp'})); urls.set(p,u); return u;
 }
 function segX(s,seg){ return seg.length>=5?[seg[3],seg[4]]:s.x }
@@ -1813,7 +1813,7 @@ function buildDeck(items,cover){
   S.push({type:'blank'});
   return S }
 async function makePptx(S,col){
-  await loadScript('lib/pptxgen.bundle.js');
+  await loadScript('pptxgen.bundle.js');
   const p=new PptxGenJS(); p.layout='LAYOUT_WIDE'; p.title=S[0].t;
   const bg=COLBG[col]||'111111', ac=COLHEX[col]||'888888';
   S.forEach(s=>{ const sl=p.addSlide(); sl.background={color:bg};
@@ -1830,7 +1830,7 @@ async function makePptx(S,col){
   });
   return await p.write({outputType:'base64'}) }
 async function makePdf(S,col){
-  await loadScript('lib/jspdf.umd.min.js');
+  await loadScript('jspdf.umd.min.js');
   const {jsPDF}=window.jspdf; const W=960,H=540; const doc=new jsPDF({orientation:'landscape',unit:'pt',format:[W,H]});
   const hex=h=>[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];
   const bg=hex(COLBG[col]||'111111'), ac=hex(COLHEX[col]||'888888');
