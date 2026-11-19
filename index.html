@@ -348,6 +348,7 @@ body.stage .runbar{display:none}
 .gd[open] summary::after{content:'–'}
 .gd > div{padding:0 16px 14px;line-height:1.5}
 .gd ul{margin:6px 0;padding-left:20px}.gd li{margin:5px 0}.gd p{margin:6px 0}
+.btnlink{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
 </style>
 
 <div id="screen"></div>
@@ -1855,8 +1856,16 @@ async function deliver(name,mime,b64){
   const bin=atob(b64), u8=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u8[i]=bin.charCodeAt(i);
   let dl=null; try{ if(window.claude&&claude.use) dl=await Promise.race([claude.use('downloads'),new Promise(r=>setTimeout(()=>r(null),1500))]) }catch(e){}
   if(dl){ try{ await dl.save({filename:name,data:new Blob([u8])}); toast('Listo: «'+name+'»') }catch(e){ if(e&&e.code!=='declined') toast('No se pudo guardar el archivo') } return }
-  const url=URL.createObjectURL(new Blob([u8],{type:mime})); const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),60000);
-  toast('Listo: se descargó «'+name+'»') }
+  const blob=new Blob([u8],{type:mime}), url=URL.createObjectURL(blob);
+  const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  if(!ios){ const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove() }
+  // botón real para tocar (en iPhone y por si el navegador bloqueó la descarga automática)
+  const b=$('sldone'); if(b){ b.hidden=false;
+    b.innerHTML=`<p><b>${ios?'Listo:':'Se descargó:'}</b> ${esc(name)}</p><div class="mbar"><a class="primary btnlink" id="sldl" href="${url}" download="${esc(name)}">${ios?'Abrir / Guardar':'Descargar de nuevo'}</a><button class="toolbtn" id="slshare" hidden>Compartir</button></div>`;
+    const file=new File([blob],name,{type:mime});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){ const sh=$('slshare'); sh.hidden=false; sh.onclick=()=>navigator.share({files:[file],title:name}).catch(()=>{}) }
+    b.scrollIntoView({behavior:'smooth',block:'nearest'}) }
+  toast(ios?'Listo: tocá «Abrir / Guardar»':'Listo: se descargó «'+name+'»') }
 function slDone(name,uri,mime){ const b=$('sldone'); if(!b) return; b.hidden=false;
   b.innerHTML=`<p><b>Guardado en Descargas:</b> ${esc(name)}</p><div class="mbar"><button class="primary" id="slopen">Abrir</button><button class="toolbtn" id="slshare">Compartir</button></div>`;
   $('slopen').onclick=()=>App.openFile(uri,mime); $('slshare').onclick=()=>App.shareFile(uri,mime) }
@@ -1889,7 +1898,7 @@ async function openSlides(){
   const run=async(kind)=>{ const b=kind==='pptx'?$('slpptx'):$('slpdf'), lab=b.textContent; b.disabled=true; b.textContent='Armando…';
     try{ const S=collect(); const b64=kind==='pptx'?await makePptx(S,col):await makePdf(S,col);
       await deliver(fname(kind),kind==='pptx'?'application/vnd.openxmlformats-officedocument.presentationml.presentation':'application/pdf',b64) }
-    catch(e){ console.error(e); toast('No se pudo armar el archivo') } b.disabled=false; b.textContent=lab };
+    catch(e){ console.error(e); toast(e&&e.type==='error'?'No se pudo cargar el armador de diapositivas: revisá que esté subida la carpeta «lib»':'No se pudo armar el archivo') } b.disabled=false; b.textContent=lab };
   $('slpptx').onclick=()=>run('pptx'); $('slpdf').onclick=()=>run('pdf');
   $('slback').onclick=()=>{ ov.remove(); document.body.style.overflow='' } }
 
