@@ -677,7 +677,10 @@ function keepOffline(ref){ const x=XM.get(ref); if(savable(x)) try{ App.saveOffl
 function keepMarked(){ if(!HAS_APP) return; new Set([...favs,...list].filter(r=>typeof r==='string'&&/^[wrl]/.test(r))).forEach(keepOffline) }
 function jesedNames(){ return [...new Set([...X.filter(x=>x.src==='jes').map(x=>x.raw.u),...D.songs.filter(s=>s.j).map(s=>s.j.u)])] }
 window.onAppEvent=function(type,a,b){
-  if(type==='updated'){ upBanner('Hay novedades en el cancionero','Actualizar',()=>location.reload()); return }
+  if(type==='updated'){ window.upManual=false; upBanner('Hay novedades en el cancionero','Actualizar',()=>location.reload()); return }
+  if(type==='upprog'){ upBanner(`Bajando novedades… ${+a+1} de ${b}`,'',null); return }
+  if(type==='upnone'){ if(window.upManual){ window.upManual=false; toast('Ya tenés la última versión.') } return }
+  if(type==='upfail'){ const bar=document.querySelector('.upbar'); if(bar) bar.remove(); if(window.upManual){ window.upManual=false; toast('No se pudieron bajar las novedades ahora. Probá de nuevo con wifi.') } return }
   if(type==='newapk'){ upBanner('Hay una versión nueva de la app para instalar','Bajar',()=>{ try{ App.openUrl(a) }catch(e){ location.href=a } }); return }
   if(type==='saved'){ if(cur&&cur.kind==='w'&&cur.s&&cur.s.url===a) offlineLine(); }
   else if(type==='jesed'){ const el=$('jesprog'); if(el) el.textContent=`Descargando… ${a} de ${b}`; }
@@ -686,8 +689,8 @@ window.onAppEvent=function(type,a,b){
   else if(type==='jesedEnd'){ const el=$('jesprog'); if(el) el.textContent=+a?`Listo, pero ${a} no se pudieron bajar. Probá de nuevo con buena conexión.`:'Listo: todos los cancioneros de Jésed están en el teléfono.'; const bt=$('jesbtn'); if(bt){bt.disabled=false;bt.textContent='Descargar los que falten'} toast(+a?'Faltaron algunos cancioneros de Jésed':'Jésed descargado: anda sin internet'); }
 };
 function upBanner(msg,btn,fn){ let b=document.querySelector('.upbar'); if(b) b.remove(); b=document.createElement('div'); b.className='upbar'; b.setAttribute('role','status');
-  b.innerHTML=`<span>${esc(msg)}</span><button class="primary">${esc(btn)}</button><button class="toolbtn" aria-label="Cerrar">✕</button>`; document.body.appendChild(b);
-  const [ok,no]=b.querySelectorAll('button'); ok.onclick=()=>{ b.remove(); fn() }; no.onclick=()=>b.remove() }
+  b.innerHTML=`<span>${esc(msg)}</span>${btn?`<button class="primary">${esc(btn)}</button>`:''}<button class="toolbtn" aria-label="Cerrar">✕</button>`; document.body.appendChild(b);
+  const bs=b.querySelectorAll('button'), no=bs[bs.length-1]; if(btn) bs[0].onclick=()=>{ b.remove(); fn() }; no.onclick=()=>b.remove() }
 function offlineLine(){ const el=$('offl'); if(!el||!cur||!cur.s) return; const x=cur.s; let ok=false; try{ ok=App.isSaved(x.url) }catch(e){}
   el.innerHTML=ok?'<b>Guardada en el teléfono:</b> la podés abrir sin conexión.':'<button class="toolbtn" id="offbtn">Guardar sin conexión</button> <span class="note">Se guarda una copia en el teléfono para abrirla sin internet.</span>';
   const bt=$('offbtn'); if(bt) bt.onclick=()=>{ keepOffline(x.ref); bt.disabled=true; bt.textContent='Guardando…' } }
@@ -1188,9 +1191,11 @@ function renderMas(m){
     <li><button id="godom"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><span>Salmos del domingo<small>Los tres ciclos, con letra o audio</small></span></button></li>
     <li><a href="#acerca"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><span>Acerca de la aplicación<small>Autor, contacto y cancioneros</small></span></a></li>
   </ul>
+  ${window.App&&App.checkNow?`<div class="sec"><h3>Actualizaciones</h3><p class="note">La app busca novedades sola cada vez que la abrís con internet. Si querés, buscalas ahora.</p><button class="toolbtn" id="upnow">Buscar novedades ahora</button></div>`:''}
   <div class="sec"><h3>Aspecto</h3><p class="note">La app se viste con el color del tiempo litúrgico: ahora, ${esc(SEASON.color)}. El modo noche ayuda en la iglesia con poca luz.</p>
     <div class="opt" role="group" aria-label="Aspecto">${[['auto','Como el teléfono'],['light','Claro'],['dark','Noche']].map(([k,n])=>`<button class="chip" data-th="${k}" aria-pressed="${th===k}">${n}</button>`).join('')}</div></div>`;
   w.querySelector('#gomine').onclick=()=>{ sub='mine'; setTab('cantos') };
+  const un=w.querySelector('#upnow'); if(un) un.onclick=()=>{ window.upManual=true; toast('Buscando novedades…'); try{ App.checkNow() }catch(e){} };
   const col=document.createElement('div'); col.className='sec';
   col.innerHTML=`<h3>Colaborar con el cancionero</h3><p class="note">La app es gratuita. Si querés hacer un aporte para sostener su crecimiento, escribinos a <b>cancionerocatolico.app@gmail.com</b> y te contamos cómo.</p><button class="toolbtn" id="colab">Escribir un correo</button>`;
   setTimeout(()=>{ w.appendChild(col); col.querySelector('#colab').onclick=()=>mailTo('Quiero colaborar con el Cancionero Católico','Hola, me gustaría hacer un aporte para sostener el Cancionero Católico. ¿Cómo puedo hacerlo?\n\nGracias.') },0);
