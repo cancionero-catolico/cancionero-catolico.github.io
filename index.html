@@ -354,6 +354,12 @@ body.stage .runbar{display:none}
 .ovbar{margin:0 0 10px;display:flex;justify-content:flex-end}
 .gpwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}.gpsheet{background:#fff;border-radius:12px;padding:6px;margin:8px 0}.gpsheet img{display:block;width:100%;height:auto;margin:0 0 8px}
 .verbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0}.verbar .toolbtn{text-decoration:none;font-size:13px;padding:6px 10px}.verbar .toolbtn.on{background:var(--lit);color:var(--bg);border-color:transparent}#verbar{padding:0 12px}
+#mnote{margin:6px 0}.mnote{display:flex;gap:8px;align-items:center;justify-content:space-between;background:var(--lit-soft);border:1px solid var(--line);border-radius:12px;padding:8px 10px;font-weight:600}
+.litw{display:block;color:var(--danger);font-size:13px;font-style:normal;margin:2px 0 4px}.ord .litw{padding-left:2px}
+.lyr.solo p{margin:0 0 1em;line-height:1.55}
+.chpop{position:fixed;z-index:60;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:8px 10px 6px;text-align:center;width:110px}.chpop svg{display:block;margin:0 auto;width:90px;height:auto}.chpop b{display:block;font-size:15px;margin-top:2px}
+#errbox{margin:14px 0 4px}#errform textarea{width:100%;box-sizing:border-box;margin:6px 0}
+#txt .lyr b{cursor:pointer}
 </style>
 
 <div id="screen"></div>
@@ -378,7 +384,8 @@ body.stage .runbar{display:none}
     <button class="iconbtn fav" aria-label="Favorita" aria-pressed="false"><svg width="23" height="23" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z"/></svg></button>
   </div></div>
   <div class="scroller" id="scroller"><div class="wrap">
-    <div class="infoline"><button class="toolbtn" id="reset" hidden>Volver al tono original</button><p class="capo" id="capo" hidden></p></div>
+    <div class="infoline"><button class="toolbtn" id="reset" hidden>Volver al tono original</button><button class="toolbtn" id="solo" aria-pressed="false">Solo letra</button><p class="capo" id="capo" hidden></p></div>
+    <div id="mnote" hidden></div>
     <div id="verbar" hidden></div><div class="ovbar" id="ovbar" hidden></div>
     <div class="harm" id="harm" hidden></div>
     <div class="segwrap" id="segwrap"><div class="segs" id="segs"></div></div>
@@ -386,6 +393,7 @@ body.stage .runbar{display:none}
     <div class="block" id="vinfo"></div>
     <div class="block" id="diagrams"></div>
     <div class="rowbtns" id="vbtns"></div>
+    <div id="errbox"></div>
   </div></div>
   <div class="dock"><div class="wrap">
     <div class="speed" id="speedrow" hidden></div>
@@ -419,8 +427,8 @@ body.stage .runbar{display:none}
   </div></div>
   <div class="scroller"><div class="wrap guide">
     <p class="note">Tocá un tema para verlo. Podés volver a esta guía cuando quieras desde <b>Más › Cómo se usa</b>.</p>
-    <details class="gd"><summary>Primeros pasos</summary><div><p>La app tiene cinco pestañas abajo:</p><ul><li><b>Hoy</b>: el domingo que viene, su tiempo litúrgico, el salmo y cantos sugeridos.</li><li><b>Cantos</b>: todo el cancionero para buscar.</li><li><b>Misa</b>: donde armás la lista de cantos de la celebración.</li><li><b>Favoritas</b>: los cantos que marcaste con la estrella ☆.</li><li><b>Más</b>: tus canciones, enviar cantos, salmos del domingo, aspecto y esta guía.</li></ul><p>El color de la app cambia según el tiempo litúrgico del próximo domingo (verde, morado, blanco, rojo).</p></div></details><details class="gd"><summary>Buscar un canto</summary><div><ul><li>En <b>Cantos</b>, escribí parte del <b>título</b>, una frase de la <b>letra</b> o el <b>autor</b> (por ejemplo «Gallego» o «Athenas»).</li><li>Arriba elegís dónde buscar: <b>Todos</b>, <b>En la app</b> (con acordes, funcionan sin internet), <b>En internet</b> o <b>Mis canciones</b>.</li><li>Con <b>Filtrar</b> elegís el momento de la misa (Entrada, Gloria, Comunión…), el tiempo litúrgico, el tema, el clima o la ocasión (bautismo, casamiento, difuntos…).</li><li>En <b>Hoy › Celebraciones</b> tenés accesos directos: <b>Don Bosco</b> (los cantos salesianos) y <b>Santos</b>, con los cantos agrupados por santo: San Francisco, Santa Teresita, San José, San Cayetano, Brochero, Ceferino y más.</li></ul></div></details><details class="gd"><summary>Tocar un canto: tono, letra y acordes</summary><div><ul><li><b>‹ Volver</b> te lleva a la pantalla de donde viniste (la Misa, la búsqueda, Hoy…), aunque hayas pasado por varios cantos. <b>Manteniéndola apretada</b> volvés directo al inicio.</li><li>La <b>lupa</b> de arriba abre el buscador sin salir: abrís otro canto y con <b>‹</b> volvés al canto donde estabas.</li><li>Abajo, con <b>–</b> y <b>+</b> cambiás el tono. Si conviene, te dice en qué traste poner la <b>cejilla</b> para tocar con los acordes originales. Tocando el tono volvés al original. El <b>tono original</b> es la tonalidad con la que empieza el canto (aunque después suba o cambie).</li><li>Los cantos del cancionero (y los de Pascua Joven y Athenas) se ven como <b>texto con los acordes arriba</b>: cambian de tono sin fallas y la letra se acomoda a la pantalla. Con <b>Ver hoja original</b> ves la página tal cual está en el cancionero (y con <b>Ver como texto</b> volvés).</li><li>Con <b>A A</b> agrandás o achicás la letra. También podés pellizcar. En los cantos de texto, la letra se ajusta sola al ancho de la pantalla; si un renglón es muy largo, se parte en dos con sus acordes.</li><li>La flecha <b>↓</b> hace que el canto baje solo; elegís la velocidad.</li><li>El botón de <b>pantalla completa</b> esconde todo lo demás para tocar cómodo. La pantalla no se apaga mientras tenés un canto abierto.</li><li>Más abajo están los <b>dibujos de todos los acordes</b> del canto (también sus4, 7sus4, 9, maj7, disminuidos…), ya en el tono que elegiste. En los salmos de Bevilacqua los acordes van escritos en la partitura y no cambian de tono, pero abajo tenés sus dibujos con <b>−</b> y <b>+</b> para verlos en otro tono.</li><li>La app recuerda el tono y el tamaño que usaste en cada canto.</li></ul></div></details><details class="gd"><summary>Favoritas</summary><div><p>Dentro de un canto tocá la estrella ☆ de arriba. Aparece en la pestaña <b>Favoritas</b> y en las listas con una estrella dorada.</p></div></details><details class="gd"><summary>Armar la Misa</summary><div><ul><li>En <b>Misa</b> están todos los momentos de la celebración. Tocá <b>Agregar</b> en cada uno: te muestra primero los cantos que sirven para ese momento y ese tiempo litúrgico.</li><li>También podés sumar un canto desde adentro del canto, con el botón de lista de arriba.</li><li>Con <b>⇅</b> cambiás el momento de un canto y con <b>×</b> lo sacás.</li><li><b>Compartir</b> manda la lista por WhatsApp u otra app. El mensaje lleva un código con la misa: quien lo recibe lo mantiene apretado, toca <b>Copiar</b> y abre la app, y le aparece la misa armada. También puede usar <b>Misa › Cargar una misa que me compartieron</b>, o en WhatsApp elegir <b>Compartir › Cancionero Católico</b>. La misa queda además en sus <b>Misas guardadas</b>.</li><li><b>Guardar</b> la deja en <b>Misas guardadas</b>, abajo, para volver a usarla (por ejemplo, el mismo domingo del año que viene). <b>Nueva</b> empieza otra.</li></ul></div></details>
-    <details class="gd"><summary>Diapositivas para proyectar la letra</summary><div><p>Para que los fieles sigan el canto en la tele o el proyector.</p><ul><li>Con la misa armada, en <b>Misa</b> tocá <b>▣ Diapositivas para proyectar</b>.</li><li>La <b>primera diapositiva</b> muestra la celebración (por ejemplo «Domingo I de Adviento»), para dejarla proyectada hasta que empiece la misa. Podés cambiar el texto.</li><li>Después va la <b>letra grande, sin acordes</b>: cada estrofa como un párrafo centrado, sin palabras sueltas en un renglón, con las mayúsculas solo donde corresponden. Si una estrofa es larga, se reparte en dos diapositivas. Entre canto y canto va una <b>diapositiva vacía</b>.</li><li>Revisá la letra de cada canto: las estrofas van separadas por un renglón en blanco y el estribillo empieza con <b>Estribillo:</b>, así se repite entre estrofas. Si un canto dice «Sin letra», pegala. Lo que corrijas queda guardado.</li><li>Los colores siguen el <b>tiempo litúrgico</b>.</li><li>Tocá <b>Generar PowerPoint</b> o <b>Generar PDF</b>. En el teléfono se guarda en <b>Descargas › Cancionero</b> y lo podés abrir o compartir por WhatsApp, mail o pendrive.</li></ul></div></details><details class="gd"><summary>Durante la misa: «Empezar la misa»</summary><div><p>En <b>Misa</b>, tocá <b>▶ Empezar la misa</b>. Se abre el primer canto y abajo aparece una barra que dice cuál sigue. Con <b>›</b> pasás al siguiente canto y con <b>‹</b> volvés, sin salir a la lista. En el último canto, <b>✓</b> termina.</p></div></details><details class="gd"><summary>Salmos del domingo</summary><div><p>En <b>Hoy</b> y en <b>Más › Salmos del domingo</b> está el salmo de cada domingo y fiesta, en los tres ciclos, con las versiones que hay en la app para cantarlo:</p><ul><li>Para ir al canto anterior o al siguiente usá las flechas de abajo. La <b>‹</b> de arriba te devuelve a la Misa.</li><li><b>Athenas</b>: letra y acordes que cambian de tono.</li><li><b>Bevilacqua</b>: la partitura de la «Salmodia responsorial» del P. José Bevilacqua, con los acordes escritos en el tono original. También están sus aclamaciones antes del Evangelio y 41 melodías para el Aleluia (en el momento Aleluya).</li><li><b>Pueblo de Dios</b>: con audio y partitura.</li></ul></div></details><details class="gd"><summary>Cantos repetidos, versiones y cuál es cuál</summary><div><ul><li>Cuando el mismo canto (la misma letra, o con pocas palabras distintas) está en varios cancioneros, aparece <b>una sola vez</b> en la lista. Adentro, arriba, están los botones <b>Versiones</b>: <b>1</b>, <b>2</b>, <b>3</b>… con el cancionero de cada una. La <b>1</b> es la que más usás.</li><li>Los <b>Santos, Glorias, Padrenuestros, Corderos, Señor ten piedad, Aleluyas y Ave Marías</b> que se llaman igual están <b>numerados</b>: SANTO 1, SANTO 2… El número es fijo, así podés decirle a alguien «el Santo 7» y lo encuentra en su app buscando <b>santo 7</b>.</li><li>Otros cantos que tienen el mismo título muestran debajo la <b>primera frase de la letra</b>, para reconocerlos sin abrirlos.</li><li>Los que pusiste en tus misas guardadas dicen <b>en 3 misas</b>, por ejemplo, y al elegir los cantos de un momento de la misa aparecen <b>primero</b>.</li></ul></div></details><details class="gd"><summary>Cantos de otros cancioneros</summary><div><ul><li>Los del <b>Cancionero Maestro</b>, <b>Pastoral de Música</b>, <b>Recursos Católicos</b>, <b>Jésed</b>, <b>LaCuerda</b> y casi todos los del <b>Grupo Pueblo de Dios</b> están dentro de la app, con letra y acordes: se ven igual que los demás, <b>cambian de tono</b>, tienen los <b>dibujos de los acordes</b> y funcionan <b>sin internet</b>. Se usan con permiso de cada cancionero.</li><li>Los de Pastoral de Música que tienen varias versiones traen botones de <b>Versiones</b> debajo del canto.</li><li>Debajo de cada uno está <b>Ver en la página original</b> (o la partitura o el PDF), por si querés compararlo. En los de <b>Pueblo de Dios</b>, arriba está <b>Ver la partitura</b>: muestra la hoja original guardada en la app, sin internet (con <b>A</b> la agrandás). Volvés con <b>Ver como texto</b>.</li><li>Los pocos que no se pudieron pasar a texto (partituras escaneadas de Pueblo de Dios) siguen abriéndose en su página; hace falta conexión. En su ficha también están los dibujos de sus acordes.</li><li>En la lista, el nombre del cancionero aparece en gris al lado del título cuando el canto se abre por internet o cuando hay otro con el mismo título. Dentro de cada canto siempre figura de dónde viene.</li></ul></div></details><details class="gd"><summary>Qué significan las etiquetas</summary><div><ul><li><b>Litúrgico</b>: en el Perdón, Gloria, Santo, Cordero y Padrenuestro, sigue el texto del Misal.</li><li><b>No litúrgico</b>: cambia el texto; se usa en muchas comunidades, pero no es el texto oficial.</li><li><b>Origen evangélico</b>: canto nacido en iglesias evangélicas, con una reseña que explica su origen. Va muy bien en retiros y oración; para la misa conviene elegir otro.</li><li><b>Athenas</b>, <b>Pascua Joven</b>, <b>Cancionero Maestro</b>, <b>Pueblo de Dios</b>, <b>Jésed</b>…: de qué cancionero viene. En la lista se muestra solo cuando hace falta (canto de internet o con título repetido).</li><li><b>Comunidad</b>: canto que mandó otro músico y fue revisado.</li></ul></div></details><details class="gd"><summary>Cargar tus propias canciones</summary><div><ul><li>Tocá el <b>+</b> en Cantos (o <b>Más › Agregar una canción</b>).</li><li>Escribí o pegá la letra con los <b>acordes en la línea de arriba</b> de cada verso, como en cualquier cancionero. La app los reconoce solos (en cifrado americano —C, Am, G7— o en español —DO, lam, SOL7—) y los puede transponer.</li><li>En <b>Para escucharla</b> podés pegar el enlace de YouTube o tocar <b>🎙 Grabar audio</b> y grabarte con la guitarra (la primera vez, la app pide permiso para el micrófono). La grabación se sube al cancionero, así la escuchan también los que reciben tu misa o ven el canto en la comunidad.</li><li>Quedan en <b>Cantos › Mis canciones</b>, guardadas en el teléfono. Las podés editar o borrar desde adentro del canto.</li></ul></div></details><details class="gd"><summary>Compartir un canto con todos</summary><div><ul><li>Dentro de una canción tuya, tocá <b>Enviar a la comunidad</b>, poné tu nombre y <b>Enviar</b>.</li><li>Lo revisa la persona que administra el cancionero. Cuando lo aprueba, aparece para todos en <b>Mis canciones › De la comunidad</b>.</li><li>Si preferís, <b>Mandar por correo</b> lo envía a cancionerocatolico.app@gmail.com.</li></ul></div></details><details class="gd"><summary>Sin conexión, modo noche y otros detalles</summary><div><ul><li>Todo el cancionero de la app, tus canciones, tus favoritas y tus misas funcionan <b>sin internet</b>. Los pocos cantos que se abren en su página necesitan conexión.</li><li>En <b>Más › Aspecto</b> elegís el <b>modo noche</b>, útil en la iglesia con poca luz.</li><li><b>La app se actualiza sola</b>: cuando hay cantos nuevos o arreglos, se bajan al abrirla con internet y aparece abajo <b>Hay novedades › Actualizar</b>. No hace falta instalarla de nuevo; lo tuyo (misas, favoritas, canciones) no se toca.</li><li>Las novedades de cada versión aparecen una vez en <b>Hoy</b>.</li></ul></div></details>
+    <details class="gd"><summary>Primeros pasos</summary><div><p>La app tiene cinco pestañas abajo:</p><ul><li><b>Hoy</b>: el domingo que viene, su tiempo litúrgico, el salmo y cantos sugeridos.</li><li><b>Cantos</b>: todo el cancionero para buscar.</li><li><b>Misa</b>: donde armás la lista de cantos de la celebración.</li><li><b>Favoritas</b>: los cantos que marcaste con la estrella ☆.</li><li><b>Más</b>: tus canciones, enviar cantos, salmos del domingo, aspecto y esta guía.</li></ul><p>El color de la app cambia según el tiempo litúrgico del próximo domingo (verde, morado, blanco, rojo).</p></div></details><details class="gd"><summary>Buscar un canto</summary><div><ul><li>En <b>Cantos</b>, escribí parte del <b>título</b>, una frase de la <b>letra</b> o el <b>autor</b> (por ejemplo «Gallego» o «Athenas»).</li><li>Arriba elegís dónde buscar: <b>Todos</b>, <b>En la app</b> (con acordes, funcionan sin internet), <b>En internet</b> o <b>Mis canciones</b>.</li><li>Con <b>Filtrar</b> elegís el momento de la misa (Entrada, Gloria, Comunión…), el tiempo litúrgico, el tema, el clima o la ocasión (bautismo, casamiento, difuntos…).</li><li>En <b>Hoy › Celebraciones</b> tenés accesos directos: <b>Don Bosco</b> (los cantos salesianos) y <b>Santos</b>, con los cantos agrupados por santo: San Francisco, Santa Teresita, San José, San Cayetano, Brochero, Ceferino y más.</li></ul></div></details><details class="gd"><summary>Tocar un canto: tono, letra y acordes</summary><div><ul><li><b>Tocá un acorde</b> de la letra y aparece su dibujo, sin bajar hasta el final.</li><li><b>Solo letra</b> saca los acordes (para los cantores); <b>Con acordes</b> los vuelve a mostrar.</li><li>Al final del canto está <b>Avisar un error en este canto</b>: contás qué está mal y nos llega para corregirlo.</li><li><b>‹ Volver</b> te lleva a la pantalla de donde viniste (la Misa, la búsqueda, Hoy…), aunque hayas pasado por varios cantos. <b>Manteniéndola apretada</b> volvés directo al inicio.</li><li>La <b>lupa</b> de arriba abre el buscador sin salir: abrís otro canto y con <b>‹</b> volvés al canto donde estabas.</li><li>Abajo, con <b>–</b> y <b>+</b> cambiás el tono. Si conviene, te dice en qué traste poner la <b>cejilla</b> para tocar con los acordes originales. Tocando el tono volvés al original. El <b>tono original</b> es la tonalidad con la que empieza el canto (aunque después suba o cambie).</li><li>Los cantos del cancionero (y los de Pascua Joven y Athenas) se ven como <b>texto con los acordes arriba</b>: cambian de tono sin fallas y la letra se acomoda a la pantalla. Con <b>Ver hoja original</b> ves la página tal cual está en el cancionero (y con <b>Ver como texto</b> volvés).</li><li>Con <b>A A</b> agrandás o achicás la letra. También podés pellizcar. En los cantos de texto, la letra se ajusta sola al ancho de la pantalla; si un renglón es muy largo, se parte en dos con sus acordes.</li><li>La flecha <b>↓</b> hace que el canto baje solo; elegís la velocidad.</li><li>El botón de <b>pantalla completa</b> esconde todo lo demás para tocar cómodo. La pantalla no se apaga mientras tenés un canto abierto.</li><li>Más abajo están los <b>dibujos de todos los acordes</b> del canto (también sus4, 7sus4, 9, maj7, disminuidos…), ya en el tono que elegiste. En los salmos de Bevilacqua los acordes van escritos en la partitura y no cambian de tono, pero abajo tenés sus dibujos con <b>−</b> y <b>+</b> para verlos en otro tono.</li><li>La app recuerda el tono y el tamaño que usaste en cada canto.</li></ul></div></details><details class="gd"><summary>Favoritas</summary><div><p>Dentro de un canto tocá la estrella ☆ de arriba. Aparece en la pestaña <b>Favoritas</b> y en las listas con una estrella dorada.</p></div></details><details class="gd"><summary>Armar la Misa</summary><div><ul><li>Cada canto de la misa guarda <b>su propio tono</b>: si lo cambiás estando en la misa, queda para esa misa (abajo dice «misa») y no cambia en las demás.</li><li>Con <b>📝</b> le ponés una <b>nota</b> a cada canto («solo estribillo», «2 veces», «entra la flauta»). Se ve en la misa y arriba del canto, y viaja cuando la compartís.</li><li>La app <b>avisa</b> lo que no corresponde: en Adviento y Cuaresma, que no va el Gloria; en Cuaresma, que no se canta Aleluya (el momento pasa a llamarse Aclamación al Evangelio); y los Santos, Glorias o Corderos que no siguen el texto de la misa (no litúrgicos).</li><li>En <b>Misa</b> están todos los momentos de la celebración. Tocá <b>Agregar</b> en cada uno: te muestra primero los cantos que sirven para ese momento y ese tiempo litúrgico.</li><li>También podés sumar un canto desde adentro del canto, con el botón de lista de arriba.</li><li>Con <b>⇅</b> cambiás el momento de un canto y con <b>×</b> lo sacás.</li><li><b>Compartir</b> manda la lista por WhatsApp u otra app. El mensaje lleva un código con la misa: quien lo recibe lo mantiene apretado, toca <b>Copiar</b> y abre la app, y le aparece la misa armada. También puede usar <b>Misa › Cargar una misa que me compartieron</b>, o en WhatsApp elegir <b>Compartir › Cancionero Católico</b>. La misa queda además en sus <b>Misas guardadas</b>.</li><li><b>Guardar</b> la deja en <b>Misas guardadas</b>, abajo, para volver a usarla (por ejemplo, el mismo domingo del año que viene). <b>Nueva</b> empieza otra.</li></ul></div></details>
+    <details class="gd"><summary>Diapositivas para proyectar la letra</summary><div><p>Para que los fieles sigan el canto en la tele o el proyector.</p><ul><li>Con la misa armada, en <b>Misa</b> tocá <b>▣ Diapositivas para proyectar</b>.</li><li>La <b>primera diapositiva</b> muestra la celebración (por ejemplo «Domingo I de Adviento»), para dejarla proyectada hasta que empiece la misa. Podés cambiar el texto.</li><li>Después va la <b>letra grande, sin acordes</b>: cada estrofa como un párrafo centrado, sin palabras sueltas en un renglón, con las mayúsculas solo donde corresponden. Si una estrofa es larga, se reparte en dos diapositivas. Entre canto y canto va una <b>diapositiva vacía</b>.</li><li>Revisá la letra de cada canto: las estrofas van separadas por un renglón en blanco y el estribillo empieza con <b>Estribillo:</b>, así se repite entre estrofas. Si un canto dice «Sin letra», pegala. Lo que corrijas queda guardado.</li><li>Los colores siguen el <b>tiempo litúrgico</b>.</li><li>Tocá <b>Generar PowerPoint</b> o <b>Generar PDF</b>. En el teléfono se guarda en <b>Descargas › Cancionero</b> y lo podés abrir o compartir por WhatsApp, mail o pendrive.</li></ul></div></details><details class="gd"><summary>Durante la misa: «Empezar la misa»</summary><div><p>En <b>Misa</b>, tocá <b>▶ Empezar la misa</b>. Se abre el primer canto y abajo aparece una barra que dice cuál sigue. Con <b>›</b> pasás al siguiente canto y con <b>‹</b> volvés, sin salir a la lista. En el último canto, <b>✓</b> termina.</p></div></details><details class="gd"><summary>Salmos del domingo</summary><div><p>En <b>Hoy</b> y en <b>Más › Salmos del domingo</b> está el salmo de cada domingo y fiesta, en los tres ciclos, con las versiones que hay en la app para cantarlo:</p><ul><li>Para ir al canto anterior o al siguiente usá las flechas de abajo. La <b>‹</b> de arriba te devuelve a la Misa.</li><li><b>Athenas</b>: letra y acordes que cambian de tono.</li><li><b>Bevilacqua</b>: la partitura de la «Salmodia responsorial» del P. José Bevilacqua, con los acordes escritos en el tono original. También están sus aclamaciones antes del Evangelio y 41 melodías para el Aleluia (en el momento Aleluya).</li><li><b>Pueblo de Dios</b>: con audio y partitura.</li></ul></div></details><details class="gd"><summary>Cantos repetidos, versiones y cuál es cuál</summary><div><ul><li>Cuando el mismo canto (la misma letra, o con pocas palabras distintas) está en varios cancioneros, aparece <b>una sola vez</b> en la lista. Adentro, arriba, están los botones <b>Versiones</b>: <b>1</b>, <b>2</b>, <b>3</b>… con el cancionero de cada una. La <b>1</b> es la que más usás.</li><li>Los <b>Santos, Glorias, Padrenuestros, Corderos, Señor ten piedad, Aleluyas y Ave Marías</b> que se llaman igual están <b>numerados</b>: SANTO 1, SANTO 2… El número es fijo, así podés decirle a alguien «el Santo 7» y lo encuentra en su app buscando <b>santo 7</b>.</li><li>Otros cantos que tienen el mismo título muestran debajo la <b>primera frase de la letra</b>, para reconocerlos sin abrirlos.</li><li>Los que pusiste en tus misas guardadas dicen <b>en 3 misas</b>, por ejemplo, y al elegir los cantos de un momento de la misa aparecen <b>primero</b>.</li></ul></div></details><details class="gd"><summary>Cantos de otros cancioneros</summary><div><ul><li>Los del <b>Cancionero Maestro</b>, <b>Pastoral de Música</b>, <b>Recursos Católicos</b>, <b>Jésed</b>, <b>LaCuerda</b> y casi todos los del <b>Grupo Pueblo de Dios</b> están dentro de la app, con letra y acordes: se ven igual que los demás, <b>cambian de tono</b>, tienen los <b>dibujos de los acordes</b> y funcionan <b>sin internet</b>. Se usan con permiso de cada cancionero.</li><li>Los de Pastoral de Música que tienen varias versiones traen botones de <b>Versiones</b> debajo del canto.</li><li>Debajo de cada uno está <b>Ver en la página original</b> (o la partitura o el PDF), por si querés compararlo. En los de <b>Pueblo de Dios</b>, arriba está <b>Ver la partitura</b>: muestra la hoja original guardada en la app, sin internet (con <b>A</b> la agrandás). Volvés con <b>Ver como texto</b>.</li><li>Los pocos que no se pudieron pasar a texto (partituras escaneadas de Pueblo de Dios) siguen abriéndose en su página; hace falta conexión. En su ficha también están los dibujos de sus acordes.</li><li>En la lista, el nombre del cancionero aparece en gris al lado del título cuando el canto se abre por internet o cuando hay otro con el mismo título. Dentro de cada canto siempre figura de dónde viene.</li></ul></div></details><details class="gd"><summary>Qué significan las etiquetas</summary><div><ul><li><b>Litúrgico</b>: en el Perdón, Gloria, Santo, Cordero y Padrenuestro, sigue el texto del Misal.</li><li><b>No litúrgico</b>: cambia el texto; se usa en muchas comunidades, pero no es el texto oficial.</li><li><b>Origen evangélico</b>: canto nacido en iglesias evangélicas, con una reseña que explica su origen. Va muy bien en retiros y oración; para la misa conviene elegir otro.</li><li><b>Athenas</b>, <b>Pascua Joven</b>, <b>Cancionero Maestro</b>, <b>Pueblo de Dios</b>, <b>Jésed</b>…: de qué cancionero viene. En la lista se muestra solo cuando hace falta (canto de internet o con título repetido).</li><li><b>Comunidad</b>: canto que mandó otro músico y fue revisado.</li></ul></div></details><details class="gd"><summary>Cargar tus propias canciones</summary><div><ul><li>Tocá el <b>+</b> en Cantos (o <b>Más › Agregar una canción</b>).</li><li>Escribí o pegá la letra con los <b>acordes en la línea de arriba</b> de cada verso, como en cualquier cancionero. La app los reconoce solos (en cifrado americano —C, Am, G7— o en español —DO, lam, SOL7—) y los puede transponer.</li><li>En <b>Para escucharla</b> podés pegar el enlace de YouTube o tocar <b>🎙 Grabar audio</b> y grabarte con la guitarra (la primera vez, la app pide permiso para el micrófono). La grabación se sube al cancionero, así la escuchan también los que reciben tu misa o ven el canto en la comunidad.</li><li>Quedan en <b>Cantos › Mis canciones</b>, guardadas en el teléfono. Las podés editar o borrar desde adentro del canto.</li></ul></div></details><details class="gd"><summary>Compartir un canto con todos</summary><div><ul><li>Dentro de una canción tuya, tocá <b>Enviar a la comunidad</b>, poné tu nombre y <b>Enviar</b>.</li><li>Lo revisa la persona que administra el cancionero. Cuando lo aprueba, aparece para todos en <b>Mis canciones › De la comunidad</b>.</li><li>Si preferís, <b>Mandar por correo</b> lo envía a cancionerocatolico.app@gmail.com.</li></ul></div></details><details class="gd"><summary>Sin conexión, modo noche y otros detalles</summary><div><ul><li>En <b>Más › Cifrado de los acordes</b> elegís cómo se escriben: <b>C D E</b> o <b>Do Re Mi</b>.</li><li>Todo el cancionero de la app, tus canciones, tus favoritas y tus misas funcionan <b>sin internet</b>. Los pocos cantos que se abren en su página necesitan conexión.</li><li>En <b>Más › Aspecto</b> elegís el <b>modo noche</b>, útil en la iglesia con poca luz.</li><li><b>La app se actualiza sola</b>: cuando hay cantos nuevos o arreglos, se bajan al abrirla con internet y aparece abajo <b>Hay novedades › Actualizar</b>. No hace falta instalarla de nuevo; lo tuyo (misas, favoritas, canciones) no se toca.</li><li>Las novedades de cada versión aparecen una vez en <b>Hoy</b>.</li></ul></div></details>
   </div></div>
 </section>
 <section id="aview" class="sheet" hidden aria-label="Acerca de">
@@ -607,6 +615,11 @@ function svg(shape){const x0=10,y0=16,dx=10,dy=13;const fr=shape.filter(v=>v>0);
   if(mf>0&&at.length>=3){const a=at[0],b=at[at.length-1];s+=`<rect x="${x0+a*dx-3}" y="${y0+(mf-base+.5)*dy-3.5}" width="${(b-a)*dx+6}" height="7" rx="3.5" fill="currentColor"/>`}
   shape.forEach((v,i)=>{const x=x0+i*dx;if(v<0)s+=`<text x="${x}" y="${y0-4}" font-size="8" text-anchor="middle" fill="currentColor">×</text>`;else if(v===0)s+=`<circle cx="${x}" cy="${y0-6}" r="2.6" fill="none" stroke="currentColor"/>`;else s+=`<circle cx="${x}" cy="${y0+(v-base+.5)*dy}" r="4" fill="currentColor"/>`});
   return s+'</svg>'}
+// cifrado para mostrar: C D E (americano) o Do Re Mi (latino). Solo cambia lo que se ve.
+const ESN={C:'Do',D:'Re',E:'Mi',F:'Fa',G:'Sol',A:'La',B:'Si'};
+function latin(){ try{ return store.get('nota','en')==='es' }catch(e){ return false } }
+function dch(c){ if(!c||!latin()) return c; return String(c).replace(/(^|[\s(\/\[|-])([A-G])(?![a-z]{2})/g,(m,p,r)=>p+ESN[r]) }
+
 const LIT=(()=>{
   const DAY=864e5;
   const D=(y,m,d)=>new Date(y,m-1,d);
@@ -811,12 +824,20 @@ function guessKey(chs,info){ const P=chs.map(c=>parse(c)).filter(Boolean); if(!P
 function userKey(s){ if(s.k) return s.k; const c=firstSection(s); return c.length?guessKey(c):null }
 // Letra «de libro»: letra normal (la de la app) y cada acorde colgado de la sílaba que tiene debajo.
 // Si un renglón no entra, baja la palabra entera con su acorde (nunca queda corrido).
+function soloLetra(){ try{ return !!store.get('solo',false) }catch(e){ return false } }
+// solo la letra (para los cantores): sin renglones de acordes ni acordes entre corchetes
+function renderLyrics(s){ const html=[]; let para=[];
+  const flush=()=>{ if(para.length) html.push(`<p>${para.join('<br>')}</p>`); para=[] };
+  parseSong(s.tx||'').forEach(l=>{ if(!l.text.trim()){ flush(); return } if(l.ch) return;
+    const t=l.text.replace(/\[[^\]]*\]/g,'').replace(/\s{2,}/g,' ').trim(); if(t) para.push(esc(t)) });
+  flush(); return `<div class="lyr solo">${html.join('')}</div>` }
 function renderText(s,n){
+  if(soloLetra()) return renderLyrics(s);
   const key=s.key?parseKey(s.key):null;
   const P=parseSong(s.tx||'');
-  const T=c=>{ const inner=c.replace(/^\(|\)$/g,''), e=toEng(inner); return e?c.replace(inner, n?tr(e,n,key):e):c };
+  const T=c=>{ const inner=c.replace(/^\(|\)$/g,''), e=toEng(inner); return e?c.replace(inner, dch(n?tr(e,n,key):e)):c };
   const chordsOf=text=>{ const out=[], re=/\S+/g; let m; while((m=re.exec(text))) out.push([m.index,T(m[0])]); return out };
-  const inl=t=>esc(t).replace(/\[([^\]]+)\]/g,(all,c)=>{ const e=toEng(c.replace(/&amp;/g,'&')); return e?`<b class="ci">${esc(n?tr(e,n,key):e)}</b>`:all });
+  const inl=t=>esc(t).replace(/\[([^\]]+)\]/g,(all,c)=>{ const e=toEng(c.replace(/&amp;/g,'&')); return e?`<b class="ci">${esc(dch(n?tr(e,n,key):e))}</b>`:all });
   const html=[];
   for(let i=0;i<P.length;i++){ const l=P[i];
     if(!l.text.trim()){ if(html.length&&html[html.length-1]!=='<p class="gap"></p>') html.push('<p class="gap"></p>'); continue }
@@ -1121,8 +1142,9 @@ function renderHoy(m){
     g.innerHTML=`<h3>¿Primera vez en la app?</h3><p class="note">Mirá la guía rápida: cómo buscar, cambiar el tono, armar la misa y más. Siempre la tenés en <b>Más › Cómo se usa</b>.</p><div class="mbar" style="margin-top:10px"><a class="primary" href="#ayuda" style="text-decoration:none">Ver la guía</a><button class="toolbtn" id="gno">Ahora no</button></div>`;
     w.appendChild(g); g.querySelector('#gno').onclick=()=>{ store.set('guideSeen',true); g.remove() }; g.querySelector('a').addEventListener('click',()=>setTimeout(()=>g.remove(),300)) }
   // novedades: una sola tarjeta, la de la última versión (las anteriores ya no hacen falta)
-  if(!store.get('news55',false)){ const n=document.createElement('div'); n.className='sec news';
+  if(!store.get('news56',false)){ const n=document.createElement('div'); n.className='sec news';
     n.innerHTML=`<h3>Novedades del cancionero</h3><ul>
+      <li><b>Acordes en Do Re Mi</b> (en Más), <b>tono y nota de cada canto para cada misa</b>, <b>avisos litúrgicos</b> al armar la misa, <b>Solo letra</b> para los cantores, <b>tocá un acorde y ves su dibujo</b>, y <b>Avisar un error</b> al final de cada canto.</li>
       <li><b>Volver más fácil</b>: la <b>‹</b> te lleva a la pantalla de donde viniste (no al canto anterior), la <b>lupa</b> busca otro canto sin salir de la misa, y <b>manteniendo apretada la ‹</b> volvés al inicio.</li>
       <li><b>Cantos repetidos unidos</b>: aparecen una sola vez, con botones de <b>Versiones</b> adentro (la 1 es la que más usás). Los <b>Santos, Glorias, Padrenuestros</b> y demás están <b>numerados</b> (SANTO 1, SANTO 2…), y los que usás en tus misas aparecen primero. Los de <b>Pascua Joven y Athenas</b> también se ven como texto, con «Ver hoja original».</li>
       <li><b>Los cantos de Pastoral de Música, Recursos Católicos, Jésed, LaCuerda y Pueblo de Dios ya no se abren en su página</b>: se ven como los demás, con cambio de tono y dibujos, y andan sin internet. En los de Pueblo de Dios, <b>Ver la partitura</b> muestra la hoja original.</li>
@@ -1132,7 +1154,7 @@ function renderHoy(m){
       <li><b>Santos</b>: en Hoy › Celebraciones, los cantos agrupados por santo (San Francisco, Santa Teresita, San José, San Cayetano, Brochero, Ceferino…).</li>
       <li><b>Más de 300 cantos del Cancionero Maestro</b>, con letra y acordes dentro de la app.</li>
       <li><b>Diapositivas</b> con cada estrofa como párrafo y letra más grande.</li></ul><button class="toolbtn" id="newsok">Entendido</button>`;
-    w.appendChild(n); n.querySelector('#newsok').onclick=()=>{ store.set('news55',true); store.set('news54',true); store.set('news53',true); store.set('news52',true); store.set('news51',true); store.set('news50',true); store.set('news49',true); store.set('news481',true); n.remove() } }
+    w.appendChild(n); n.querySelector('#newsok').onclick=()=>{ store.set('news56',true); store.set('news55',true); store.set('news54',true); store.set('news53',true); store.set('news52',true); store.set('news51',true); store.set('news50',true); store.set('news49',true); store.set('news481',true); n.remove() } }
   // psalm of the coming sunday
   const ps=document.createElement('div'); ps.className='sec';
   const rows=DOM?domRowsFor(sun):[];
@@ -1210,8 +1232,16 @@ function renderDom(m,nq,words){
 // ---------- MISA: the songs of the celebration, in the order of the mass ----------
 const MORD=['ent','per','glo','sal','ale','ofr','san','pad','cor','com','acc','env','mar'];
 function lkey(r){ return String(r) }
+let lk=store.get('lk',{})||{}, ln=store.get('ln',{})||{};   // tono (semitonos) y nota de cada canto, para esta misa
+function misaKeyName(r,n){ const b=typeof r==='number'&&D.songs[r]?D.songs[r].key:null; const k=b?parseKey(b):null; return k?dch(keyName(k,n)):(n>0?'+':'')+n }
+function inMisa(){ return !!cur&&list.some(r=>String(r)===String(refOf())) }
+function misaKey(){ if(!inMisa()) return; const v=lk[String(refOf())]; if(v!=null) cur.n=v }
+function misaNoteUI(){ const b=$('mnote'); if(!b) return; if(!inMisa()){ b.hidden=true; b.innerHTML=''; return }
+  const r=String(refOf()), t=ln[r]||''; b.hidden=false;
+  b.innerHTML=t?`<div class="mnote"><span>📝 ${esc(t)}</span><button class="toolbtn" id="mnedit">Cambiar</button></div>`:`<button class="toolbtn" id="mnedit">📝 Nota para esta misa</button>`;
+  $('mnedit').onclick=()=>{ const v=prompt('Nota para este canto en esta misa (por ejemplo: solo estribillo, 2 veces, entra la flauta)',t); if(v==null) return; if(v.trim()) ln[r]=v.trim().slice(0,140); else delete ln[r]; store.set('ln',ln); misaNoteUI() } }
 function momentOf(r){ return lm[lkey(r)]||null }
-function saveList(){ store.set('list',list); const keep={}; list.forEach(r=>{ const k=lkey(r); if(lm[k]) keep[k]=lm[k] }); lm=keep; store.set('lm',lm); updCount() }
+function saveList(){ store.set('list',list); const keep={},k2={},n2={}; list.forEach(r=>{ const k=lkey(r); if(lm[k]) keep[k]=lm[k]; if(lk[k]!=null) k2[k]=lk[k]; if(ln[k]) n2[k]=ln[k] }); lm=keep; lk=k2; ln=n2; store.set('lm',lm); store.set('lk',lk); store.set('ln',ln); updCount() }
 function updCount(){ const b=$('lcount'); b.hidden=!list.length; b.textContent=list.length }
 function addToMisa(ref,moment){
   if(!list.includes(ref)) list.push(ref);
@@ -1237,17 +1267,34 @@ function renderMisa(m){
 function slot(code,name){
   const el=document.createElement('li'); const items=list.filter(r=>momentOf(r)===code);
   if(items.length) el.className='has';
-  el.innerHTML=`<div class="mh"><b>${esc(name)}</b>${code?'<button class="addm">Agregar</button>':''}</div>`;
+  const lw=litSlot(code); el.innerHTML=`<div class="mh"><b>${esc(lw.name||name)}</b>${code?'<button class="addm">Agregar</button>':''}</div>${lw.note?`<p class="litw">${lw.note}</p>`:''}`;
   if(code) el.querySelector('.addm').onclick=()=>openPicker(code);
   items.forEach(r=>{ const i=refInfo(r); if(!i) return; const row=document.createElement('div'); row.className='song';
     const k=i.k&&!i.mine?` · ${i.k}`:'';
-    row.innerHTML=`<a href="#${i.hash}"><b>${esc(i.t)}</b><span>${esc((i.sn||'').slice(0,80))}</span></a>`;
+    const kk=lk[lkey(r)], nt=ln[lkey(r)];
+    row.innerHTML=`<a href="#${i.hash}"><b>${esc(i.t)}</b><span>${nt?'📝 '+esc(nt)+' · ':''}${kk?'tono '+(misaKeyName(r,kk))+' · ':''}${esc((i.sn||'').slice(0,80))}</span>${litWarn(r,code)}</a>`;
     const sel=document.createElement('select'); sel.className='mini'; sel.style.width='36px'; sel.setAttribute('aria-label','Mover a otro momento'); sel.style.appearance='none'; sel.style.textAlign='center';
     sel.innerHTML='<option value="" disabled selected>⇅</option>'+MORD.map(c=>`<option value="${c}">${esc(nameIn(MOM,c))}</option>`).join('')+'<option value="-">Otros cantos</option>';
     sel.onchange=()=>{ const v=sel.value; if(v==='-') delete lm[lkey(r)]; else lm[lkey(r)]=v; saveList(); render() };
     const rm=mk('×','Quitar de la misa',()=>{ list=list.filter(x=>x!==r); saveList(); render() });
-    row.append(sel,rm); el.appendChild(row) });
+    const nb=mk('📝','Nota para este canto',()=>{ const v=prompt('Nota para este canto en esta misa (por ejemplo: solo estribillo, 2 veces, entra la flauta)',ln[lkey(r)]||''); if(v==null) return; if(v.trim()) ln[lkey(r)]=v.trim().slice(0,140); else delete ln[lkey(r)]; saveList(); render() });
+    row.append(nb,sel,rm); el.appendChild(row) });
   return el }
+// ---------- avisos litúrgicos al armar la misa ----------
+const SOLEMNE=/inmaculada|san jose|anunciacion|jueves santo/;
+function noGloria(){ return ['adv','cua','ss'].includes(SEASON.code)&&!SOLEMNE.test((SUN&&SUN.key)||'') }
+function noAleluya(){ return ['cua','ss'].includes(SEASON.code) }
+function litSlot(code){
+  if(code==='glo'&&noGloria()) return {note:`En ${SEASON.code==='adv'?'Adviento':SEASON.code==='cua'?'Cuaresma':'Semana Santa'} los domingos no se canta el Gloria (sí en las solemnidades).`};
+  if(code==='ale'&&noAleluya()) return {name:'Aclamación al Evangelio',note:'En Cuaresma no se canta «Aleluya»: va una aclamación sin aleluya (por ejemplo «Gloria a ti, Señor Jesús»).'};
+  return {} }
+const ORDIN=['glo','san','cor','pad','per'];
+function litInfo(r){ if(typeof r==='number'){ const s=D.songs[r]; return s?{lt:s.lt,t:s.t,nt:s.nt}:null } if(/^u/.test(r)) return null; const x=XM.get(r); return x?{lt:x.raw.lt,t:x.t,nt:x.nt}:null }
+function litWarn(r,code){ const i=litInfo(r); if(!i) return '';
+  if(ORDIN.includes(code)&&i.lt==='nol') return '<em class="litw">⚠ No litúrgico: no sigue el texto de la misa</em>';
+  if(code==='glo'&&noGloria()) return '<em class="litw">⚠ En este tiempo no va el Gloria</em>';
+  if(noAleluya()&&/aleluy|aleluia|alleluia/.test(i.nt||'')) return '<em class="litw">⚠ Tiene «Aleluya»: en Cuaresma no se canta</em>';
+  return '' }
 function mk(t,label,fn){const b=document.createElement('button');b.className='mini';b.textContent=t;b.setAttribute('aria-label',label);b.onclick=fn;return b}
 function openPicker(code){
   const ov=document.createElement('div'); ov.className='pick'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-label','Elegir '+nameIn(MOM,code));
@@ -1260,7 +1307,8 @@ function openPicker(code){
   const all=[...D.songs.filter(s=>s.hide==null&&(s.m||[]).includes(code)).map(s=>({ref:s.i,t:s.t,nt:s.nt,tl:s.tl||[],lt:s.lt,ev:s.ev,sub:'',fav:favs.has(s.i)})),
     ...X.filter(x=>!x.hide&&x.m.includes(code)).map(x=>({ref:x.ref,t:x.t,nt:x.nt,tl:x.tl||[],lt:x.raw.lt,ev:x.raw.ev,sub:x.badge,fav:favs.has(x.ref)})),
     ...[...U.values()].filter(s=>MO_TXT[norm(s.mo||'').trim()]===code).map(s=>({ref:'u'+s.id,t:s.t,nt:s.nt,tl:[],sub:'mía',fav:favs.has('u'+s.id)}))];
-  const score=x=>(sea!=='ord'&&x.tl.includes(sea)?0:sea==='ord'&&!x.tl.length?1:2)-(x.fav?2:0)+(sea==='ord'&&x.tl.length?2:0)+(x.lt==='nol'?1:0)+(x.ev?3:0);
+  const aleNo=code==='ale'&&noAleluya(), gloNo=code==='glo'&&noGloria();
+  const score=x=>(sea!=='ord'&&x.tl.includes(sea)?0:sea==='ord'&&!x.tl.length?1:2)-(x.fav?2:0)+(sea==='ord'&&x.tl.length?2:0)+(x.lt==='nol'?(ORDIN.includes(code)?6:1):0)+(x.ev?3:0)+(aleNo&&/aleluy|aleluia|alleluia/.test(x.nt)?8:0);
   all.forEach(x=>{ x.use=useScore(x.ref); x.mc=misaCount(x.ref); const k=String(x.ref); x.fl=(META.nm||{})[k]?'':(META.fl[k]||''); x.rt=META.rt[k]||'' });
   all.sort((a,b)=>(b.mc-a.mc)||score(a)-score(b)||(b.use-a.use)||a.nt.localeCompare(b.nt,'es',{numeric:true}));
   function draw(){ const q=norm(inp.value).trim(), ws=q.split(' ').filter(Boolean); const res=ws.length?all.filter(x=>ws.every(w=>x.nt.includes(w))):all;
@@ -1301,7 +1349,10 @@ function renderMas(m){
   </ul>
   ${window.App&&App.checkNow?`<div class="sec"><h3>Actualizaciones</h3><p class="note">La app busca novedades sola cada vez que la abrís con internet. Si querés, buscalas ahora.</p><button class="toolbtn" id="upnow">Buscar novedades ahora</button></div>`:''}
   <div class="sec"><h3>Aspecto</h3><p class="note">La app se viste con el color del tiempo litúrgico: ahora, ${esc(SEASON.color)}. El modo noche ayuda en la iglesia con poca luz.</p>
-    <div class="opt" role="group" aria-label="Aspecto">${[['auto','Como el teléfono'],['light','Claro'],['dark','Noche']].map(([k,n])=>`<button class="chip" data-th="${k}" aria-pressed="${th===k}">${n}</button>`).join('')}</div></div>`;
+    <div class="opt" role="group" aria-label="Aspecto">${[['auto','Como el teléfono'],['light','Claro'],['dark','Noche']].map(([k,n])=>`<button class="chip" data-th="${k}" aria-pressed="${th===k}">${n}</button>`).join('')}</div></div>
+  <div class="sec"><h3>Cifrado de los acordes</h3><p class="note">Cómo se escriben los acordes en los cantos, el tono y los dibujos.</p>
+    <div class="opt" role="group" aria-label="Cifrado">${[['en','C D E (americano)'],['es','Do Re Mi (latino)']].map(([k,n])=>`<button class="chip" data-nota="${k}" aria-pressed="${store.get('nota','en')===k}">${n}</button>`).join('')}</div></div>`;
+  w.querySelectorAll('[data-nota]').forEach(b=>b.onclick=()=>{ store.set('nota',b.dataset.nota); w.querySelectorAll('[data-nota]').forEach(x=>x.setAttribute('aria-pressed',x===b)); toast(b.dataset.nota==='es'?'Acordes en Do Re Mi':'Acordes en C D E') });
   w.querySelector('#gomine').onclick=()=>{ sub='mine'; setTab('cantos') };
   const un=w.querySelector('#upnow'); if(un) un.onclick=()=>{ window.upManual=true; toast('Buscando novedades…'); try{ App.checkNow() }catch(e){} };
   const col=document.createElement('div'); col.className='sec';
@@ -1348,7 +1399,7 @@ function paint(d){
   s.c.forEach((c,ci)=>{ if(c[0]!==p||c[2]<y0-2||c[4]>y1+2||(cols&&(c[1]<x0-2||c[3]>x1+2))) return; const es=c[6]===1;
     if(!n&&!es&&!hm) return;
     const hh=(c[4]-c[2]), fs=Math.max(8,hh*px*0.86);
-    items.push({l:(c[1]-x0)*px,t:(c[2]-y0)*px,w:(c[3]-c[1])*px,h:hh*px,fs,txt:(hm&&hm[ci]?hm[ci]:c[5]).split(' ').map(x=>tr(x,n,key)).join(' ')}) });
+    items.push({l:(c[1]-x0)*px,t:(c[2]-y0)*px,w:(c[3]-c[1])*px,h:hh*px,fs,txt:(hm&&hm[ci]?hm[ci]:c[5]).split(' ').map(x=>dch(tr(x,n,key))).join(' ')}) });
   const cv=paint.cv||(paint.cv=document.createElement('canvas').getContext('2d'));
   // agrupa en renglones (aunque la altura varíe un poco) y ordena cada renglón de izquierda a derecha
   items.sort((a,b)=>a.t-b.t); const rows=[];
@@ -1426,6 +1477,37 @@ function verLabel(r){ if(typeof r==='number'){ const s=D.songs[r]; return (bookN
 function verBar(ref){ const g=VG.get(String(ref)); if(!g) return '';
   return `<div class="verbar"><span class="note">Versiones:</span>${g.map((r,i)=>{ const inf=refInfo(r); const on=String(r)===String(ref);
     return `<a class="toolbtn${on?' on':''}" ${on?'aria-current="true"':''} href="#${inf?inf.hash:''}">${i+1} · ${esc(verLabel(r))}</a>` }).join('')}</div>` }
+function songExtras(ref){ showVerBar(ref); misaKey(); misaNoteUI(); errUI() }
+// ---------- avisar un error en el canto (llega al buzón del cancionero) ----------
+function errUI(){ const b=$('errbox'); if(!b) return; if(!cur){ b.innerHTML=''; return }
+  b.innerHTML=`<button class="golink second" id="erropen">Avisar un error en este canto</button>
+    <div id="errform" hidden><p class="note">Contanos qué está mal: un acorde, una palabra, una estrofa que falta, el tono… Si podés, copiá el renglón.</p>
+    <textarea id="errtx" class="tin" rows="4" maxlength="1500" placeholder="Ej.: en la 2.ª estrofa, sobre «pan» va Am y no C"></textarea>
+    <label class="note" for="errnm">Tu nombre (opcional)</label><input id="errnm" class="tin" maxlength="60" autocomplete="name">
+    <div class="mbar" style="margin-top:10px"><button class="primary" id="errgo">Enviar aviso</button><button class="toolbtn" id="errmail">Por correo</button></div></div>`;
+  const f=$('errform'); $('errnm').value=store.get('myname','');
+  $('erropen').onclick=()=>{ f.hidden=!f.hidden; if(!f.hidden) $('errtx').focus() };
+  const info=()=>{ const r=refOf(), i=refInfo(r); return {t:cur.s.t, r:String(r), src:i?(i.badge||i.sn||''):'', k:$('keyname').textContent} };
+  const body=()=>{ const i=info(); return $('errtx').value.trim()+'\n\n— Canto: '+i.t+'\n— Referencia: '+i.r+(i.src?'\n— Fuente: '+i.src:'')+'\n— Tono en pantalla: '+i.k };
+  $('errmail').onclick=()=>mailTo('Error en el canto: '+info().t,body());
+  $('errgo').onclick=async()=>{ const tx=$('errtx').value.trim(); if(tx.length<3){ toast('Contanos qué está mal'); return }
+    const nm=$('errnm').value.trim(); if(nm) store.set('myname',nm); const g=$('errgo'); g.disabled=true; g.textContent='Enviando…';
+    const ok=await postComm({titulo:'[ERROR] '+info().t+' ('+info().r+')',momento:'error',letra:body(),enviado_por:nm});
+    if(ok){ f.hidden=true; $('erropen').textContent='Aviso enviado ✓ ¡Gracias!'; toast('¡Gracias! Lo vamos a revisar') }
+    else { g.disabled=false; g.textContent='Enviar aviso'; toast('No se pudo enviar. Probá por correo') } } }
+// ---------- tocar un acorde de la letra muestra su dibujo ----------
+document.addEventListener('click',e=>{ const old=document.querySelector('.chpop');
+  const b=e.target.closest&&e.target.closest('#txt .lyr b, #segs .cc');
+  if(old&&(!b||old.dataset.c===b.textContent)){ old.remove(); if(!b) return; return } if(old) old.remove();
+  if(!b||!cur) return; const name=b.textContent.trim().split(/\s+/)[0]; const e2=toEng(name.replace(/^\(|\)$/g,'')); if(!e2) return;
+  const p=parse(e2.split('/')[0]); const sh=p?shapeFor(p.s,p.q):null; if(!sh) return;
+  const pop=document.createElement('div'); pop.className='chpop'; pop.dataset.c=b.textContent; pop.innerHTML=`${svg(sh)}<b>${esc(name)}</b>`;
+  document.body.appendChild(pop); const r=b.getBoundingClientRect(); const w=pop.offsetWidth||110;
+  pop.style.left=Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2))+'px'; pop.style.top=(r.top>170?r.top-pop.offsetHeight-8:r.bottom+8)+'px';
+  setTimeout(()=>{ if(pop.isConnected) pop.remove() },4000) });
+window.addEventListener('scroll',()=>{ const o=document.querySelector('.chpop'); if(o) o.remove() },true);
+// ---------- solo letra ----------
+$('solo').onclick=()=>{ store.set('solo',!soloLetra()); updKey(); applyZoom(false) };
 function showVerBar(ref){ let b=$('verbar'); if(!b) return; const h=verBar(ref); b.innerHTML=h; b.hidden=!h }
 function setPressed(){ const r=refOf(), on=favs.has(r);
   document.querySelectorAll('.fav').forEach(b=>{b.setAttribute('aria-pressed',on); b.querySelector('path').setAttribute('fill',on?'currentColor':'none')});
@@ -1450,7 +1532,7 @@ function renderOwnBody(){ const s=cur.s; $('txt').innerHTML=`<div class="txtsong
 function openSong(s){
   cur={kind:'c',s,n:store.get('t:'+s.i,0)}; remember(s.i); cur.tx=!!ownTx(s)&&store.get('ov:'+s.i,'t')==='t';
   $('vt').textContent=s.t; showSheet('view'); $('scroller').scrollTop=0; $('segwrap').scrollLeft=0; setPressed(); awake(true);
-  $('txt').innerHTML=''; $('vbtns').innerHTML=''; showVerBar(s.i);
+  $('txt').innerHTML=''; $('vbtns').innerHTML=''; songExtras(s.i);
   const pg=s.s.map(x=>x[0]); const first=pg[0], last=pg[pg.length-1];
   const num=p=>p>=4000?(p-4000)%200+1:p>=3000?p-3000-1:p>=2000?p-2000+1:p>=1000?p-1000+1:p+1;
   const book=s.src==='pj'?'del Cancionero Pascua Joven':s.src==='ath'?'de los Salmos de Athenas':s.src==='ach'?'del Cancionero de Athenas':s.src==='bev'?`del cuadernillo «Salmodia responsorial», año ${s.ath&&s.ath.cy?esc(s.ath.cy[0]):''}, del P. José Bevilacqua`:'del cancionero';
@@ -1485,12 +1567,16 @@ function harmUI(){ const box=$('harm'), r=cur&&cur.kind==='c'&&!cur.tx&&RH[cur.s
 function updKey(){
   const s=cur.s, key=s.key?parseKey(s.key):null, n=cur.n, has=chordsOf().length;
   $('keysel').parentElement.hidden=!!s.fix;
-  $('keyname').textContent=key?keyName(key,n):(n?((n>0?'+':'')+n):'—');
-  $('keyorig').textContent=!has?'sin acordes':(n===0?'original':`orig. ${s.key||''} ${n>0?'+':''}${n}`);
+  $('keyname').textContent=key?dch(keyName(key,n)):(n?((n>0?'+':'')+n):'—');
+  const inM=inMisa(); $('keyorig').textContent=!has?'sin acordes':(n===0?(inM&&lk[String(refOf())]!=null?'original · misa':'original'):`orig. ${dch(s.key||'')} ${n>0?'+':''}${n}${inM?' · misa':''}`);
   $('keysel').classList.toggle('changed',n!==0); $('reset').hidden=n===0;
   const up=((n%12)+12)%12;
   $('capo').innerHTML=(n!==0&&up>=1&&up<=7)?`O cejilla en el traste <b>${up}</b> y tocás los acordes originales.`:''; $('capo').hidden=!$('capo').innerHTML;
-  if(cur.kind==='c'){ if(cur.tx) renderOwnBody(); else paintAll(); store.set('t:'+s.i,n) } else { renderUserBody(); store.set('t:u'+s.id,n) }
+  if(inMisa()){ lk[String(refOf())]=n; store.set('lk',lk) }      // en la misa armada, el tono queda para esta misa
+  else if(cur.kind==='c') store.set('t:'+s.i,n); else store.set('t:u'+s.id,n);
+  if(cur.kind==='c'){ if(cur.tx) renderOwnBody(); else paintAll() } else renderUserBody();
+  $('solo').setAttribute('aria-pressed',soloLetra()); $('solo').textContent=soloLetra()?'Con acordes':'Solo letra';
+  $('solo').hidden=!has||(cur.kind==='c'&&!cur.tx);
   diagrams();
 }
 function diagrams(){
@@ -1498,7 +1584,7 @@ function diagrams(){
   chordsOf().forEach(c=>{const t=tr(c,cur.n,key).split('/')[0]; if(!seen.includes(t)) seen.push(t)});
   const box=$('diagrams'); if(!seen.length&&cur.kind==='c'&&cur.s.ch){ diagBlock(box,cur.s.ch,'Leídos de la partitura: puede faltar o sobrar alguno.'); return }
   if(!seen.length){ box.innerHTML=cur.s.fix?'':'<h3>Acordes</h3><p class="note">Esta canción no tiene acordes cargados.</p>'; return }
-  box.innerHTML=`<h3>Acordes${cur.n?' en el tono nuevo':''}</h3><div class="dgrid">`+seen.map(t=>{const p=parse(t); const sh=p?shapeFor(p.s,p.q):null; return `<div class="dg">${sh?svg(sh):''}<b>${esc(t)}</b></div>`}).join('')+'</div>';
+  box.innerHTML=`<h3>Acordes${cur.n?' en el tono nuevo':''}</h3><div class="dgrid">`+seen.map(t=>{const p=parse(t); const sh=p?shapeFor(p.s,p.q):null; return `<div class="dg">${sh?svg(sh):''}<b>${esc(dch(t))}</b></div>`}).join('')+'</div>';
 }
 $('up').onclick=()=>{ cur.n=cur.n>=6?cur.n-11:cur.n+1; updKey() };
 $('down').onclick=()=>{ cur.n=cur.n<=-5?cur.n+11:cur.n-1; updKey() };
@@ -1528,7 +1614,7 @@ $('stage').onclick=()=>stage(!document.body.classList.contains('stage'));
 // ---------- my songs ----------
 function openUser(s){
   s.key=userKey(s); remember('u'+s.id);
-  cur={kind:'u',id:s.id,s,n:store.get('t:u'+s.id,0),z:store.get('z:u'+s.id,1)}; $('harm').hidden=true; $('ovbar').hidden=true; showVerBar(null); $('segwrap').hidden=false;
+  cur={kind:'u',id:s.id,s,n:store.get('t:u'+s.id,0),z:store.get('z:u'+s.id,1)}; $('harm').hidden=true; $('ovbar').hidden=true; songExtras(null); $('segwrap').hidden=false;
   $('vt').textContent=up(s.t); showSheet('view'); $('scroller').scrollTop=0; setPressed(); awake(true);
   $('segs').innerHTML=''; $('segs').style.width=''; $('vinfo').innerHTML=`<p class="note">${s.comm?'Canto de la comunidad'+(s.by?', enviado por <b>'+esc(s.by)+'</b>':'')+'. Fue revisado antes de publicarse.':s.local?'Guardada en este teléfono.':'Guardada en tu cancionero: la ven todos los que lo usan.'}</p>`;
   const ed=document.createElement('button'); ed.className='toolbtn'; ed.textContent='Editar'; ed.onclick=()=>{location.hash='editar-'+s.id};
@@ -1607,7 +1693,7 @@ let tt; function toast(m){ let t=document.querySelector('.toast'); if(!t){t=docu
 // ---------- Cancionero Maestro: texto con acordes, de solo lectura ----------
 function cmLyrics(tx){ return parseSong(tx||'').filter(l=>!l.ch).map(l=>l.text.trim()) }
 function openCm(x){ const s={id:x.ref,t:x.t,tx:x.raw.tx,au:'',k:x.raw.k}; s.key=userKey(s); remember(x.ref);
-  cur={kind:'u',cm:x.ref,id:x.ref,s,n:store.get('t:u'+x.ref,0),z:store.get('z:u'+x.ref,1)}; $('harm').hidden=true; $('ovbar').hidden=true; $('segwrap').hidden=false; showVerBar(x.ref);
+  cur={kind:'u',cm:x.ref,id:x.ref,s,n:store.get('t:u'+x.ref,0),z:store.get('z:u'+x.ref,1)}; $('harm').hidden=true; $('ovbar').hidden=true; $('segwrap').hidden=false; songExtras(x.ref);
   $('vt').textContent=x.t; showSheet('view'); $('scroller').scrollTop=0; setPressed(); awake(true);
   $('segs').innerHTML=''; $('segs').style.width='';
   const w=x.web&&XM.get(x.web);
@@ -1623,7 +1709,7 @@ function openItx(x,vi){ if(vi==null) vi=store.get('vi:'+x.ref,0);
   cur={kind:'u',cm:x.ref,id:x.ref,s,n:store.get('t:u'+x.ref,0),z:store.get('z:u'+x.ref,1)}; $('harm').hidden=true; $('ovbar').hidden=true; $('segwrap').hidden=false;
   $('vt').textContent=x.t; showSheet('view'); $('scroller').scrollTop=0; setPressed(); awake(true);
   $('segs').innerHTML=''; $('segs').style.width='';
-  showVerBar(x.ref);
+  songExtras(x.ref);
   const P=webParts(x), V=ITX[x.ref];
   const vers=V&&typeof V==='object'&&V.v.length?`<div class="sec"><h3>Versiones</h3><div class="mbar">${[V.vl||'Original',...V.v.map(a=>a[0])].map((l,i)=>`<button class="toolbtn${i===vi?' on':''}" data-vi="${i}" aria-pressed="${i===vi}">${esc(l||('Versión '+(i+1)))}</button>`).join('')}</div></div>`:'';
   const link=x.url?`<a class="golink second" href="${esc(x.url)}" target="_blank" rel="noopener">${x.src==='gpd'?'Ver la partitura original':x.src==='jes'?'Ver el PDF de Jésed':'Ver en la página original'}</a>`:'';
@@ -1680,7 +1766,7 @@ function openWebRaw(ref){
 }
 // dibujos de acordes para cantos que se abren afuera o con la partitura fija; con -/+ para verlos en otro tono
 function diagBlock(box,chs,note){ let n=0; const draw=()=>{ const seen=[]; chs.forEach(c=>{ const t=tr(c,n,null).split('/')[0]; if(!seen.includes(t)) seen.push(t) });
-    box.innerHTML=`<div class="sec" style="margin-top:14px"><h3>Acordes${n?' en otro tono':''}</h3><div class="mbar" style="margin:4px 0 8px"><button class="toolbtn" data-d="-1" aria-label="Bajar medio tono">−</button><span class="note" style="align-self:center">${n?(n>0?'+':'')+n+' semitonos':'tono original'}</span><button class="toolbtn" data-d="1" aria-label="Subir medio tono">+</button></div><div class="dgrid">`+seen.map(t=>{const p=parse(t); const sh=p?shapeFor(p.s,p.q):null; return `<div class="dg">${sh?svg(sh):''}<b>${esc(t)}</b></div>`}).join('')+`</div>${note?`<p class="note">${esc(note)}</p>`:''}</div>`;
+    box.innerHTML=`<div class="sec" style="margin-top:14px"><h3>Acordes${n?' en otro tono':''}</h3><div class="mbar" style="margin:4px 0 8px"><button class="toolbtn" data-d="-1" aria-label="Bajar medio tono">−</button><span class="note" style="align-self:center">${n?(n>0?'+':'')+n+' semitonos':'tono original'}</span><button class="toolbtn" data-d="1" aria-label="Subir medio tono">+</button></div><div class="dgrid">`+seen.map(t=>{const p=parse(t); const sh=p?shapeFor(p.s,p.q):null; return `<div class="dg">${sh?svg(sh):''}<b>${esc(dch(t))}</b></div>`}).join('')+`</div>${note?`<p class="note">${esc(note)}</p>`:''}</div>`;
     box.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{ n+=+b.dataset.d; if(n>11) n-=12; if(n<-11) n+=12; draw() }) };
   draw() }
 // ---------- Enviar cantos al cancionero ----------
@@ -1742,10 +1828,10 @@ function misas(){ return store.get('misas',[])||[] }
 function saveMisa(){
   if(!list.length){ toast('Primero elegí algún canto'); return }
   const t=store.get('misaT','')||SUN.name; const all=misas(); const id=store.get('misaId','')||('m'+Date.now().toString(36));
-  const item={id,t,d:new Date().toISOString(),list:list.slice(),lm:{...lm}};
+  const item={id,t,d:new Date().toISOString(),list:list.slice(),lm:{...lm},lk:{...lk},ln:{...ln}};
   const rest=all.filter(m=>m.id!==id); store.set('misas',[item,...rest].slice(0,60)); store.set('misaId',id); toast('Misa guardada'); render() }
-function newMisa(){ list=[]; lm={}; store.set('misaT',''); store.set('misaId',''); saveList(); render() }
-function loadMisa(id){ const m=misas().find(x=>x.id===id); if(!m) return; list=m.list.slice(); lm={...m.lm}; store.set('misaT',m.t); store.set('misaId',m.id); saveList(); render(); window.scrollTo(0,0); toast('Abriste «'+m.t+'»') }
+function newMisa(){ list=[]; lm={}; lk={}; ln={}; store.set('misaT',''); store.set('misaId',''); saveList(); render() }
+function loadMisa(id){ const m=misas().find(x=>x.id===id); if(!m) return; list=m.list.slice(); lm={...m.lm}; lk={...(m.lk||{})}; ln={...(m.ln||{})}; store.set('misaT',m.t); store.set('misaId',m.id); saveList(); render(); window.scrollTo(0,0); toast('Abriste «'+m.t+'»') }
 function delMisa(id){ store.set('misas',misas().filter(m=>m.id!==id)); if(store.get('misaId','')===id) store.set('misaId',''); render() }
 function savedBlock(w){
   const all=misas(); const s=document.createElement('div'); s.className='sec saved';
@@ -1786,7 +1872,7 @@ async function pipe(bytes,Stream){ const r=new Blob([bytes]).stream().pipeThroug
 async function misaCode(){
   const own={};
   list.forEach(r=>{ if(typeof r==='string'&&/^u/.test(r)){ const s=U.get(r.slice(1)); if(s&&!s.comm) own[s.id]={t:s.t,au:s.au||'',mo:s.mo||'',tx:s.tx||'',yt:ytLink(s.yt),ad:AID.test(s.ad||'')?s.ad:''} } });
-  const p={v:1,t:store.get('misaT','')||SUN.name,r:list.map(r=>[r,momentOf(r)||0])}; if(Object.keys(own).length) p.s=own;
+  const p={v:1,t:store.get('misaT','')||SUN.name,r:list.map(r=>{ const a=[r,momentOf(r)||0], k=lk[lkey(r)], n=ln[lkey(r)]; if(k||n) a.push(k||0); if(n) a.push(n); return a })}; if(Object.keys(own).length) p.s=own;
   const raw=new TextEncoder().encode(JSON.stringify(p));
   try{ if(window.CompressionStream) return 'CCM1.'+b64u(await pipe(raw,CompressionStream)) }catch(e){}
   return 'CCM0.'+b64u(raw) }
@@ -1802,8 +1888,8 @@ function importMisa(p){
   if(p.s) saveLocalMine();
   if(list.length&&!store.get('misaId','')) saveMisa();             // lo que tenías armado queda en «Misas guardadas»
   const refs=p.r.map(([r])=>r).filter(r=>typeof r==='number'?!!D.songs[r]:typeof r==='string');
-  const id='m'+Date.now().toString(36); const item={id,t:String(p.t||'Misa compartida'),d:new Date().toISOString(),list:refs,lm:{}};
-  p.r.forEach(([r,m])=>{ if(m&&refs.includes(r)) item.lm[lkey(r)]=m });
+  const id='m'+Date.now().toString(36); const item={id,t:String(p.t||'Misa compartida'),d:new Date().toISOString(),list:refs,lm:{},lk:{},ln:{}};
+  p.r.forEach(([r,m,k,n])=>{ if(!refs.includes(r)) return; if(m) item.lm[lkey(r)]=m; if(k) item.lk[lkey(r)]=+k||0; if(n) item.ln[lkey(r)]=String(n).slice(0,140) });
   store.set('misas',[item,...misas()].slice(0,60)); markSeen(p.code);
   loadMisa(id); setTab('misa'); refs.forEach(r=>{ if(typeof r==='string') keepOffline(r) }) }
 function offerMisa(p,manual){
