@@ -1,0 +1,32 @@
+# Publica una versión nueva de la app de Android (APK) en «Releases».
+# Claude sube el APK partido en pedazos a la rama «subir-apk» (GitHub no acepta archivos de más de 100 MB);
+# este robot lo vuelve a armar, verifica que esté entero, crea la versión y borra la rama.
+name: Publicar APK
+on:
+  push:
+    branches: [subir-apk]
+permissions:
+  contents: write
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: subir-apk
+      - name: Armar el APK
+        run: |
+          cat apk/parte_* > Cancionero_Catolico.apk
+          echo "$(jq -r .sha256 apk/version.json)  Cancionero_Catolico.apk" | sha256sum -c -
+      - name: Crear la versión
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=$(jq -r .tag apk/version.json)
+          gh release create "$TAG" Cancionero_Catolico.apk \
+            --repo "$GITHUB_REPOSITORY" --target main --latest \
+            --title "$(jq -r .titulo apk/version.json)" \
+            --notes "$(jq -r .notas apk/version.json)"
+      - name: Borrar la rama
+        if: always()
+        run: git push origin --delete subir-apk || true
