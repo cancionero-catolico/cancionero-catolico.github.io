@@ -202,6 +202,7 @@ footer.foot{color:var(--muted);font-size:14.5px;padding-block:24px 10px}
 .txtsong .lyr .s b.ov{width:0;padding-right:0;position:relative}
 .lyr .s b.ov::before{content:'\200b'}
 .lyr .s b.ov i{position:absolute;left:0;top:0;font-style:normal;white-space:nowrap}
+.lyr p.nota{font-size:.72em;line-height:1.35;color:var(--muted);font-style:italic;margin:.15em 0 .45em;padding-left:.6em;border-left:2px solid var(--line)}
 .lyr .co{margin-top:.3em}.txtsong .lyr .co b{padding-right:.6em}
 .txtsong pre{margin:0;font-family:var(--f-mono);font-size:14.5px;line-height:1.5;white-space:pre;color:var(--ink)}
 .txtsong .ch{color:var(--chord-text);font-weight:700}
@@ -836,13 +837,24 @@ function soloLetra(){ try{ return !!store.get('solo',false) }catch(e){ return fa
 // solo la letra (para los cantores): sin renglones de acordes ni acordes entre corchetes
 function renderLyrics(s){ const html=[]; let para=[];
   const flush=()=>{ if(para.length) html.push(`<p>${para.join('<br>')}</p>`); para=[] };
-  parseSong(s.tx||'').forEach(l=>{ if(!l.text.trim()){ flush(); return } if(l.ch) return;
+  parseSong(splitCred(s.tx).tx).forEach(l=>{ if(!l.text.trim()){ flush(); return } if(l.ch) return; if(NOTA.test(l.text.trim())) return;
     const t=l.text.replace(/\[[^\]]*\]/g,'').replace(/\s{2,}/g,' ').trim(); if(t) para.push(esc(t)) });
   flush(); return `<div class="lyr solo">${html.join('')}</div>` }
+const NOTA=/^\(?\s*(?:importante|indicaci[oó]n|nota)?\s*:?\s*\(?\s*(?:tono\b|tonalidad|\(?original en\b|original:|para tocar en la tonalidad|la guitarra (?:va )?con ?transporte|capo\b|\[?cejilla|\[?transporte\b|en do, con transporte|(?:o sea,|es decir,)?\s*(?:con )?el capo\b)/i;
+// autores, intérpretes y discos del comienzo del texto: salen de la letra y van arriba, en chiquito
+const CRED=/^\(?\s*(?:autor(?:a|es)?|letra|m[uú]sica|m\s*[.:]|l\s*[.:]|l\.?\s*y\s*m\b|m\.?\s*y\s*l\b|compositor|composici[oó]n|int[eé]rpretes?|interpreta|arreglos?|adaptaci[oó]n|versi[oó]n (?:de|en|original)|grupo\b|basad[ao] en|texto\b|traducci[oó]n|del (?:disco|[aá]lbum)|[aá]lbum|disco\b|cd\b|canta\b|tradicional|popular|an[oó]nimo)/i;
+const STYLE=/capo|transp|tono|tonalidad|aire|ritmo|tonada|chaya|zamba|chacarera|cueca|vidala|baguala|huayno|carnavalito|litoraleñ|rasguido|empieza|punteado|lento|r[aá]pido|tiempo|domingo|ciclo|bis\b|x\d|coro|estribillo|^\(\s*[A-G][#b]?m?\b/i;
+function splitCred(tx){ const L=String(tx||'').split('\n'), cred=[]; let seen=0;
+  for(let i=0;i<L.length&&seen<5;i++){ const st=L[i].trim(); if(!st) continue; if(isChordLine(L[i])) break;
+    if(CRED.test(st)||(/^\([^()]{3,90}\)$/.test(st)&&!STYLE.test(st))){ cred.push(st.replace(/^\((.*)\)$/,'$1').replace(/^\(|\)$/g,'').replace(/\s{2,}/g,' ').trim()); L[i]=null; seen++; continue }
+    if(NOTA.test(st)||STYLE.test(st)&&/^\(.*\)$/.test(st)){ seen++; continue }
+    break }
+  return {cred, tx:L.filter(l=>l!==null).join('\n').replace(/^\n+/,'')} }
+function credLine(s){ const c=splitCred(s.tx).cred; return c.length?`<p class="meta cred">${c.map(esc).join(' · ')}</p>`:'' }
 function renderText(s,n){
   if(soloLetra()) return renderLyrics(s);
   const key=s.key?parseKey(s.key):null;
-  const P=parseSong(s.tx||'');
+  const P=parseSong(splitCred(s.tx).tx);
   const T=c=>{ const inner=c.replace(/^\(|\)$/g,''), e=toEng(inner); return e?c.replace(inner, dch(n?tr(e,n,key):e)):c };
   const chordsOf=text=>{ const out=[], re=/\S+/g; let m; while((m=re.exec(text))) out.push([m.index,T(m[0])]); return out };
   const inl=t=>esc(t).replace(/\[([^\]]+)\]/g,(all,c)=>{ const e=toEng(c.replace(/&amp;/g,'&')); return e?`<b class="ci">${esc(dch(n?tr(e,n,key):e))}</b>`:all });
@@ -866,7 +878,11 @@ function renderText(s,n){
           out.push(`<span class="w">${w}</span>`) }
         html.push(`<p class="h">${out.join('')}</p>`); i++; continue }
       html.push(`<p class="co">${C.map(([,c])=>`<b>${esc(c)}</b>`).join(' ')}</p>`); continue }
-    html.push(`<p>${inl(l.text.trim().replace(/\s{2,}/g,' '))}</p>`) }
+    let tl=l.text.trim();
+    // «Tono original:» con el acorde en el renglón de abajo: una sola nota
+    if(/:\s*-?$/.test(tl)&&NOTA.test(tl)&&P[i+1]&&P[i+1].ch&&P[i+1].text.trim().split(/\s+/).length===1){ tl=tl.replace(/\s*-?$/,'')+' '+T(P[i+1].text.trim()); i++ }
+    if(NOTA.test(tl)||(/^\([^()]{3,90}\)$/.test(tl)&&STYLE.test(tl)&&!/bis\b|x\d|coro|estribillo/i.test(tl))){ html.push(`<p class="nota">${inl(tl.replace(/\s{2,}/g,' '))}</p>`); continue }   // tono original, capo, transporte: como nota
+    html.push(`<p>${inl(tl.replace(/\s{2,}/g,' '))}</p>`) }
   return `<div class="lyr">${html.join('')}</div>`;
 }
 
@@ -1155,7 +1171,7 @@ function renderHoy(m){
   // novedades: una sola tarjeta, la de la última versión (las anteriores ya no hacen falta)
   if(store.get('guideSeen',false)&&!store.get('news58',false)){ const n=document.createElement('div'); n.className='sec news newsbar';
     n.innerHTML=`<div class="nbh"><button class="nbt" id="newsmore" aria-expanded="false">✨ <b>Novedades del cancionero</b> <span>Ver</span></button><button class="iconbtn" id="newsx" aria-label="Ya las vi">✕</button></div><div id="newsbody" hidden><ul>
-      <li><b>Letra más pareja</b>: los acordes ya no separan las palabras sin necesidad (como en los salmos). En la lista de salmos de Hoy ya no aparece el tono (se ve al entrar), y se sacaron los títulos repetidos al empezar la letra. Un canto tuyo que mandaste a la comunidad ya no aparece dos veces.</li>
+      <li><b>Letra más pareja</b>: los acordes ya no separan las palabras sin necesidad (como en los salmos). En la lista de salmos de Hoy ya no aparece el tono (se ve al entrar). Dentro del canto quedan solo letra, acordes y notas: el título no se repite, los autores van arriba en chiquito y las indicaciones de tono original y capo se ven como nota. Un canto tuyo que mandaste a la comunidad ya no aparece dos veces.</li>
       <li><b>Más orden en el cancionero</b>: la app abre siempre en <b>Hoy</b>; desde un canto, <b>‹ vuelve a la búsqueda</b> que estabas haciendo; se separaron cantos que habían quedado pegados (como <b>Jesús está vivo</b> de Marco López y <b>Como Bartimeo</b>), se unieron los títulos que habían quedado sueltos de su canto, más versiones del mismo canto quedaron juntas (como <b>A María le gusta tanto</b>), los títulos ya no llevan el autor pegado la pestaña <b>En internet</b> muestra solo los que todavía se abren en su página, los cantos a dos columnas (Athenas, Pascua Joven) se leen en orden, estrofa por estrofa, y los compases de la intro se ven como en la hoja («Bm | D | A | G»). La app pesa unos 60 MB menos: ya no guarda las hojas escaneadas de los cancioneros que están como texto (sí las partituras con melodía).</li>
       <li><b>Acordes en Do Re Mi</b> (en Más), <b>tono y nota de cada canto para cada misa</b>, <b>avisos litúrgicos</b> al armar la misa, <b>Solo letra</b> para los cantores, <b>tocá un acorde y ves su dibujo</b>, y <b>Avisar un error</b> al final de cada canto.</li>
       <li><b>Volver más fácil</b>: la <b>‹</b> te lleva a la pantalla de donde viniste (no al canto anterior), la <b>lupa</b> busca otro canto sin salir de la misa, y <b>manteniendo apretada la ‹</b> volvés al inicio.</li>
@@ -1545,7 +1561,7 @@ function ovUI(){ const b=$('ovbar'), s=cur.s, has=false&&cur.kind==='c'&&ownTx(s
   b.innerHTML=`<button class="toolbtn" id="ovtg">${cur.tx?'Ver hoja original':'Ver como texto'}</button>${!cur.tx&&RH[s.i]?'':''}`;
   $('ovtg').onclick=()=>{ cur.tx=!cur.tx; store.set('ov:'+s.i,cur.tx?'t':'h'); showMode(); updKey(); applyZoom(false) } }
 function showMode(){ $('segwrap').hidden=!!cur.tx; if(cur.tx){ $('segs').innerHTML=''; harmUI(); } else { $('txt').innerHTML=''; buildSegs(); harmUI() } ovUI() }
-function renderOwnBody(){ const s=cur.s; $('txt').innerHTML=`<div class="txtsong">${renderText({tx:ownTx(s),key:s.key},cur.n)}</div>`; applyZoom(false) }
+function renderOwnBody(){ const s=cur.s; const o={tx:ownTx(s),key:s.key}; $('txt').innerHTML=`<div class="txtsong">${soloLetra()?'':credLine(o)}${renderText(o,cur.n)}</div>`; applyZoom(false) }
 function openSong(s){
   cur={kind:'c',s,n:store.get('t:'+s.i,0)}; remember(s.i); cur.tx=!!ownTx(s);
   $('vt').textContent=s.t; showSheet('view'); $('scroller').scrollTop=0; $('segwrap').scrollLeft=0; setPressed(); awake(true);
@@ -1645,7 +1661,7 @@ function openUser(s){
 }
 function renderUserBody(){ const s=cur.s; s.key=userKey(s);
   if(cur.sheet&&cur.pages){ $('txt').innerHTML=`<div class="gpwrap"><div class="gpsheet" style="width:${Math.round(Math.max(1,cur.z||1)*100)}%">${Array.from({length:cur.pages},(_,i)=>`<img src="${'gp'+'_'+cur.id.slice(1)+'_'+i}.webp" alt="Partitura de ${esc(s.t)}, hoja ${i+1}" loading="lazy">`).join('')}</div></div>`; return }
-  $('txt').innerHTML=`<div class="txtsong"><h2 class="tt">${esc(up(s.t))}</h2>${(s.au||s.mo)?`<p class="meta">${esc([s.au,s.mo].filter(Boolean).join(' · '))}</p>`:''}${renderText(s,cur.n)}</div>`; applyZoom(false) }
+  $('txt').innerHTML=`<div class="txtsong">${(()=>{ const c=soloLetra()?'':credLine(s); const m=[c?'':s.au,s.mo].filter(Boolean); return c+(m.length?`<p class="meta">${esc(m.join(' · '))}</p>`:'') })()}${renderText(s,cur.n)}</div>`; applyZoom(false) }
 // ---------- zoom (buttons + two-finger pinch), remembered per song ----------
 window.addEventListener('resize',()=>{ if(cur&&cur.kind==='u') renderUserBody(); else if(cur&&cur.tx) renderOwnBody() });
 const ZMIN=1, ZMAX=3, ZSTEPS=[1,1.25,1.5,1.75,2,2.5,3];
@@ -1709,7 +1725,7 @@ $('form').addEventListener('submit',async e=>{
 let tt; function toast(m){ let t=document.querySelector('.toast'); if(!t){t=document.createElement('div');t.className='toast';t.setAttribute('role','status');document.body.appendChild(t)} t.textContent=m; clearTimeout(tt); tt=setTimeout(()=>t.remove(),2600) }
 // ---------- Cancionero Maestro: texto con acordes, de solo lectura ----------
 function cmLyrics(tx){ return parseSong(tx||'').filter(l=>!l.ch).map(l=>l.text.trim()) }
-function openCm(x){ const s={id:x.ref,t:x.t,tx:x.raw.tx,au:'',k:x.raw.k}; s.key=userKey(s); remember(x.ref);
+function openCm(x){ const s={id:x.ref,t:x.t,tx:x.raw.tx,au:x.raw.au||'',k:x.raw.k}; s.key=userKey(s); remember(x.ref);
   cur={kind:'u',cm:x.ref,id:x.ref,s,n:store.get('t:u'+x.ref,0),z:store.get('z:u'+x.ref,1)}; $('harm').hidden=true; $('ovbar').hidden=true; $('segwrap').hidden=false; songExtras(x.ref);
   $('vt').textContent=x.t; showSheet('view'); $('scroller').scrollTop=0; setPressed(); awake(true);
   $('segs').innerHTML=''; $('segs').style.width='';
