@@ -151,6 +151,7 @@ footer.foot{color:var(--muted);font-size:14.5px;padding-block:24px 10px}
 .iconbtn:active{background:var(--sunk)}
 .iconbtn[aria-pressed="true"]{color:var(--lit)}
 .vtitle{flex:1;min-width:0}
+.vsub{display:block;font-size:12.5px;line-height:1.25;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.vsub:empty{display:none}
 .vtitle h2{font-size:21px;line-height:1.1;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .scroller{flex:1;overflow:auto;-webkit-overflow-scrolling:touch}
 /* song toolbar at the bottom, within thumb reach */
@@ -192,6 +193,7 @@ footer.foot{color:var(--muted);font-size:14.5px;padding-block:24px 10px}
 .txtsong .lyr .s b.ov{width:0;padding-right:0;position:relative}
 .lyr .s b.ov::before{content:'\200b'}
 .lyr .s b.ov i{position:absolute;left:0;top:0;font-style:normal;white-space:nowrap}
+.lyr .s b:not(.ov) i{position:static;font-style:normal}
 .lyr p.nota{font-size:.72em;line-height:1.35;color:var(--muted);font-style:italic;margin:.15em 0 .45em;padding-left:.6em;border-left:2px solid var(--line)}
 .lyr .co{margin-top:.3em}
 .bkbox{margin-top:12px;padding:12px;border-radius:12px;background:var(--bg2,rgba(0,0,0,.04))}.bkbox p{margin:0 0 8px}.bkbox input[type=file]{font-size:15px;max-width:100%}.txtsong .lyr .co b{padding-right:.6em}
@@ -375,7 +377,7 @@ body.stage .runbar{display:none}
 <section id="view" class="sheet" hidden aria-label="Canción">
   <div class="vbar"><div class="wrap">
     <button class="iconbtn back" aria-label="Volver"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 5l-7 7 7 7"/></svg></button>
-    <div class="vtitle"><h2 id="vt"></h2></div>
+    <div class="vtitle"><h2 id="vt"></h2><small id="vsub" class="vsub"></small></div>
     <button class="iconbtn findbtn" aria-label="Buscar otro canto"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></button>
     <button class="iconbtn addlist" aria-label="Agregar a la misa" aria-pressed="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 6h11M4 12h11M4 18h7"/><path d="M18 14v8M14 18h8"/></svg></button>
     <button class="iconbtn fav" aria-label="Favorita" aria-pressed="false"><svg width="23" height="23" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z"/></svg></button>
@@ -842,7 +844,20 @@ function splitCred(tx){ const L=String(tx||'').split('\n'), cred=[]; let seen=0;
     if(NOTA.test(st)||STYLE.test(st)&&/^\(.*\)$/.test(st)){ seen++; continue }
     break }
   return {cred, tx:L.filter(l=>l!==null).join('\n').replace(/^\n+/,'')} }
+function credText(s){ return splitCred(s.tx).cred.join(' · ') }
+// el autor va arriba, junto al título (no en el recuadro que lee el músico)
+function setSub(t){ const e=document.getElementById('vsub'); if(e) e.textContent=t||'' }
 function credLine(s){ const c=splitCred(s.tx).cred; return c.length?`<p class="meta cred">${c.map(esc).join(' · ')}</p>`:'' }
+// acordes volados: si en pantalla el acorde llega a tocar al siguiente, deja de volar y la letra se separa lo justo
+function fixOv(root){ if(!root) return;
+  const run=()=>{ const all=[...root.querySelectorAll('.s > b')];
+    all.forEach(b=>{ if(b.querySelector('i')) b.classList.add('ov') });   // empezar de cero (por si cambió el tamaño)
+    for(let j=0;j<all.length;j++){ const b=all[j], i=b.querySelector('i'); if(!i) continue;
+      const nx=all[j+1]; if(!nx) continue; const r=i.getBoundingClientRect(), q=nx.getBoundingClientRect();
+      if(Math.abs(r.top-q.top)>4) continue;   // el siguiente está en otro renglón
+      const gap=parseFloat(getComputedStyle(b).fontSize)*0.35;
+      if(r.right+gap>q.left) b.classList.remove('ov') } };
+  run(); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(run) }
 function renderText(s,n){
   if(soloLetra()) return renderLyrics(s);
   const key=s.key?parseKey(s.key):null;
@@ -1555,10 +1570,10 @@ function ovUI(){ const b=$('ovbar'), s=cur.s, has=false&&cur.kind==='c'&&ownTx(s
   b.innerHTML=`<button class="toolbtn" id="ovtg">${cur.tx?'Ver hoja original':'Ver como texto'}</button>${!cur.tx&&RH[s.i]?'':''}`;
   $('ovtg').onclick=()=>{ cur.tx=!cur.tx; store.set('ov:'+s.i,cur.tx?'t':'h'); showMode(); updKey(); applyZoom(false) } }
 function showMode(){ $('segwrap').hidden=!!cur.tx; if(cur.tx){ $('segs').innerHTML=''; harmUI(); } else { $('txt').innerHTML=''; buildSegs(); harmUI() } ovUI() }
-function renderOwnBody(){ const s=cur.s; const o={tx:ownTx(s),key:s.key}; $('txt').innerHTML=`<div class="txtsong">${soloLetra()?'':credLine(o)}${renderText(o,cur.n)}</div>`; applyZoom(false) }
+function renderOwnBody(){ const s=cur.s; const o={tx:ownTx(s),key:s.key}; setSub(credText(o)||s.au||''); $('txt').innerHTML=`<div class="txtsong">${renderText(o,cur.n)}</div>`; applyZoom(false) }
 function openSong(s){
   cur={kind:'c',s,n:store.get('t:'+s.i,0)}; remember(s.i); cur.tx=!!ownTx(s);
-  $('vt').textContent=s.t; showSheet('view'); $('scroller').scrollTop=0; $('segwrap').scrollLeft=0; setPressed(); awake(true);
+  setSub('');$('vt').textContent=s.t; showSheet('view'); $('scroller').scrollTop=0; $('segwrap').scrollLeft=0; setPressed(); awake(true);
   $('txt').innerHTML=''; $('vbtns').innerHTML=''; songExtras(s.i);
   const pg=s.s.map(x=>x[0]); const first=pg[0], last=pg[pg.length-1];
   const num=p=>p>=4000?(p-4000)%200+1:p>=3000?p-3000-1:p>=2000?p-2000+1:p>=1000?p-1000+1:p+1;
@@ -1642,7 +1657,7 @@ $('stage').onclick=()=>stage(!document.body.classList.contains('stage'));
 function openUser(s){
   s.key=userKey(s); remember('u'+s.id);
   cur={kind:'u',id:s.id,s,n:store.get('t:u'+s.id,0),z:store.get('z:u'+s.id,1)}; $('harm').hidden=true; $('ovbar').hidden=true; songExtras(null); $('segwrap').hidden=false;
-  $('vt').textContent=up(s.t); showSheet('view'); $('scroller').scrollTop=0; setPressed(); awake(true);
+  setSub('');$('vt').textContent=up(s.t); showSheet('view'); $('scroller').scrollTop=0; setPressed(); awake(true);
   $('segs').innerHTML=''; $('segs').style.width=''; $('vinfo').innerHTML=`<p class="note">${s.comm?'Canto de la comunidad'+(s.by?', enviado por <b>'+esc(s.by)+'</b>':'')+'. Fue revisado antes de publicarse.':'Guardada en este teléfono.'}</p>`;
   const ed=document.createElement('button'); ed.className='toolbtn'; ed.textContent='Editar'; ed.onclick=()=>{location.hash='editar-'+s.id};
   const del=document.createElement('button'); del.className='toolbtn dangerbtn'; del.textContent='Borrar canción';
@@ -1655,7 +1670,7 @@ function openUser(s){
 }
 function renderUserBody(){ const s=cur.s; s.key=userKey(s);
   if(cur.sheet&&cur.pages){ $('txt').innerHTML=`<div class="gpwrap"><div class="gpsheet" style="width:${Math.round(Math.max(1,cur.z||1)*100)}%">${Array.from({length:cur.pages},(_,i)=>`<img src="${'pages/gp'+'_'+cur.id.slice(1)+'_'+i}.webp" alt="Partitura de ${esc(s.t)}, hoja ${i+1}" loading="lazy">`).join('')}</div></div>`; return }
-  $('txt').innerHTML=`<div class="txtsong">${(()=>{ const c=soloLetra()?'':credLine(s); const m=[c?'':s.au,s.mo].filter(Boolean); return c+(m.length?`<p class="meta">${esc(m.join(' · '))}</p>`:'') })()}${renderText(s,cur.n)}</div>`; applyZoom(false) }
+  setSub(credText(s)||s.au||''); $('txt').innerHTML=`<div class="txtsong">${renderText(s,cur.n)}</div>`; applyZoom(false) }
 // ---------- zoom (buttons + two-finger pinch), remembered per song ----------
 window.addEventListener('resize',()=>{ if(cur&&cur.kind==='u') renderUserBody(); else if(cur&&cur.tx) renderOwnBody() });
 const ZMIN=1, ZMAX=3, ZSTEPS=[1,1.25,1.5,1.75,2,2.5,3];
@@ -1663,7 +1678,7 @@ function zkey(){ return 'z:'+(cur.kind==='c'?cur.s.i:'u'+cur.id) }
 function applyZoom(save){
   if(!cur||cur.kind==='w') return; const z=cur.z||1;
   if(cur.kind==='c'&&!cur.tx){ $('segs').style.width=(z*100)+'%'; paintAll() }
-  else { const ly=document.querySelector('#txt .lyr'); if(ly) ly.style.fontSize=(19*z).toFixed(1)+'px' }
+  else { const ly=document.querySelector('#txt .lyr'); if(ly){ ly.style.fontSize=(19*z).toFixed(1)+'px'; fixOv(ly) } }
   $('zout').disabled=z<=ZMIN+0.001; $('zin').disabled=z>=ZMAX-0.001;
   if(save) store.set(zkey(),Math.round(z*100)/100);
 }
@@ -1721,7 +1736,7 @@ let tt; function toast(m){ let t=document.querySelector('.toast'); if(!t){t=docu
 function cmLyrics(tx){ return parseSong(tx||'').filter(l=>!l.ch).map(l=>l.text.trim()) }
 function openCm(x){ const s={id:x.ref,t:x.t,tx:x.raw.tx,au:x.raw.au||'',k:x.raw.k}; s.key=userKey(s); remember(x.ref);
   cur={kind:'u',cm:x.ref,id:x.ref,s,n:store.get('t:u'+x.ref,0),z:store.get('z:u'+x.ref,1)}; $('harm').hidden=true; $('ovbar').hidden=true; $('segwrap').hidden=false; songExtras(x.ref);
-  $('vt').textContent=x.t; showSheet('view'); $('scroller').scrollTop=0; setPressed(); awake(true);
+  setSub('');$('vt').textContent=x.t; showSheet('view'); $('scroller').scrollTop=0; setPressed(); awake(true);
   $('segs').innerHTML=''; $('segs').style.width='';
   const w=x.web&&XM.get(x.web);
   $('vinfo').innerHTML=`<p class="note">Canto ${x.raw.n} del Cancionero Maestro.${w?` También está en ${esc(w.badge)}.`:''}</p>`+tagLinks({m:x.m,tl:x.tl});
@@ -1734,7 +1749,7 @@ function itxOf(ref,vi){ const v=ITX[ref]; if(!v) return null; if(typeof v==='str
 function openItx(x,vi){ if(vi==null) vi=store.get('vi:'+x.ref,0);
   const s={id:x.ref,t:x.t,tx:itxOf(x.ref,vi),au:x.au&&x.au.length?x.au.join(', '):''}; s.key=userKey(s); remember(x.ref);
   cur={kind:'u',cm:x.ref,id:x.ref,s,n:store.get('t:u'+x.ref,0),z:store.get('z:u'+x.ref,1)}; $('harm').hidden=true; $('ovbar').hidden=true; $('segwrap').hidden=false;
-  $('vt').textContent=x.t; showSheet('view'); $('scroller').scrollTop=0; setPressed(); awake(true);
+  setSub('');$('vt').textContent=x.t; showSheet('view'); $('scroller').scrollTop=0; setPressed(); awake(true);
   $('segs').innerHTML=''; $('segs').style.width='';
   songExtras(x.ref);
   const P=webParts(x), V=ITX[x.ref];
