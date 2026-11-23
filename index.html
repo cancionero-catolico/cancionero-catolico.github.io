@@ -161,7 +161,7 @@ footer.foot{color:var(--muted);font-size:14.5px;padding-block:24px 10px}
 .iconbtn:active{background:var(--sunk)}
 .iconbtn[aria-pressed="true"]{color:var(--lit)}
 .vtitle{flex:1;min-width:0}
-.vtitle h2{font-size:21px;line-height:1.1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.vtitle h2{font-size:21px;line-height:1.1;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .scroller{flex:1;overflow:auto;-webkit-overflow-scrolling:touch}
 /* song toolbar at the bottom, within thumb reach */
 .dock{background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -360,6 +360,8 @@ body.stage .runbar{display:none}
 .chpop{position:fixed;z-index:60;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:8px 10px 6px;text-align:center;width:110px}.chpop svg{display:block;margin:0 auto;width:90px;height:auto}.chpop b{display:block;font-size:15px;margin-top:2px}
 #errbox{margin:14px 0 4px}#errform textarea{width:100%;box-sizing:border-box;margin:6px 0}
 #txt .lyr b{cursor:pointer}
+.newsbar{padding:8px 8px 8px 14px}.newsbar .nbh{display:flex;align-items:center;gap:6px}.newsbar .nbt{flex:1;text-align:left;background:none;border:0;font:inherit;color:inherit;padding:6px 0;cursor:pointer}.newsbar .nbt span{color:var(--lit-deep);font-weight:700;margin-left:6px;text-decoration:underline}.newsbar #newsbody{padding-right:6px}
+.ordo a small{font-size:12px}
 </style>
 
 <div id="screen"></div>
@@ -607,10 +609,10 @@ function shapeFor(s,q){q=q.replace(/[()]/g,'').replace(/^4$/,'sus4').replace(/^2
   const k=s+':'+q; if(!(k in SHC)) SHC[k]=findShape(s,q); if(SHC[k]) return SHC[k]; if(tb) return tb;
   const b=/^m(?!aj)/.test(q)?'m':''; return shapeFor(s,b) }
 function svg(shape){const x0=10,y0=16,dx=10,dy=13;const fr=shape.filter(v=>v>0);let base=1;if(fr.length&&Math.max(...fr)>4)base=Math.min(...fr);
-  let s='<svg viewBox="0 0 70 84" aria-hidden="true">';
+  let s='<svg viewBox="0 0 80 84" aria-hidden="true">';
   for(let i=0;i<6;i++)s+=`<line x1="${x0+i*dx}" y1="${y0}" x2="${x0+i*dx}" y2="${y0+4*dy}" stroke="currentColor"/>`;
   for(let j=0;j<5;j++)s+=`<line x1="${x0}" y1="${y0+j*dy}" x2="${x0+5*dx}" y2="${y0+j*dy}" stroke="currentColor" stroke-width="${j===0&&base===1?3:1}"/>`;
-  if(base>1)s+=`<text x="${x0+5*dx+3}" y="${y0+dy*.7}" font-size="9" fill="currentColor">${base}</text>`;
+  if(base>1)s+=`<text x="${x0+5*dx+7}" y="${y0+dy*.75}" font-size="12" font-weight="700" fill="currentColor">${base}</text>`;
   const mf=fr.length?Math.min(...fr):0, at=shape.map((v,i)=>v===mf?i:-1).filter(i=>i>=0);
   if(mf>0&&at.length>=3){const a=at[0],b=at[at.length-1];s+=`<rect x="${x0+a*dx-3}" y="${y0+(mf-base+.5)*dy-3.5}" width="${(b-a)*dx+6}" height="7" rx="3.5" fill="currentColor"/>`}
   shape.forEach((v,i)=>{const x=x0+i*dx;if(v<0)s+=`<text x="${x}" y="${y0-4}" font-size="8" text-anchor="middle" fill="currentColor">×</text>`;else if(v===0)s+=`<circle cx="${x}" cy="${y0-6}" r="2.6" fill="none" stroke="currentColor"/>`;else s+=`<circle cx="${x}" cy="${y0+(v-base+.5)*dy}" r="4" fill="currentColor"/>`});
@@ -1122,6 +1124,7 @@ function renderMine(m,nq,words){
 // ---------- HOY ----------
 const fmtDay=d=>d.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
 function seasonPool(code){ return [...D.songs.filter(s=>s.hide==null&&(s.tl||[]).includes(code)),...X.filter(x=>!x.hide&&(x.tl||[]).includes(code))] }
+function momentSeason(code){ const sea=SEASON.code; if(sea==='ord') return 0; return D.songs.filter(s=>s.hide==null&&(s.m||[]).includes(code)&&(s.tl||[]).includes(sea)).length+X.filter(x=>!x.hide&&x.m.includes(code)&&(x.tl||[]).includes(sea)).length }
 function momentCount(code){ return D.songs.filter(s=>s.hide==null&&(s.m||[]).includes(code)).length+X.filter(x=>!x.hide&&x.m.includes(code)).length }
 function renderHoy(m){
   const sun=SUN, others=UPS.filter(u=>u!==sun);
@@ -1142,8 +1145,8 @@ function renderHoy(m){
     g.innerHTML=`<h3>¿Primera vez en la app?</h3><p class="note">Mirá la guía rápida: cómo buscar, cambiar el tono, armar la misa y más. Siempre la tenés en <b>Más › Cómo se usa</b>.</p><div class="mbar" style="margin-top:10px"><a class="primary" href="#ayuda" style="text-decoration:none">Ver la guía</a><button class="toolbtn" id="gno">Ahora no</button></div>`;
     w.appendChild(g); g.querySelector('#gno').onclick=()=>{ store.set('guideSeen',true); g.remove() }; g.querySelector('a').addEventListener('click',()=>setTimeout(()=>g.remove(),300)) }
   // novedades: una sola tarjeta, la de la última versión (las anteriores ya no hacen falta)
-  if(!store.get('news56',false)){ const n=document.createElement('div'); n.className='sec news';
-    n.innerHTML=`<h3>Novedades del cancionero</h3><ul>
+  if(store.get('guideSeen',false)&&!store.get('news56',false)){ const n=document.createElement('div'); n.className='sec news newsbar';
+    n.innerHTML=`<div class="nbh"><button class="nbt" id="newsmore" aria-expanded="false">✨ <b>Novedades del cancionero</b> <span>Ver</span></button><button class="iconbtn" id="newsx" aria-label="Ya las vi">✕</button></div><div id="newsbody" hidden><ul>
       <li><b>Acordes en Do Re Mi</b> (en Más), <b>tono y nota de cada canto para cada misa</b>, <b>avisos litúrgicos</b> al armar la misa, <b>Solo letra</b> para los cantores, <b>tocá un acorde y ves su dibujo</b>, y <b>Avisar un error</b> al final de cada canto.</li>
       <li><b>Volver más fácil</b>: la <b>‹</b> te lleva a la pantalla de donde viniste (no al canto anterior), la <b>lupa</b> busca otro canto sin salir de la misa, y <b>manteniendo apretada la ‹</b> volvés al inicio.</li>
       <li><b>Cantos repetidos unidos</b>: aparecen una sola vez, con botones de <b>Versiones</b> adentro (la 1 es la que más usás). Los <b>Santos, Glorias, Padrenuestros</b> y demás están <b>numerados</b> (SANTO 1, SANTO 2…), y los que usás en tus misas aparecen primero. Los de <b>Pascua Joven y Athenas</b> también se ven como texto, con «Ver hoja original».</li>
@@ -1153,8 +1156,9 @@ function renderHoy(m){
       <li><b>La app se actualiza sola</b>: cuando hay cantos nuevos o arreglos, se bajan al abrirla con internet y aparece el botón <b>Actualizar</b>.</li>
       <li><b>Santos</b>: en Hoy › Celebraciones, los cantos agrupados por santo (San Francisco, Santa Teresita, San José, San Cayetano, Brochero, Ceferino…).</li>
       <li><b>Más de 300 cantos del Cancionero Maestro</b>, con letra y acordes dentro de la app.</li>
-      <li><b>Diapositivas</b> con cada estrofa como párrafo y letra más grande.</li></ul><button class="toolbtn" id="newsok">Entendido</button>`;
-    w.appendChild(n); n.querySelector('#newsok').onclick=()=>{ store.set('news56',true); store.set('news55',true); store.set('news54',true); store.set('news53',true); store.set('news52',true); store.set('news51',true); store.set('news50',true); store.set('news49',true); store.set('news481',true); n.remove() } }
+      <li><b>Diapositivas</b> con cada estrofa como párrafo y letra más grande.</li></ul><button class="toolbtn" id="newsok">Entendido</button></div>`;
+    w.appendChild(n); const nseen=()=>{ store.set('news56',true); store.set('news55',true); store.set('news54',true); store.set('news53',true); store.set('news52',true); store.set('news51',true); store.set('news50',true); store.set('news49',true); store.set('news481',true); n.remove() };
+    n.querySelector('#newsok').onclick=nseen; n.querySelector('#newsx').onclick=nseen; n.querySelector('#newsmore').onclick=()=>{ const b=n.querySelector('#newsbody'); b.hidden=!b.hidden; n.querySelector('#newsmore').setAttribute('aria-expanded',!b.hidden); n.querySelector('#newsmore span').textContent=b.hidden?'Ver':'Cerrar' }; }
   // psalm of the coming sunday
   const ps=document.createElement('div'); ps.className='sec';
   const rows=DOM?domRowsFor(sun):[];
@@ -1171,10 +1175,10 @@ function renderHoy(m){
     s.appendChild(sh); w.appendChild(s) } }
   // order of mass
   const o=document.createElement('div'); o.className='sec';
-  o.innerHTML=`<h3>Cantos para cada momento</h3><p class="note">En el orden de la misa.</p>`;
+  o.innerHTML=`<h3>Cantos para cada momento</h3><p class="note">En el orden de la misa${SEASON.code!=='ord'?`; al lado, cuántos hay para ${esc(SEASON_NAME[SEASON.code])}`:''}.</p>`;
   const ol=document.createElement('ul'); ol.className='ordo';
   ORDO.forEach(([part,codes])=>{ ol.insertAdjacentHTML('beforeend',`<li class="part">${esc(part)}</li>`);
-    codes.forEach(c=>ol.insertAdjacentHTML('beforeend',`<li><a href="#ver-m-${c}">${esc(c==='sal'?'Salmo':nameIn(MOM,c))}<small>${momentCount(c)}</small></a></li>`)) });
+    codes.forEach(c=>{ const ns=momentSeason(c); ol.insertAdjacentHTML('beforeend',`<li><a href="#ver-m-${c}">${esc(c==='sal'?'Salmo':c==='ale'&&noAleluya()?'Aclamación':nameIn(MOM,c))}${ns?`<small>${ns} de ${esc(SEASON_NAME[SEASON.code])}</small>`:''}</a></li>`) }) });
   o.appendChild(ol); w.appendChild(o);
   // recents
   const rec=recent.map(r=>[r,refInfo(r)]).filter(x=>x[1]);
@@ -1477,7 +1481,8 @@ function verLabel(r){ if(typeof r==='number'){ const s=D.songs[r]; return (bookN
 function verBar(ref){ const g=VG.get(String(ref)); if(!g) return '';
   return `<div class="verbar"><span class="note">Versiones:</span>${g.map((r,i)=>{ const inf=refInfo(r); const on=String(r)===String(ref);
     return `<a class="toolbtn${on?' on':''}" ${on?'aria-current="true"':''} href="#${inf?inf.hash:''}">${i+1} · ${esc(verLabel(r))}</a>` }).join('')}</div>` }
-function songExtras(ref){ showVerBar(ref); misaKey(); misaNoteUI(); errUI() }
+function fitTitle(id){ const el=$(id); if(!el) return; const n=(el.textContent||'').length; el.style.fontSize=n>52?'15px':n>38?'16.5px':n>24?'18.5px':''; el.title=el.textContent }
+function songExtras(ref){ fitTitle('vt'); showVerBar(ref); misaKey(); misaNoteUI(); errUI() }
 // ---------- avisar un error en el canto (llega al buzón del cancionero) ----------
 function errUI(){ const b=$('errbox'); if(!b) return; if(!cur){ b.innerHTML=''; return }
   b.innerHTML=`<button class="golink second" id="erropen">Avisar un error en este canto</button>
@@ -1757,7 +1762,7 @@ function openWebRaw(ref){
   $('wt').textContent=x?x.t:'Canción de internet'; showSheet('wview'); setPressed();
   if(!x){ $('wbody').innerHTML=`<p class="note">Sin conexión no puedo mostrar los datos de esta canción.</p>`; return }
   const {who,rows,tags,extra,btn,note,yt}=webParts(x);
-  const vb=verBar(ref);
+  const vb=verBar(ref); setTimeout(()=>fitTitle('wt'),0);
   $('wbody').innerHTML=`${vb}<p class="who">${esc(who)}</p><h3>${esc(x.t)}</h3>${tags}${evBox(x.raw.ev,x.raw.evo)}${rows?`<dl class="meta">${rows}</dl>`:''}${extra}
     <a class="golink" href="${x.url}" target="_blank" rel="noopener">${btn}</a>${yt}
     <p class="note">${note}${savable(x)?' Si la marcás con la estrella o la agregás a la misa, queda guardada en el teléfono.':''}</p>${savable(x)?'<div id="offl" class="note"></div>':''}<div id="wdiag"></div>`;
