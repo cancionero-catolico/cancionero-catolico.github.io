@@ -199,7 +199,10 @@ footer.foot{color:var(--muted);font-size:14.5px;padding-block:24px 10px}
 .txtsong .lyr .w{display:inline-block;white-space:pre}
 .txtsong .lyr .s{display:inline-flex;flex-direction:column;white-space:pre;vertical-align:bottom}
 .txtsong .lyr .s b,.txtsong .lyr .co b,.txtsong .lyr .ci{color:var(--chord-text);font-weight:800;font-size:.82em;line-height:1.25;padding-right:.3em;font-family:var(--f-body)}
-.txtsong .lyr .co{margin-top:.3em}.txtsong .lyr .co b{padding-right:.6em}
+.txtsong .lyr .s b.ov{width:0;padding-right:0;position:relative}
+.lyr .s b.ov::before{content:'\200b'}
+.lyr .s b.ov i{position:absolute;left:0;top:0;font-style:normal;white-space:nowrap}
+.lyr .co{margin-top:.3em}.txtsong .lyr .co b{padding-right:.6em}
 .txtsong pre{margin:0;font-family:var(--f-mono);font-size:14.5px;line-height:1.5;white-space:pre;color:var(--ink)}
 .txtsong .ch{color:var(--chord-text);font-weight:700}
 .txtsong .wr{white-space:pre-wrap;overflow-wrap:anywhere}
@@ -796,6 +799,7 @@ async function initDb(){
   db.collection('canciones').onSnapshot(snap=>{
     for(const [id,s] of [...U]) if(!s.local&&!s.comm) U.delete(id);
     snap.docs.forEach(d=>{ const v=d.data(); if(!v||!v.t) return; const s={id:d.id,t:String(v.t),au:v.au||'',mo:v.mo||'',tx:String(v.tx||''),creado:v.creado||'',yt:v.yt||'',ad:v.ad||''}; prepUser(s); U.set(d.id,s) });
+    putComm(store.get('comm',[]));   // por si alguno de los tuyos ya está aprobado en la comunidad
     if(!cur&&$('fview').hidden&&$('xview').hidden) render(); else if(cur&&cur.kind==='u'&&U.has(cur.id)){ cur.s=U.get(cur.id); renderUserBody() }
   },()=>{ dbState='off' });
 }
@@ -849,6 +853,8 @@ function renderText(s,n){
       if(nx&&!nx.ch&&nx.text.trim()&&!/\[/.test(nx.text)){
         let ly=nx.text.replace(/\s+$/,''); const lastC=C.length?C[C.length-1][0]:0; if(lastC>=ly.length) ly=ly+' '.repeat(lastC-ly.length+1);
         const at=new Map(C.map(([p,c])=>[p,c]));
+        // el acorde puede quedar volado sobre lo que sigue si hay lugar hasta el próximo acorde: así la letra no se separa sin necesidad
+        const ov=new Set(); C.forEach(([p,c],j)=>{ const nxp=j+1<C.length?C[j+1][0]:Infinity; if(nxp-p>=c.length+1) ov.add(p) });
         // la sangría de la letra se descarta, salvo la que hace falta para que entren acordes que van antes
         let st=ly.search(/\S/); if(st<0) st=0; const first=C.length?C[0][0]:st; const from=Math.min(st,first);
         const out=[]; const re=/\S+\s*|\s+/g; let m; re.lastIndex=from;
@@ -856,7 +862,7 @@ function renderText(s,n){
         while((m=re.exec(ly))){ const a=m.index, b=a+m[0].length; const cuts=[...at.keys()].filter(k=>k>=a&&k<b).sort((x,y)=>x-y);
           if(!cuts.length){ out.push(`<span class="w">${seg(a,b)}</span>`); continue }
           let w='', prev=a;
-          cuts.forEach((k,j)=>{ if(k>prev) w+=`<span class="s"><b>&nbsp;</b>${seg(prev,k)}</span>`; const nx2=j+1<cuts.length?cuts[j+1]:b; let tx=seg(k,nx2); if(/^ ?$/.test(ly.slice(k,nx2))) tx='&nbsp;'; w+=`<span class="s"><b>${esc(at.get(k))}</b>${tx}</span>`; prev=nx2 });
+          cuts.forEach((k,j)=>{ if(k>prev) w+=`<span class="s"><b>&nbsp;</b>${seg(prev,k)}</span>`; const nx2=j+1<cuts.length?cuts[j+1]:b; let tx=seg(k,nx2); if(/^ ?$/.test(ly.slice(k,nx2))) tx='&nbsp;'; w+=`<span class="s">${ov.has(k)?`<b class="ov"><i>${esc(at.get(k))}</i></b>`:`<b>${esc(at.get(k))}</b>`}${tx}</span>`; prev=nx2 });
           out.push(`<span class="w">${w}</span>`) }
         html.push(`<p class="h">${out.join('')}</p>`); i++; continue }
       html.push(`<p class="co">${C.map(([,c])=>`<b>${esc(c)}</b>`).join(' ')}</p>`); continue }
@@ -1147,8 +1153,9 @@ function renderHoy(m){
     g.innerHTML=`<h3>¿Primera vez en la app?</h3><p class="note">Mirá la guía rápida: cómo buscar, cambiar el tono, armar la misa y más. Siempre la tenés en <b>Más › Cómo se usa</b>.</p><div class="mbar" style="margin-top:10px"><a class="primary" href="#ayuda" style="text-decoration:none">Ver la guía</a><button class="toolbtn" id="gno">Ahora no</button></div>`;
     w.appendChild(g); g.querySelector('#gno').onclick=()=>{ store.set('guideSeen',true); g.remove() }; g.querySelector('a').addEventListener('click',()=>setTimeout(()=>g.remove(),300)) }
   // novedades: una sola tarjeta, la de la última versión (las anteriores ya no hacen falta)
-  if(store.get('guideSeen',false)&&!store.get('news57',false)){ const n=document.createElement('div'); n.className='sec news newsbar';
+  if(store.get('guideSeen',false)&&!store.get('news58',false)){ const n=document.createElement('div'); n.className='sec news newsbar';
     n.innerHTML=`<div class="nbh"><button class="nbt" id="newsmore" aria-expanded="false">✨ <b>Novedades del cancionero</b> <span>Ver</span></button><button class="iconbtn" id="newsx" aria-label="Ya las vi">✕</button></div><div id="newsbody" hidden><ul>
+      <li><b>Letra más pareja</b>: los acordes ya no separan las palabras sin necesidad (como en los salmos). Se sacaron las notas de tono original y de capo, y los títulos repetidos al empezar la letra. Un canto tuyo que mandaste a la comunidad ya no aparece dos veces.</li>
       <li><b>Más orden en el cancionero</b>: la app abre siempre en <b>Hoy</b>; desde un canto, <b>‹ vuelve a la búsqueda</b> que estabas haciendo; se separaron cantos que habían quedado pegados (como <b>Jesús está vivo</b> de Marco López y <b>Como Bartimeo</b>), se unieron los títulos que habían quedado sueltos de su canto, más versiones del mismo canto quedaron juntas (como <b>A María le gusta tanto</b>), los títulos ya no llevan el autor pegado la pestaña <b>En internet</b> muestra solo los que todavía se abren en su página, los cantos a dos columnas (Athenas, Pascua Joven) se leen en orden, estrofa por estrofa, y los compases de la intro se ven como en la hoja («Bm | D | A | G»). La app pesa unos 60 MB menos: ya no guarda las hojas escaneadas de los cancioneros que están como texto (sí las partituras con melodía).</li>
       <li><b>Acordes en Do Re Mi</b> (en Más), <b>tono y nota de cada canto para cada misa</b>, <b>avisos litúrgicos</b> al armar la misa, <b>Solo letra</b> para los cantores, <b>tocá un acorde y ves su dibujo</b>, y <b>Avisar un error</b> al final de cada canto.</li>
       <li><b>Volver más fácil</b>: la <b>‹</b> te lleva a la pantalla de donde viniste (no al canto anterior), la <b>lupa</b> busca otro canto sin salir de la misa, y <b>manteniendo apretada la ‹</b> volvés al inicio.</li>
@@ -1160,7 +1167,7 @@ function renderHoy(m){
       <li><b>Santos</b>: en Hoy › Celebraciones, los cantos agrupados por santo (San Francisco, Santa Teresita, San José, San Cayetano, Brochero, Ceferino…).</li>
       <li><b>Más de 300 cantos del Cancionero Maestro</b>, con letra y acordes dentro de la app.</li>
       <li><b>Diapositivas</b> con cada estrofa como párrafo y letra más grande.</li></ul><button class="toolbtn" id="newsok">Entendido</button></div>`;
-    w.appendChild(n); const nseen=()=>{ store.set('news57',true); store.set('news56',true); store.set('news55',true); store.set('news54',true); store.set('news53',true); store.set('news52',true); store.set('news51',true); store.set('news50',true); store.set('news49',true); store.set('news481',true); n.remove() };
+    w.appendChild(n); const nseen=()=>{ store.set('news58',true); store.set('news57',true); store.set('news56',true); store.set('news55',true); store.set('news54',true); store.set('news53',true); store.set('news52',true); store.set('news51',true); store.set('news50',true); store.set('news49',true); store.set('news481',true); n.remove() };
     n.querySelector('#newsok').onclick=nseen; n.querySelector('#newsx').onclick=nseen; n.querySelector('#newsmore').onclick=()=>{ const b=n.querySelector('#newsbody'); b.hidden=!b.hidden; n.querySelector('#newsmore').setAttribute('aria-expanded',!b.hidden); n.querySelector('#newsmore span').textContent=b.hidden?'Ver':'Cerrar' }; }
   // psalm of the coming sunday
   const ps=document.createElement('div'); ps.className='sec';
@@ -1808,7 +1815,11 @@ const COMM_URL='https://script.google.com/macros/s/AKfycbzvQVRr7icnbhjNbYKK1WebX
 let commState='';
 function putComm(list){
   for(const [id,s] of [...U]) if(s.comm) U.delete(id);
+  // un canto tuyo que mandaste y ya aprobaron no se muestra dos veces: queda el tuyo (que podés editar)
+  const mine=[...U.values()].filter(s=>!s.comm), sig=t=>norm(String(t||'')).replace(/\s+/g,' ').trim();
+  const sentT=new Set(mine.filter(s=>store.get('sent:'+s.id,null)).map(s=>sig(s.t))), mineTL=new Set(mine.map(s=>sig(s.t)+'|'+sig(s.tx).slice(0,150)));
   (list||[]).forEach(c=>{ if(!c||!c.id||!c.titulo||!c.letra) return;
+    if(sentT.has(sig(c.titulo))||mineTL.has(sig(c.titulo)+'|'+sig(c.letra).slice(0,150))) return;
     const s={id:String(c.id),t:String(c.titulo),au:String(c.autor||''),mo:String(c.momento||''),tx:String(c.letra),by:String(c.enviado_por||''),yt:String(c.enlace||''),ad:String(c.audio||''),comm:true}; prepUser(s); U.set(s.id,s) }) }
 async function loadComm(){
   putComm(store.get('comm',[]));
