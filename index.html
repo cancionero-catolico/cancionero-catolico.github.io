@@ -1718,7 +1718,7 @@ function openItx(x,vi){ if(vi==null) vi=store.get('vi:'+x.ref,0);
   const P=webParts(x), V=ITX[x.ref];
   const vers=V&&typeof V==='object'&&V.v.length?`<div class="sec"><h3>Versiones</h3><div class="mbar">${[V.vl||'Original',...V.v.map(a=>a[0])].map((l,i)=>`<button class="toolbtn${i===vi?' on':''}" data-vi="${i}" aria-pressed="${i===vi}">${esc(l||('Versión '+(i+1)))}</button>`).join('')}</div></div>`:'';
   const link=x.url?`<a class="golink second" href="${esc(x.url)}" target="_blank" rel="noopener">${x.src==='gpd'?'Ver la partitura original':x.src==='jes'?'Ver el PDF de Jésed':'Ver en la página original'}</a>`:'';
-  $('vinfo').innerHTML=`<p class="note">Letra y acordes de <b>${esc(P.who)}</b>, usados con su autorización.${x.src==='gpd'?' Leídos de la partitura: si algo no coincide, mirá la original.':''}</p>${P.tags}${vers}${P.rows?`<dl class="meta">${P.rows}</dl>`:''}${P.extra}`;
+  $('vinfo').innerHTML=`${P.tags}${vers}<dl class="meta">${P.rows||''}<dt>Fuente</dt><dd>${esc(P.who)}</dd></dl>${P.extra}`;
   $('vinfo').querySelectorAll('[data-vi]').forEach(b=>b.onclick=()=>{ store.set('vi:'+x.ref,+b.dataset.vi); openItx(x,+b.dataset.vi) });
   $('vbtns').innerHTML=(P.yt||'')+link;
   const np=x.src==='gpd'&&ITX._gp&&ITX._gp[x.ref];
