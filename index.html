@@ -853,7 +853,7 @@ function renderLyrics(s){ const html=[]; let para=[];
   parseSong(splitCred(s.tx).tx).forEach(l=>{ if(!l.text.trim()){ flush(); return } if(l.ch) return; if(NOTA.test(l.text.trim())) return;
     const t=l.text.replace(/\[[^\]]*\]/g,'').replace(/\s{2,}/g,' ').trim(); if(t) para.push(esc(t)) });
   flush(); return `<div class="lyr solo">${html.join('')}</div>` }
-const NOTA=/^\(?\s*(?:importante|indicaci[oó]n|nota)?\s*:?\s*\(?\s*(?:tono\b|tonalidad|\(?original en\b|original:|para tocar en la tonalidad|la guitarra (?:va )?con ?transporte|capo\b|\[?cejilla|\[?transporte\b|en do, con transporte|(?:o sea,|es decir,)?\s*(?:con )?el capo\b)/i;
+const NOTA=/^\(?\s*(?:importante|indicaci[oó]n|nota)?\s*:?\s*\(?\s*(?:tono\b|tonalidad|rasgueo\b|arpegio\b|\(?original en\b|original:|para tocar en la tonalidad|la guitarra (?:va )?con ?transporte|capo\b|\[?cejilla|\[?transporte\b|en do, con transporte|(?:o sea,|es decir,)?\s*(?:con )?el capo\b)/i;
 // autores, intérpretes y discos del comienzo del texto: salen de la letra y van arriba, en chiquito
 const CRED=/^\(?\s*(?:autor(?:a|es)?|letra|m[uú]sica|m\s*[.:]|l\s*[.:]|l\.?\s*y\s*m\b|m\.?\s*y\s*l\b|compositor|composici[oó]n|int[eé]rpretes?|interpreta|arreglos?|adaptaci[oó]n|versi[oó]n (?:de|en|original)|grupo\b|basad[ao] en|texto\b|traducci[oó]n|del (?:disco|[aá]lbum)|[aá]lbum|disco\b|cd\b|canta\b|tradicional|popular|an[oó]nimo)/i;
 const STYLE=/capo|transp|tono|tonalidad|aire|ritmo|tonada|chaya|zamba|chacarera|cueca|vidala|baguala|huayno|carnavalito|litoraleñ|rasguido|empieza|punteado|lento|r[aá]pido|tiempo|domingo|ciclo|bis\b|x\d|coro|estribillo|^\(\s*[A-G][#b]?m?\b/i;
@@ -1390,7 +1390,7 @@ async function shareMisa(){
 
 // ---------- novedades (la primera es la que se muestra en Hoy) ----------
 const NEWS=[
- {id:'n23b',f:'23 de noviembre, tarde',items:['Al tocar un momento de la misa en <b>Hoy</b>, primero aparecen los cantos del tiempo (Adviento, Cuaresma…).','Botón <b>Ver en Do Re Mi / C D E</b> arriba de la letra.','<b>Para escuchar</b>: video o Spotify propio en los cantos de Pastoral de Música y Recursos Católicos.','Sin el enlace a la página original en los cantos que ya están cargados en la app (queda solo en «En internet»).']},
+ {id:'n23b',f:'23 de noviembre, tarde',items:['Al tocar un momento de la misa en <b>Hoy</b>, primero aparecen los cantos del tiempo (Adviento, Cuaresma…).','Botón <b>Ver en Do Re Mi / C D E</b> arriba de la letra.','<b>Para escuchar</b>: video o Spotify propio en los cantos de Pastoral de Música y Recursos Católicos.','Sin el enlace a la página original en los cantos que ya están cargados en la app (queda solo en «En internet»).','Canto nuevo: <b>Tú el único rey</b> (tuyo), con video para escuchar.']},
  {id:'n23a',f:'23 de noviembre, mañana',items:['<b>Copia de seguridad</b> en Más: guardá tus canciones, favoritas y misas en el teléfono y en Drive.','El autor va arriba, junto al título; en la letra quedan solo letra, acordes y notas.','Los acordes ya no se enciman ni separan las palabras.']},
  {id:'n22',f:'22 de noviembre',items:['La app abre siempre en <b>Hoy</b> y ‹ vuelve a la búsqueda que estabas haciendo.','Se separaron cantos que estaban pegados y se unieron versiones del mismo canto.','Los cantos a dos columnas (Athenas, Pascua Joven) se leen en orden. La app pesa 60 MB menos.']},
  {id:'n20',f:'noviembre',items:['Acordes en Do Re Mi, tono y nota de cada canto para cada misa, avisos litúrgicos, Solo letra, dibujo del acorde al tocarlo y Avisar un error.','‹ vuelve a la pantalla de donde viniste; la lupa busca sin salir de la misa; manteniendo apretada la ‹ volvés al inicio.','Cantos repetidos unidos con botones de Versiones; Santos, Glorias y Padrenuestros numerados.']},
@@ -1604,7 +1604,7 @@ function openSong(s){
   cur={kind:'c',s,n:store.get('t:'+s.i,0)}; remember(s.i); cur.tx=!!ownTx(s);
   setSub('');$('vt').textContent=s.t; showSheet('view'); $('scroller').scrollTop=0; $('segwrap').scrollLeft=0; setPressed(); awake(true);
   $('txt').innerHTML=''; $('vbtns').innerHTML=''; songExtras(s.i);
-  const pg=s.s.map(x=>x[0]); const first=pg[0], last=pg[pg.length-1];
+  const pg=s.s.map(x=>x[0]); if(!pg.length) cur.tx=true; const first=pg[0], last=pg[pg.length-1];
   const num=p=>p>=4000?(p-4000)%200+1:p>=3000?p-3000-1:p>=2000?p-2000+1:p>=1000?p-1000+1:p+1;
   const book=s.src==='pj'?'del Cancionero Pascua Joven':s.src==='ath'?'de los Salmos de Athenas':s.src==='ach'?'del Cancionero de Athenas':s.src==='bev'?`del cuadernillo «Salmodia responsorial», año ${s.ath&&s.ath.cy?esc(s.ath.cy[0]):''}, del P. José Bevilacqua`:'del cancionero';
   let info='';
@@ -1612,7 +1612,8 @@ function openSong(s){
   info+=evBox(s.ev,s.evo);
   if(s.fix) info+=`<p class="note" style="margin:0 0 8px">Los acordes van escritos en la partitura, en el tono original (en esta hoja no se puede cambiar el tono).</p>`;
   if(!s.ath) info+=(s.au?`<p style="margin:0 0 8px"><span class="note">Autor o intérprete:</span> <b>${esc(s.au)}</b></p>`:'')+tagLinks(s);
-  info+=`<p class="note">${s.src==='bev'?'Partitura '+book.replace(/^del/,'del'):'Página '+num(first)+(last!==first?'–'+num(last):'')+' '+book}.`+(s.w?` También está en <a href="${esc(WBASE||'https://www.pastoraldemusica.org.ar/cancionero/cancion.php?id=')}${s.w}" target="_blank" rel="noopener">Pastoral de Música</a>, con audio y otras versiones.`:'')+'</p>';
+  if(!s.s.length) info+=`<p class="note">${s.fu?'Letra y acordes: '+esc(s.fu)+'.':'Sumado al cancionero.'}</p>`;
+  else info+=`<p class="note">${s.src==='bev'?'Partitura '+book.replace(/^del/,'del'):'Página '+num(first)+(last!==first?'–'+num(last):'')+' '+book}.`+(s.w?` También está en <a href="${esc(WBASE||'https://www.pastoraldemusica.org.ar/cancionero/cancion.php?id=')}${s.w}" target="_blank" rel="noopener">Pastoral de Música</a>, con audio y otras versiones.`:'')+'</p>';
   info+=altBlock(s.alt,s.hide);
   if(s.gp) info+=gpdBlock(s.gp);
   if(s.j) info+=`<a class="golink second" style="margin-top:12px" href="${JBASE+s.j.u}#page=${s.j.p}" target="_blank" rel="noopener">Ver la versión de Jésed</a><p class="note" style="margin-top:6px">PDF oficial de Jésed, álbum «${esc(s.j.al)}», página ${s.j.p}.</p>`;
